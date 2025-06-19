@@ -1,0 +1,109 @@
+{
+    "models": {
+        "gpt-4.1": {
+            "name": "GPT-4.1",
+            "prices": {
+                "batch": {
+                    "input": 1.00,
+                    "output": 4.00
+                },
+                "non_batch": {
+                    "input": 2.00,
+                    "output": 8.00
+                }
+            },
+            "batch_processing": true,
+            "max_batch_size": 2048,
+            "default": 0,
+            "description": "Nejnovější verze GPT-4.1, plná velikost",
+            "context_window": 1047576,
+            "max_output_tokens": 32768,
+            "knowledge_cutoff": "2024-06-01",
+            "capabilities": "Plná verze s největším kontextem a nejnovějšími znalostmi"
+        },
+        "gpt-4.1-mini": {
+            "name": "GPT-4.1 Mini",
+            "prices": {
+                "batch": {
+                    "input": 0.20,
+                    "output": 0.80
+                },
+                "non_batch": {
+                    "input": 0.40,
+                    "output": 1.60
+                }
+            },
+            "batch_processing": true,
+            "max_batch_size": 2048,
+            "default": 0,
+            "description": "Střední verze GPT-4.1, dobrý poměr cena/výkon",
+            "context_window": 1047576,
+            "max_output_tokens": 32768,
+            "knowledge_cutoff": "2024-06-01",
+            "capabilities": "Střední verze se stejným kontextem jako plná verze"
+        },
+        "gpt-4.1-nano": {
+            "name": "GPT-4.1 Nano",
+            "prices": {
+                "batch": {
+                    "input": 0.05,
+                    "output": 0.20
+                },
+                "non_batch": {
+                    "input": 0.10,
+                    "output": 0.40
+                }
+            },
+            "batch_processing": true,
+            "max_batch_size": 2048,
+            "default": 0,
+            "description": "Nejmenší verze GPT-4.1, nejlepší poměr cena/výkon",
+            "context_window": 1047576,
+            "max_output_tokens": 32768,
+            "knowledge_cutoff": "2024-06-01",
+            "capabilities": "Nejmenší verze se stejným kontextem jako plná verze"
+        },
+        "gpt-4o": {
+            "name": "GPT-4 Optimized",
+            "prices": {
+                "batch": {
+                    "input": 1.25,
+                    "output": 5.00
+                },
+                "non_batch": {
+                    "input": 2.50,
+                    "output": 10.00
+                }
+            },
+            "batch_processing": true,
+            "max_batch_size": 2048,
+            "default": 1,
+            "description": "Optimalizovaná verze GPT-4, nejlepší kvalita",
+            "context_window": 128000,
+            "max_output_tokens": 16384,
+            "knowledge_cutoff": "2023-10-01",
+            "capabilities": "Optimalizovaná verze s menším kontextem, ale vyšší přesností"
+        },
+        "gpt-4o-mini": {
+            "name": "GPT-4 Optimized Mini",
+            "prices": {
+                "batch": {
+                    "input": 0.075,
+                    "output": 0.30
+                },
+                "non_batch": {
+                    "input": 0.15,
+                    "output": 0.60
+                }
+            },
+            "batch_processing": true,
+            "max_batch_size": 2048,
+            "default": 0,
+            "description": "Menší verze optimalizovaného GPT-4",
+            "context_window": 128000,
+            "max_output_tokens": 16384,
+            "knowledge_cutoff": "2023-10-01",
+            "capabilities": "Menší optimalizovaná verze se stejným kontextem jako plná 4o verze"
+        }
+    }
+} 
