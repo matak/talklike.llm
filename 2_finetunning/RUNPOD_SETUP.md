@@ -1,6 +1,8 @@
 # Fine-tuning Llama 3 8B pro Andreje Babiše na RunPod.io
 
-## Přehled
+> **📚 Navigace:** [🏠 Hlavní projekt](../README.md) | [📊 Příprava dat](../1_data_preparation/README.md) | [🏋️ Detailní dokumentace](README.md) | [📈 Benchmarking](../3_benchmarking/README.md)
+
+## 📋 Přehled
 Tento návod vás provede procesem fine-tuningu Llama 3 8B modelu s daty Andreje Babiše na RunPod.io platformě.
 
 ## Struktura dat

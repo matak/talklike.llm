@@ -1,5 +1,7 @@
 # LoRA Adaptéry - Snadné připojení k různým modelům
 
+> **📚 Navigace:** [🏠 Hlavní projekt](../README.md) | [📊 Příprava dat](../1_data_preparation/README.md) | [🏋️ Detailní dokumentace](README.md) | [📈 Benchmarking](../3_benchmarking/README.md)
+
 Tento dokument vysvětluje, jak vytvořit a používat LoRA adaptéry z vašeho datasetu, které se dají snadno připojit k různým modelům.
 
 ## 🎯 Co jsou LoRA adaptéry?
