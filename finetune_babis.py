@@ -569,7 +569,7 @@ def main():
         logging_steps=logging_steps,
         save_steps=save_steps,
         eval_steps=eval_steps,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         save_strategy="steps",
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
@@ -585,11 +585,9 @@ def main():
         push_to_hub=args.push_to_hub,
         hub_model_id=args.hub_model_id,
         hub_token=HF_TOKEN if args.push_to_hub else None,
-        # Nastavení pro network storage
-        save_total_limit=2,  # Uloží pouze 2 nejlepší checkpointy
+        save_total_limit=2,
         logging_dir=f"{args.output_dir}/logs",
-        # Nastavení pro malé datasety
-        dataloader_num_workers=0,  # Vypnuto pro malé datasety
+        dataloader_num_workers=0,
     )
     
     # 9. Trainer
