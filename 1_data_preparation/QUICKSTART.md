@@ -1,4 +1,8 @@
-# 🚀 Rychlý start - Příprava dat
+# 🚀 Rychlý start - Příprava dat TalkLike.LLM
+
+> **📚 Navigace:** [🏠 Hlavní projekt](../README.md) | [📊 Detailní dokumentace](README.md) | [🏋️ Fine-tuning](../2_finetunning/README.md) | [📈 Benchmarking](../3_benchmarking/README.md)
+
+## 🎯 Cíl
 
 Tento průvodce vás provede rychlým spuštěním přípravy dat pro fine-tuning jazykového modelu.
 

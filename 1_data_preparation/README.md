@@ -1,5 +1,7 @@
 # 🤖 Příprava dat pro Fine-tuning - TalkLike.LLM
 
+> **📚 Navigace:** [🏠 Hlavní projekt](../README.md) | [🏋️ Fine-tuning](../2_finetunning/README.md) | [📊 Benchmarking](../3_benchmarking/README.md)
+
 ## 📋 Přehled
 
 Tento projekt vytváří dataset pro fine-tuning jazykového modelu, který napodobuje komunikační styl Andreje Babiše. Vytvořený dataset obsahuje 1,500 QA párů ve strukturovaném formátu s charakteristickým stylem "babíšovštiny".

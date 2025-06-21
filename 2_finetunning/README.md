@@ -1,5 +1,7 @@
 # 🏋️ Fine-tuning Jazykového Modelu - TalkLike.LLM
 
+> **📚 Navigace:** [🏠 Hlavní projekt](../README.md) | [📊 Příprava dat](../1_data_preparation/README.md) | [📈 Benchmarking](../3_benchmarking/README.md)
+
 ## 📋 Přehled
 
 Tento projekt implementuje **fine-tuning jazykového modelu** pomocí LoRA (Low-Rank Adaptation) techniky pro napodobení komunikačního stylu Andreje Babiše. Fine-tuning je optimalizován pro efektivní trénování na RunPod.io nebo lokálních GPU.
