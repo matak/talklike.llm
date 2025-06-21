@@ -866,6 +866,19 @@ def main():
         "validation_size": len(eval_dataset)
     }, "Uložené soubory train a validation datasetů")
     
+    # Dynamické nastavení training parametrů podle velikosti datasetu
+    if len(train_dataset) < 10:
+        # Pro malé datasety
+        save_steps = max(1, len(train_dataset) // 2)
+        eval_steps = max(1, len(train_dataset) // 2)
+        logging_steps = 1
+        print(f"📊 Malý dataset - save_steps: {save_steps}, eval_steps: {eval_steps}")
+    else:
+        # Pro větší datasety
+        save_steps = 500
+        eval_steps = 500
+        logging_steps = 10
+    
     print(f"\n✅ System messages jsou v obou datasetech - model se učí na kompletních konverzacích")
     print(f"✅ Každá konverzace obsahuje: system + user + assistant")
     print(f"✅ Data jsou připravena pro fine-tuning")
@@ -945,19 +958,6 @@ def main():
     
     # 8. Training Arguments - nastavení na network storage
     print("\n⚙️ Nastavuji training arguments...")
-    
-    # Dynamické nastavení podle velikosti datasetu
-    if len(train_dataset) < 10:
-        # Pro malé datasety
-        save_steps = max(1, len(train_dataset) // 2)
-        eval_steps = max(1, len(train_dataset) // 2)
-        logging_steps = 1
-        print(f"📊 Malý dataset - save_steps: {save_steps}, eval_steps: {eval_steps}")
-    else:
-        # Pro větší datasety
-        save_steps = 500
-        eval_steps = 500
-        logging_steps = 10
     
     training_args = TrainingArguments(
         output_dir=args.output_dir,
