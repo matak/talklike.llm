@@ -41,7 +41,7 @@ Vytvořit fine-tuned jazykový model, který napodobuje komunikační styl Andre
 
 #### [2. Fine-tuning](#fine-tuning)
 - **Umístění**: `2_finetunning/`
-- **README**: [Průvodce fine-tuningem](2_finetunning/README_FINETUNE.md)
+- **README**: [Průvodce fine-tuningem](2_finetunning/README.md)
 - **Účel**: Fine-tuning jazykového modelu pomocí LoRA techniky
 - **Výstup**: Fine-tuned model s adaptací stylu
 
