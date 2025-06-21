@@ -16,6 +16,11 @@ if [ ! -f ".env" ]; then
     fi
 fi
 
+# Debug: Show current directory and verify we're in the right place
+echo "📍 Aktuální adresář: $(pwd)"
+echo "📁 Obsah adresáře:"
+ls -la | head -10
+
 # Kontrola existence .env souboru
 if [ ! -f ".env" ]; then
     echo "❌ Soubor .env nebyl nalezen!"
@@ -32,6 +37,17 @@ if [ ! -f "data/all.jsonl" ]; then
     exit 1
 fi
 
+# Kontrola existence lib modulu
+if [ ! -d "lib" ]; then
+    echo "❌ Adresář lib nebyl nalezen!"
+    echo "💡 Ujistěte se, že jste v root directory projektu."
+    exit 1
+fi
+
+# Nastavení PYTHONPATH pro lib modul
+export PYTHONPATH="$(pwd):$PYTHONPATH"
+echo "🔧 PYTHONPATH nastaven na: $PYTHONPATH"
+
 # Instalace závislostí
 if [ -f "2_finetunning/requirements_finetunning.txt" ]; then
     echo "📦 Instaluji závislosti..."
@@ -40,7 +56,9 @@ fi
 
 # Spuštění fine-tuningu s menším modelem
 echo "🤖 Spouštím fine-tuning s DialoGPT-medium..."
-python 2_finetunning/finetune_babis.py \
+echo "🐍 Python path: $PYTHONPATH"
+echo "📂 Spouštím: python 2_finetunning/finetune_babis.py"
+PYTHONPATH="$(pwd):$PYTHONPATH" python 2_finetunning/finetune_babis.py \
     --model_name microsoft/DialoGPT-medium \
     --output_dir /workspace/babis-finetuned \
     --epochs 3 \

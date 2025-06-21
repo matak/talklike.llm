@@ -212,8 +212,21 @@ def setup_tokenizer_and_model(model_name, base_model):
     return base_tokenizer, base_model
 
 def main():
+    # Kontrola, že jsme v root directory projektu
+    if not os.path.exists('lib') or not os.path.exists('data'):
+        print("❌ Skript musí být spuštěn z root directory projektu!")
+        print("💡 Spusťte skript z adresáře, kde jsou složky 'lib' a 'data'")
+        print(f"📍 Aktuální adresář: {os.getcwd()}")
+        print("📁 Obsah aktuálního adresáře:")
+        try:
+            for item in os.listdir('.'):
+                print(f"  - {item}")
+        except:
+            pass
+        return
+    
     parser = argparse.ArgumentParser(description='Fine-tuning 3 8B pro Andreje Babiše')
-    parser.add_argument('--data_path', type=str, default='../data/all.jsonl', help='Cesta k datům')
+    parser.add_argument('--data_path', type=str, default='data/all.jsonl', help='Cesta k datům')
     parser.add_argument('--output_dir', type=str, default='/workspace/babis-finetuned', help='Výstupní adresář')
     parser.add_argument('--model_name', type=str, default='microsoft/DialoGPT-medium', help='Název base modelu')
     parser.add_argument('--epochs', type=int, default=3, help='Počet epoch')
