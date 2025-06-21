@@ -433,41 +433,104 @@ def main():
     print(f"📊 Train dataset: {len(train_dataset)} vzorků")
     print(f"📊 Validation dataset: {len(eval_dataset)} vzorků")
     
-    # Kontrola struktury v train datasetu
+    # Detailní debug informace o train datasetu
     if len(train_dataset) > 0:
-        print(f"📝 Ukázka prvního train vzorku:")
-        first_train = train_dataset[0]
-        decoded_text = tokenizer.decode(first_train['input_ids'], skip_special_tokens=False)
-        print(f"Tokenizovaný text (prvních 200 znaků): {decoded_text[:200]}...")
+        print(f"\n📋 DETAILNÍ DEBUG - TRAIN DATASET:")
+        print(f"📊 Celkový počet vzorků: {len(train_dataset)}")
         
-        # Kontrola přítomnosti tagů v train datasetu
-        train_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in train_dataset[:5]]
+        # Ukázka prvních 3 vzorků
+        for i in range(min(3, len(train_dataset))):
+            print(f"\n📝 Train vzorek {i+1}:")
+            sample = train_dataset[i]
+            decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
+            print(f"  Délka tokenů: {len(sample['input_ids'])}")
+            print(f"  Text (prvních 300 znaků): {decoded_text[:300]}...")
+            
+            # Kontrola přítomnosti tagů
+            has_system = "<|system|>" in decoded_text
+            has_user = "<|user|>" in decoded_text
+            has_assistant = "<|assistant|>" in decoded_text
+            has_end = "<|end|>" in decoded_text
+            print(f"  Tagy: System={has_system}, User={has_user}, Assistant={has_assistant}, End={has_end}")
+        
+        # Statistiky délky tokenů v train datasetu
+        train_lengths = [len(sample['input_ids']) for sample in train_dataset]
+        print(f"\n📏 Statistiky délky tokenů v train datasetu:")
+        print(f"  Min: {min(train_lengths)}")
+        print(f"  Max: {max(train_lengths)}")
+        print(f"  Průměr: {sum(train_lengths)/len(train_lengths):.1f}")
+        print(f"  Medián: {sorted(train_lengths)[len(train_lengths)//2]}")
+        
+        # Kontrola přítomnosti tagů v celém train datasetu
+        train_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in train_dataset]
         train_system_count = sum(1 for text in train_texts if "<|system|>" in text)
         train_user_count = sum(1 for text in train_texts if "<|user|>" in text)
         train_assistant_count = sum(1 for text in train_texts if "<|assistant|>" in text)
+        train_end_count = sum(1 for text in train_texts if "<|end|>" in text)
         
-        print(f"📊 Tagy v train datasetu (prvních 5 vzorků):")
-        print(f"  System: {train_system_count}/5")
-        print(f"  User: {train_user_count}/5")
-        print(f"  Assistant: {train_assistant_count}/5")
+        print(f"\n📊 Tagy v celém train datasetu:")
+        print(f"  System: {train_system_count}/{len(train_dataset)} ({train_system_count/len(train_dataset)*100:.1f}%)")
+        print(f"  User: {train_user_count}/{len(train_dataset)} ({train_user_count/len(train_dataset)*100:.1f}%)")
+        print(f"  Assistant: {train_assistant_count}/{len(train_dataset)} ({train_assistant_count/len(train_dataset)*100:.1f}%)")
+        print(f"  End: {train_end_count}/{len(train_dataset)} ({train_end_count/len(train_dataset)*100:.1f}%)")
     
-    # Kontrola struktury v validation datasetu
+    # Detailní debug informace o validation datasetu
     if len(eval_dataset) > 0:
-        print(f"📝 Ukázka prvního validation vzorku:")
-        first_eval = eval_dataset[0]
-        decoded_text = tokenizer.decode(first_eval['input_ids'], skip_special_tokens=False)
-        print(f"Tokenizovaný text (prvních 200 znaků): {decoded_text[:200]}...")
+        print(f"\n📋 DETAILNÍ DEBUG - VALIDATION DATASET:")
+        print(f"📊 Celkový počet vzorků: {len(eval_dataset)}")
         
-        # Kontrola přítomnosti tagů v validation datasetu
-        eval_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in eval_dataset[:5]]
+        # Ukázka prvních 3 vzorků
+        for i in range(min(3, len(eval_dataset))):
+            print(f"\n📝 Validation vzorek {i+1}:")
+            sample = eval_dataset[i]
+            decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
+            print(f"  Délka tokenů: {len(sample['input_ids'])}")
+            print(f"  Text (prvních 300 znaků): {decoded_text[:300]}...")
+            
+            # Kontrola přítomnosti tagů
+            has_system = "<|system|>" in decoded_text
+            has_user = "<|user|>" in decoded_text
+            has_assistant = "<|assistant|>" in decoded_text
+            has_end = "<|end|>" in decoded_text
+            print(f"  Tagy: System={has_system}, User={has_user}, Assistant={has_assistant}, End={has_end}")
+        
+        # Statistiky délky tokenů v validation datasetu
+        eval_lengths = [len(sample['input_ids']) for sample in eval_dataset]
+        print(f"\n📏 Statistiky délky tokenů v validation datasetu:")
+        print(f"  Min: {min(eval_lengths)}")
+        print(f"  Max: {max(eval_lengths)}")
+        print(f"  Průměr: {sum(eval_lengths)/len(eval_lengths):.1f}")
+        print(f"  Medián: {sorted(eval_lengths)[len(eval_lengths)//2]}")
+        
+        # Kontrola přítomnosti tagů v celém validation datasetu
+        eval_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in eval_dataset]
         eval_system_count = sum(1 for text in eval_texts if "<|system|>" in text)
         eval_user_count = sum(1 for text in eval_texts if "<|user|>" in text)
         eval_assistant_count = sum(1 for text in eval_texts if "<|assistant|>" in text)
+        eval_end_count = sum(1 for text in eval_texts if "<|end|>" in text)
         
-        print(f"📊 Tagy v validation datasetu (prvních 5 vzorků):")
-        print(f"  System: {eval_system_count}/5")
-        print(f"  User: {eval_user_count}/5")
-        print(f"  Assistant: {eval_assistant_count}/5")
+        print(f"\n📊 Tagy v celém validation datasetu:")
+        print(f"  System: {eval_system_count}/{len(eval_dataset)} ({eval_system_count/len(eval_dataset)*100:.1f}%)")
+        print(f"  User: {eval_user_count}/{len(eval_dataset)} ({eval_user_count/len(eval_dataset)*100:.1f}%)")
+        print(f"  Assistant: {eval_assistant_count}/{len(eval_dataset)} ({eval_assistant_count/len(eval_dataset)*100:.1f}%)")
+        print(f"  End: {eval_end_count}/{len(eval_dataset)} ({eval_end_count/len(eval_dataset)*100:.1f}%)")
+    
+    # Porovnání train vs validation
+    print(f"\n🔍 POROVNÁNÍ TRAIN vs VALIDATION:")
+    print(f"📊 Poměr velikostí: {len(train_dataset)}:{len(eval_dataset)} ({len(train_dataset)/len(eval_dataset):.1f}:1)")
+    
+    if len(train_dataset) > 0 and len(eval_dataset) > 0:
+        train_avg_length = sum(len(sample['input_ids']) for sample in train_dataset) / len(train_dataset)
+        eval_avg_length = sum(len(sample['input_ids']) for sample in eval_dataset) / len(eval_dataset)
+        print(f"📏 Průměrná délka: Train={train_avg_length:.1f}, Validation={eval_avg_length:.1f}")
+        
+        # Kontrola, zda jsou data podobná
+        train_sample = tokenizer.decode(train_dataset[0]['input_ids'], skip_special_tokens=False)
+        eval_sample = tokenizer.decode(eval_dataset[0]['input_ids'], skip_special_tokens=False)
+        
+        print(f"📝 Ukázka struktury:")
+        print(f"  Train první vzorek: {train_sample[:100]}...")
+        print(f"  Validation první vzorek: {eval_sample[:100]}...")
     
     print(f"\n✅ System messages jsou v obou datasetech - model se učí na kompletních konverzacích")
     print(f"✅ Každá konverzace obsahuje: system + user + assistant")
