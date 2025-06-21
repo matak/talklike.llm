@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Kontrola existence .env souboru
+if [ ! -f ".env" ]; then
+    echo "❌ Soubor .env nebyl nalezen!"
+    echo "📝 Vytvořte soubor .env s následujícím obsahem:"
+    echo "HF_TOKEN=hf_your_token_here"
+    echo "WANDB_API_KEY=your_wandb_token_here"
+    exit 1
+fi
+
 # Skript pro spuštění fine-tuningu s Mistralem a agresivním vyčištěním
 # Optimalizováno pro překonání problémů s místem na disku
 
@@ -11,6 +20,12 @@ if [ ! -f "data/all.jsonl" ]; then
     echo "❌ Soubor data/all.jsonl nebyl nalezen!"
     echo "💡 Zkontrolujte, zda máte data v adresáři data/"
     exit 1
+fi
+
+# Instalace závislostí
+if [ -f "requirements.txt" ]; then
+    echo "📦 Instaluji závislosti..."
+    pip install -r requirements.txt
 fi
 
 # Kontrola místa na disku
