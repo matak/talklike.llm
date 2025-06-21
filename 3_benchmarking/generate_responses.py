@@ -5,17 +5,18 @@ Generování odpovědí pro benchmarking TalkLike.LLM
 Používá skutečný model s adaptérem pro generování odpovědí
 """
 
+# Import a nastavení prostředí
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+import setup_environment
+
 import json
 import os
 import random
-import sys
 import torch
 from datetime import datetime
 from typing import List, Dict
-from pathlib import Path
-
-# Přidání cesty k 2_finetunning pro import
-sys.path.append(str(Path(__file__).parent.parent / "2_finetunning"))
 
 try:
     from test_adapter import load_model_with_adapter, generate_response

@@ -5,12 +5,11 @@ Rychlý test adaptéru pro TalkLike.LLM
 Ověřuje, že váš natrénovaný adaptér funguje správně
 """
 
+# Import a nastavení prostředí
 import sys
-import os
 from pathlib import Path
-
-# Přidání cesty k 2_finetunning pro import
-sys.path.append(str(Path(__file__).parent.parent / "2_finetunning"))
+sys.path.append(str(Path(__file__).parent.parent))
+import setup_environment
 
 def quick_test():
     """Rychlý test adaptéru"""
@@ -115,6 +114,7 @@ Odpovídej vždy v první osobě jako Andrej Babiš, používej jeho charakteris
         return False
 
 if __name__ == "__main__":
+    import sys
     success = quick_test()
     if not success:
         sys.exit(1) 

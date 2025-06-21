@@ -1,33 +1,84 @@
 #!/bin/bash
+# -*- coding: utf-8 -*-
+"""
+Spuštění benchmarkingu s adaptérem pro TalkLike.LLM
+Automaticky nastaví cache a spustí kompletní benchmarking
+"""
 
-# Benchmarking script pro TalkLike.LLM s adaptérem
-# Spouští kompletní benchmarking pipeline s vaším natrénovaným adaptérem
+set -e  # Zastaví skript při chybě
 
-echo "🚀 Spouštím benchmarking TalkLike.LLM s adaptérem..."
-echo "📁 Cache nastaven do /workspace"
+echo "🚀 SPUŠTĚNÍ BENCHMARKINGU S ADAPTÉREM"
+echo "=================================="
 
-# Nastavení cache do /workspace (stejné jako v chat_babis.sh)
-export HF_HOME=/workspace/.cache/huggingface
-export TRANSFORMERS_CACHE=/workspace/.cache/huggingface/transformers
-export HF_DATASETS_CACHE=/workspace/.cache/huggingface/datasets
+# Kontrola, že jsme ve správném adresáři
+if [ ! -f "run_benchmark.py" ]; then
+    echo "❌ Spusťte skript z adresáře 3_benchmarking/"
+    exit 1
+fi
+
+# Nastavení cache prostředí
+echo "🔧 Nastavuji cache prostředí..."
+
+# Nastavení cache do /workspace
+export HF_HOME="/workspace/.cache/huggingface"
+export TRANSFORMERS_CACHE="/workspace/.cache/huggingface/transformers"
+export HF_DATASETS_CACHE="/workspace/.cache/huggingface/datasets"
 
 # Vytvoření cache adresářů
 mkdir -p /workspace/.cache/huggingface/transformers
 mkdir -p /workspace/.cache/huggingface/datasets
 
-# Kontrola místa
-echo "💾 Dostupné místo:"
-df -h /workspace | tail -1
+echo "✅ Cache nastaveno:"
+echo "   HF_HOME: $HF_HOME"
+echo "   TRANSFORMERS_CACHE: $TRANSFORMERS_CACHE"
+echo "   HF_DATASETS_CACHE: $HF_DATASETS_CACHE"
 
-# Instalace requirements
-echo "📦 Instaluji requirements..."
-pip install -r requirements_benchmarking.txt
+# Test centrálního setup modulu
+echo ""
+echo "🧪 Test centrálního setup modulu..."
+python -c "
+import sys
+from pathlib import Path
+sys.path.append(str(Path('.').parent))
+import setup_environment
+print('✅ Centrální setup modul OK')
+"
 
-# Spuštění benchmarkingu
-echo "🔬 Spouštím benchmarking pipeline..."
+# Rychlý test adaptéru
+echo ""
+echo "🔍 Rychlý test adaptéru..."
+python quick_test_adapter.py
+
+if [ $? -ne 0 ]; then
+    echo "❌ Rychlý test selhal!"
+    echo "💡 Zkontrolujte:"
+    echo "   - Máte přístup k modelu mcmatak/babis-mistral-adapter?"
+    echo "   - Jste přihlášeni na Hugging Face?"
+    echo "   - Máte dostatek místa v /workspace?"
+    exit 1
+fi
+
+echo ""
+echo "✅ Rychlý test úspěšný!"
+
+# Spuštění hlavního benchmarkingu
+echo ""
+echo "📊 Spouštím hlavní benchmarking..."
 python run_benchmark.py
 
-echo "✅ Benchmarking dokončen!"
-echo "📊 Výsledky najdete v adresáři results/"
-echo "📋 Reporty v: results/reports/"
-echo "📈 Vizualizace v: results/visualizations/" 
+if [ $? -ne 0 ]; then
+    echo "❌ Benchmarking selhal!"
+    exit 1
+fi
+
+echo ""
+echo "🎉 BENCHMARKING DOKONČEN!"
+echo "=========================="
+echo ""
+echo "📁 Výstupy:"
+echo "   📊 Excel report: results/reports/benchmark_report.xlsx"
+echo "   📈 Grafy: results/visualizations/"
+echo "   📋 Shrnutí: results/reports/benchmark_summary.txt"
+echo ""
+echo "🚀 Váš adaptér byl úspěšně otestován!"
+echo "💡 Výsledky jsou připraveny pro odevzdání." 

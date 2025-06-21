@@ -89,6 +89,22 @@ python run_benchmark.py
 
 ---
 
+## 🔧 Nastavení prostředí
+
+### Automatické nastavení
+Všechny Python skripty automaticky importují `setup_environment.py` z rootu projektu, který:
+- Nastaví cache do `/workspace/.cache/huggingface`
+- Vytvoří potřebné adresáře
+- Přidá cesty pro import modulů
+
+### Manuální nastavení (volitelné)
+```bash
+# Spuštění centrálního setup skriptu
+python ../setup_environment.py
+```
+
+---
+
 ## 📊 Metriky evaluace
 
 ### Bodový systém (0-10 bodů)
