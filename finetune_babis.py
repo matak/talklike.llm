@@ -593,7 +593,6 @@ def main():
             print("🔧 Zkouším opravit padding...")
             try:
                 # Vytvoříme nový data collator s explicitním padding
-                from transformers import DataCollatorForLanguageModeling
                 fixed_collator = DataCollatorForLanguageModeling(
                     tokenizer=tokenizer,
                     mlm=False,
