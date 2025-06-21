@@ -19,7 +19,7 @@ fi
 # Instalace závislostí
 if [ -f "requirements_finetunning.txt" ]; then
     echo "📦 Instaluji závislosti..."
-    pip install -r requirements.txt
+    pip install -r requirements_finetunning.txt
 fi
 
 # Spuštění fine-tuningu s Mistralem
