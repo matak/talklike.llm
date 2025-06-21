@@ -54,7 +54,10 @@ def cleanup_cache():
     cache_dirs = [
         os.path.expanduser("~/.cache/huggingface"),
         "/tmp",
-        "/root/.cache"
+        "/root/.cache",
+        "/root/.local/share/huggingface",
+        "/var/cache",
+        "/usr/local/lib/python3.10/dist-packages/transformers/.cache"
     ]
     
     for cache_dir in cache_dirs:
@@ -76,6 +79,61 @@ def cleanup_cache():
                     os.makedirs(cache_dir, exist_ok=True)
             except Exception as e:
                 print(f"⚠️ Nelze vyčistit {cache_dir}: {e}")
+    
+    # Další vyčištění
+    try:
+        # Vyčištění pip cache
+        os.system("pip cache purge")
+        print("🗑️ Vyčištěn pip cache")
+    except:
+        pass
+    
+    try:
+        # Vyčištění conda cache
+        os.system("conda clean -a -y")
+        print("🗑️ Vyčištěn conda cache")
+    except:
+        pass
+
+def aggressive_cleanup():
+    """Agresivní vyčištění pro uvolnění maximálního místa"""
+    print("🧹 Agresivní vyčištění...")
+    
+    # Vyčištění všech možných cache adresářů
+    cleanup_dirs = [
+        "/tmp",
+        "/var/tmp", 
+        "/root/.cache",
+        "/root/.local",
+        "/root/.config",
+        "/usr/local/lib/python3.10/dist-packages/transformers/.cache",
+        "/usr/local/lib/python3.10/dist-packages/huggingface_hub/.cache",
+        "/usr/local/lib/python3.10/dist-packages/datasets/.cache"
+    ]
+    
+    for dir_path in cleanup_dirs:
+        if os.path.exists(dir_path):
+            try:
+                print(f"🗑️ Mažu {dir_path}")
+                shutil.rmtree(dir_path, ignore_errors=True)
+                os.makedirs(dir_path, exist_ok=True)
+            except Exception as e:
+                print(f"⚠️ Nelze vyčistit {dir_path}: {e}")
+    
+    # Vyčištění log souborů
+    try:
+        os.system("find /var/log -name '*.log' -delete")
+        os.system("find /var/log -name '*.gz' -delete")
+        print("🗑️ Vyčištěny log soubory")
+    except:
+        pass
+    
+    # Restart služeb pro uvolnění paměti
+    try:
+        os.system("sync")
+        print("💾 Synchronizováno filesystem")
+    except:
+        pass
 
 def load_babis_data(file_path):
     """Načte data z JSONL souboru nebo jednoho velkého JSON objektu"""
@@ -180,7 +238,7 @@ def tokenize_function(examples, tokenizer, max_length=2048):
 def main():
     parser = argparse.ArgumentParser(description='Fine-tuning 3 8B pro Andreje Babiše')
     parser.add_argument('--data_path', type=str, default='data/all.jsonl', help='Cesta k datům')
-    parser.add_argument('--output_dir', type=str, default='./babis-finetuned', help='Výstupní adresář')
+    parser.add_argument('--output_dir', type=str, default='/workspace/babis-finetuned', help='Výstupní adresář')
     parser.add_argument('--model_name', type=str, default='microsoft/DialoGPT-medium', help='Název base modelu')
     parser.add_argument('--epochs', type=int, default=3, help='Počet epoch')
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
@@ -190,8 +248,13 @@ def main():
     parser.add_argument('--push_to_hub', action='store_true', help='Nahrát model na HF Hub')
     parser.add_argument('--hub_model_id', type=str, default='babis-lora', help='Název modelu na HF Hub')
     parser.add_argument('--cleanup_cache', action='store_true', help='Vyčistit cache před spuštěním')
+    parser.add_argument('--aggressive_cleanup', action='store_true', help='Agresivní vyčištění pro velké modely')
     
     args = parser.parse_args()
+    
+    # Zajistíme, že výstupní adresář je na network storage
+    if not args.output_dir.startswith('/workspace'):
+        args.output_dir = f'/workspace/{args.output_dir.lstrip("./")}'
     
     print("🚀 Spouštím fine-tuning pro Andreje Babiše")
     print(f"📁 Data: {args.data_path}")
@@ -203,22 +266,32 @@ def main():
         print("⚠️ Root filesystem je plný. Zkouším vyčistit cache...")
         cleanup_cache()
         if not check_disk_space():
-            print("❌ Stále není dost místa. Použijte menší model nebo vyčistěte disk.")
-            return
+            print("⚠️ Stále není dost místa. Zkouším agresivní vyčištění...")
+            aggressive_cleanup()
+            if not check_disk_space():
+                print("❌ Stále není dost místa. Použijte menší model nebo vyčistěte disk.")
+                return
     
     # Vyčištění cache pokud požadováno
     if args.cleanup_cache:
         cleanup_cache()
     
+    # Agresivní vyčištění pro velké modely
+    if args.aggressive_cleanup or "mistral" in args.model_name.lower() or "llama" in args.model_name.lower():
+        print("🧹 Agresivní vyčištění pro velký model...")
+        aggressive_cleanup()
+    
     # Nastavení cache adresáře na workspace (více místa)
     os.environ['HF_HOME'] = '/workspace/.cache/huggingface'
     os.environ['TRANSFORMERS_CACHE'] = '/workspace/.cache/huggingface/transformers'
     os.environ['HF_DATASETS_CACHE'] = '/workspace/.cache/huggingface/datasets'
+    os.environ['HF_HUB_CACHE'] = '/workspace/.cache/huggingface/hub'
     
     # Vytvoření cache adresářů
     os.makedirs('/workspace/.cache/huggingface', exist_ok=True)
     os.makedirs('/workspace/.cache/huggingface/transformers', exist_ok=True)
     os.makedirs('/workspace/.cache/huggingface/datasets', exist_ok=True)
+    os.makedirs('/workspace/.cache/huggingface/hub', exist_ok=True)
     
     print(f"💾 Cache nastaven na: {os.environ['HF_HOME']}")
     
@@ -262,7 +335,7 @@ def main():
     
     # Použití menšího modelu pro úsporu místa
     if "mistral" in args.model_name.lower() or "llama" in args.model_name.lower():
-        print("⚠️ Detekován velký model. Doporučuji použít menší model pro úsporu místa.")
+        print("⚠️ Detekován velký model. Používám agresivní optimalizaci.")
         print("💡 Dostupné menší modely:")
         print("   - microsoft/DialoGPT-medium (355M)")
         print("   - microsoft/DialoGPT-large (774M)")
@@ -276,28 +349,58 @@ def main():
         bnb_4bit_quant_type="nf4",
     )
     
-    try:
-        model = AutoModelForCausalLM.from_pretrained(
-            args.model_name,
-            quantization_config=bnb_config,
-            torch_dtype=torch.float16,
-            device_map="auto",
-            trust_remote_code=True,
-            cache_dir='/workspace/.cache/huggingface/transformers'
-        )
-    except OSError as e:
-        if "No space left on device" in str(e):
-            print("❌ Stále není dost místa. Zkuste:")
-            print("   1. Použít menší model: --model_name microsoft/DialoGPT-medium")
-            print("   2. Vyčistit cache: --cleanup_cache")
-            print("   3. Restartovat kontejner")
-            return
-        else:
-            raise e
+    # Pokus o načtení modelu s retry logikou
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            print(f"🔄 Pokus {attempt + 1}/{max_retries} načtení modelu...")
+            
+            model = AutoModelForCausalLM.from_pretrained(
+                args.model_name,
+                quantization_config=bnb_config,
+                torch_dtype=torch.float16,
+                device_map="auto",
+                trust_remote_code=True,
+                cache_dir='/workspace/.cache/huggingface/transformers',
+                local_files_only=False,
+                resume_download=True,
+                force_download=False
+            )
+            print("✅ Model úspěšně načten!")
+            break
+            
+        except OSError as e:
+            if "No space left on device" in str(e):
+                print(f"❌ Pokus {attempt + 1} selhal - není dost místa")
+                if attempt < max_retries - 1:
+                    print("🧹 Zkouším další vyčištění...")
+                    aggressive_cleanup()
+                    # Počkáme chvíli
+                    import time
+                    time.sleep(5)
+                else:
+                    print("❌ Všechny pokusy selhaly. Zkuste:")
+                    print("   1. Použít menší model: --model_name microsoft/DialoGPT-medium")
+                    print("   2. Restartovat kontejner")
+                    print("   3. Zvýšit velikost root filesystem")
+                    return
+            else:
+                raise e
+        except Exception as e:
+            print(f"❌ Neočekávaná chyba při načítání modelu: {e}")
+            if attempt < max_retries - 1:
+                print("🔄 Zkouším znovu...")
+                import time
+                time.sleep(10)
+            else:
+                raise e
     
     tokenizer = AutoTokenizer.from_pretrained(
         args.model_name,
-        cache_dir='/workspace/.cache/huggingface/transformers'
+        cache_dir='/workspace/.cache/huggingface/transformers',
+        local_files_only=False,
+        resume_download=True,
+        force_download=False
     )
     
     # Přidání pad tokenu
@@ -362,7 +465,7 @@ def main():
         mlm=False,
     )
     
-    # 8. Training Arguments
+    # 8. Training Arguments - nastavení na network storage
     print("\n⚙️ Nastavuji training arguments...")
     training_args = TrainingArguments(
         output_dir=args.output_dir,
@@ -391,6 +494,9 @@ def main():
         push_to_hub=args.push_to_hub,
         hub_model_id=args.hub_model_id,
         hub_token=HF_TOKEN if args.push_to_hub else None,
+        # Nastavení pro network storage
+        save_total_limit=2,  # Uloží pouze 2 nejlepší checkpointy
+        logging_dir=f"{args.output_dir}/logs",
     )
     
     # 9. Trainer
@@ -408,10 +514,24 @@ def main():
     print("\n🚀 Spouštím fine-tuning...")
     trainer.train()
     
-    # 11. Uložení modelu
-    print("\n💾 Ukládám model...")
-    trainer.save_model(f"{args.output_dir}-final")
-    tokenizer.save_pretrained(f"{args.output_dir}-final")
+    # 11. Uložení modelu na network storage
+    print("\n💾 Ukládám model na network storage...")
+    final_model_path = f"{args.output_dir}-final"
+    
+    # Vytvoření adresáře pokud neexistuje
+    os.makedirs(final_model_path, exist_ok=True)
+    
+    trainer.save_model(final_model_path)
+    tokenizer.save_pretrained(final_model_path)
+    
+    # Výpis velikosti uloženého modelu
+    try:
+        import subprocess
+        result = subprocess.run(['du', '-sh', final_model_path], capture_output=True, text=True)
+        if result.stdout:
+            print(f"📊 Velikost modelu: {result.stdout.strip()}")
+    except:
+        pass
     
     if args.push_to_hub and HF_TOKEN:
         print("📤 Nahrávám model na Hugging Face Hub...")
@@ -453,9 +573,25 @@ def main():
         wandb.finish()
     
     print("\n🎉 Fine-tuning dokončen!")
-    print(f"📁 Model uložen v: {args.output_dir}-final")
+    print(f"📁 Model uložen v: {final_model_path}")
+    print(f"💾 Network storage: {args.output_dir}")
     if args.push_to_hub:
         print(f"🌐 Model dostupný na: https://huggingface.co/{args.hub_model_id}")
+    
+    # Výpis informací o uložených souborech
+    print(f"\n📋 Uložené soubory:")
+    try:
+        for root, dirs, files in os.walk(final_model_path):
+            level = root.replace(final_model_path, '').count(os.sep)
+            indent = ' ' * 2 * level
+            print(f"{indent}{os.path.basename(root)}/")
+            subindent = ' ' * 2 * (level + 1)
+            for file in files[:5]:  # Zobrazíme pouze prvních 5 souborů
+                print(f"{subindent}{file}")
+            if len(files) > 5:
+                print(f"{subindent}... a dalších {len(files) - 5} souborů")
+    except Exception as e:
+        print(f"⚠️ Nelze zobrazit seznam souborů: {e}")
 
 if __name__ == "__main__":
     main() 
