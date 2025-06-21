@@ -4,7 +4,7 @@
 Tento návod vás provede procesem fine-tuningu Llama 3 8B modelu s daty Andreje Babiše na RunPod.io platformě.
 
 ## Struktura dat
-Vaše data v `data/all.jsonl` mají formát:
+Vaše data v `../data/all.jsonl` mají formát:
 ```json
 {
     "messages": [

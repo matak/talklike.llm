@@ -4,8 +4,8 @@ Script pro generování všech dávek datasetu z babis_templates_400.json.
 Generuje 10 dávek po 300 náhodných šablonách (1 výrok na šablonu) pro celkem 3000 výroků.
 """
 
-from babis_dataset_generator import BabisDatasetGenerator
-from openai_cost_calculator import OpenAICostCalculator
+from lib.babis_dataset_generator import BabisDatasetGenerator
+from lib.openai_cost_calculator import OpenAICostCalculator
 import os
 from dotenv import load_dotenv
 import json
@@ -67,8 +67,8 @@ def generate_all_batches():
         model = next(iter(available_models))
     
     # Inicializace generátoru s explicitními parametry
-    templates_file = 'TASK/babis_templates_400.json'
-    output_dir = "generated_batches"
+    templates_file = 'babis_templates_400.json'
+    output_dir = "../data/generated_batches"
     invalid_dir = os.path.join(output_dir, "invalid")  # Directory for invalid responses
     content_dir = os.path.join(output_dir, "content")  # Directory for content files
     

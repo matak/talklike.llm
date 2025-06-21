@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
 Script pro generování fine-tuning datasetu pomocí BabisDialogGenerator.
-Zpracovává všechny batch soubory z generated_batches a vytváří QA páry.
+Zpracovává všechny batch soubory z data/generated_batches a vytváří QA páry.
 """
 
 import os
 from dotenv import load_dotenv
 import glob
 import json
-from babis_dialog_generator import BabisDialogGenerator
-from openai_cost_calculator import OpenAICostCalculator
+from lib.babis_dialog_generator import BabisDialogGenerator
+from lib.openai_cost_calculator import OpenAICostCalculator
 
 # Načtení environment proměnných
 load_dotenv()
@@ -76,7 +76,7 @@ def main():
             model = next(iter(available_models))
         
         # Získání batch souborů
-        pattern = os.path.join('generated_batches', 'batch_*_babis_output.jsonl')
+        pattern = os.path.join('../data/generated_batches', 'batch_*_babis_output.jsonl')
         batch_files = glob.glob(pattern)
         
         # Filtrujeme pouze validní soubory (ne invalid)
@@ -84,7 +84,7 @@ def main():
         valid_files = sorted(valid_files)
         
         if not valid_files:
-            print("Nebyly nalezeny žádné batch soubory v adresáři generated_batches/")
+            print("Nebyly nalezeny žádné batch soubory v adresáři data/generated_batches/")
             return
         
         print(f"Nalezeno {len(valid_files)} batch souborů")
@@ -143,8 +143,8 @@ def main():
         # Zpracování všech batch souborů
         print("\n=== Zpracovávám batch soubory ===")
         processed_files = generator.process_all_batches(
-            input_dir='generated_batches',
-            output_dir='final',
+            input_dir='../data/generated_batches',
+            output_dir='../data/final',
             model=model,
             batch_size=10  # Zpracováváme po 10 odpovědích najednou
         )
@@ -152,7 +152,7 @@ def main():
         if processed_files:
             print(f"\n=== QA dataset úspěšně vytvořen ===")
             print(f"Počet zpracovaných souborů: {len(processed_files)}")
-            print(f"Výstupní adresář: final/")
+            print(f"Výstupní adresář: ../data/final/")
             print("\nZpracované soubory:")
             for file in processed_files:
                 print(f"  - {file}")

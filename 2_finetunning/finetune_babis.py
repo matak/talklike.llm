@@ -30,7 +30,7 @@ import wandb
 import argparse
 
 # Import disk manager knihovny
-from disk_manager import DiskManager, setup_for_ml_project, check_and_cleanup
+from lib.disk_manager import DiskManager, setup_for_ml_project, check_and_cleanup
 
 def load_babis_data(file_path):
     """Načte data z JSONL souboru nebo jednoho velkého JSON objektu"""
@@ -213,7 +213,7 @@ def setup_tokenizer_and_model(model_name, base_model):
 
 def main():
     parser = argparse.ArgumentParser(description='Fine-tuning 3 8B pro Andreje Babiše')
-    parser.add_argument('--data_path', type=str, default='data/all.jsonl', help='Cesta k datům')
+    parser.add_argument('--data_path', type=str, default='../data/all.jsonl', help='Cesta k datům')
     parser.add_argument('--output_dir', type=str, default='/workspace/babis-finetuned', help='Výstupní adresář')
     parser.add_argument('--model_name', type=str, default='microsoft/DialoGPT-medium', help='Název base modelu')
     parser.add_argument('--epochs', type=int, default=3, help='Počet epoch')

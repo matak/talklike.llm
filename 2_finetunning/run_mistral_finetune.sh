@@ -10,8 +10,8 @@ if [ ! -f ".env" ]; then
 fi
 
 # Kontrola dostupnosti dat
-if [ ! -f "data/all.jsonl" ]; then
-    echo "❌ Soubor data/all.jsonl nebyl nalezen!"
+if [ ! -f "../data/all.jsonl" ]; then
+    echo "❌ Soubor ../data/all.jsonl nebyl nalezen!"
     echo "💡 Zkontrolujte, zda máte data v adresáři data/"
     exit 1
 fi

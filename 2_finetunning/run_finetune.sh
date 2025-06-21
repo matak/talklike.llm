@@ -10,16 +10,16 @@ if [ ! -f ".env" ]; then
 fi
 
 # Kontrola dostupnosti dat
-if [ ! -f "data/all.jsonl" ]; then
-    echo "❌ Soubor data/all.jsonl nebyl nalezen!"
+if [ ! -f "../data/all.jsonl" ]; then
+    echo "❌ Soubor ../data/all.jsonl nebyl nalezen!"
     echo "💡 Zkontrolujte, zda máte data v adresáři data/"
     exit 1
 fi
 
 # Instalace závislostí
-if [ -f "requirements.txt" ]; then
+if [ -f "requirements_finetunning.txt" ]; then
     echo "📦 Instaluji závislosti..."
-    pip install -r requirements.txt
+    pip install -r requirements_finetunning.txt
 fi
 
 # Spuštění fine-tuningu s menším modelem

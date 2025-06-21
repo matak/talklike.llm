@@ -47,7 +47,7 @@ python finetune_babis_llama.py --use_wandb --push_to_hub
 
 ## 📊 Struktura dat
 
-Vaše data v `data/all.jsonl` mají formát:
+Vaše data v `../data/all.jsonl` mají formát:
 
 ```json
 {
@@ -126,15 +126,17 @@ nano .env
 
 ```
 talklike.llm/
+├── 2_finetunning/                 # Fine-tuning scripts and configs
+│   ├── finetune_babis.py          # Main fine-tuning script
+│   ├── test_tokenization.py       # Tokenization testing
+│   ├── run_finetune.sh            # Fine-tuning shell script
+│   ├── run_mistral_finetune.sh    # Mistral fine-tuning script
+│   ├── requirements_finetunning.txt # Python dependencies
+│   ├── README_FINETUNE.md         # This file
+│   └── RUNPOD_SETUP.md           # RunPod.io instructions
 ├── data/
-│   └── all.jsonl                 # Trénovací data
-├── finetune_babis_llama.py       # Hlavní fine-tuning skript
-├── finetune_babis_llama.ipynb    # Jupyter notebook
-├── quick_start.sh                # Rychlý start skript
-├── requirements.txt              # Python závislosti
-├── .env                          # Konfigurační soubor (vytvořit)
-├── RUNPOD_SETUP.md              # Instrukce pro RunPod.io
-└── README_FINETUNE.md           # Tento soubor
+│   └── all.jsonl                 # Training data
+└── [other directories...]
 ```
 
 ## ⚙️ Konfigurace
@@ -143,7 +145,7 @@ talklike.llm/
 
 ```bash
 python finetune_babis_llama.py \
-    --data_path data/all.jsonl \
+    --data_path ../data/all.jsonl \
     --output_dir ./babis-llama-finetuned \
     --epochs 3 \
     --batch_size 2 \
@@ -155,7 +157,7 @@ python finetune_babis_llama.py \
 
 ```bash
 python finetune_babis_llama.py \
-    --data_path data/all.jsonl \
+    --data_path ../data/all.jsonl \
     --output_dir ./babis-llama-finetuned \
     --model_name meta-llama/Meta-Llama-3-8B-Instruct \
     --epochs 5 \

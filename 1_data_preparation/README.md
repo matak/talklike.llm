@@ -45,7 +45,7 @@ Cílem projektu bylo vytvořit fine-tuning dataset pro jazykový model, který b
 
 ### Krok 1: Vytvoření šablon (Templates)
 
-**Soubor:** `TASK/LLM.Outline.CreateTemplates.md`
+**Soubor:** `1_data_preparation/LLM.Outline.CreateTemplates.md`
 - **Úkol:** Vygenerovat 400 originálních šablon výroků ve stylu Andreje Babiše
 - **Model:** GPT-o3 (GPT-4.5 se ukázal jako nevhodný - nepochopil zadání)
 - **Zajímavost:** GPT-o3 si vytvořil Python skripty pro brute-force skládání slov
@@ -60,7 +60,7 @@ Cílem projektu bylo vytvořit fine-tuning dataset pro jazykový model, který b
 
 ### Krok 2: Generování odpovědí
 
-**Soubor:** `TASK/LLM.CreateAnswers.systemPrompt.md`
+**Soubor:** `1_data_preparation/LLM.CreateAnswers.systemPrompt.md`
 - **Úkol:** Nahradit placeholdery v šablonách konkrétními hodnotami
 - **Zpracování:** Po 300 šablonách v dávkách
 - **Pravidla:** 
@@ -70,7 +70,7 @@ Cílem projektu bylo vytvořit fine-tuning dataset pro jazykový model, který b
 
 ### Krok 3: Vytvoření dialogů
 
-**Soubor:** `TASK/LLM.CreateDialogue.systemPrompt.md`
+**Soubor:** `1_data_preparation/LLM.CreateDialogue.systemPrompt.md`
 - **Úkol:** Generovat korespondující novinářské otázky k odpovědím
 - **Formát:** JSONL s páry otázka-odpověď
 - **Styl:** Profesionální redaktor v rozhovoru
@@ -108,24 +108,23 @@ Cílem projektu bylo vytvořit fine-tuning dataset pro jazykový model, který b
 
 ```
 talklike.llm/
-├── TASK/                          # Zadání a šablony
+├── 1_data_preparation/                          # Zadání a šablony
 │   ├── babis_templates_400.json   # Vygenerované šablony
 │   ├── LLM.Outline.CreateTemplates.md
 │   ├── LLM.CreateAnswers.systemPrompt.md
 │   ├── LLM.CreateDialogue.systemPrompt.md
 │   └── LLM.finetunning.systemPrompt.json
-├── generated_batches/             # Mezivýstupy
-│   ├── batch_01_babis_output.jsonl
-│   ├── content/                   # Obsah dávek
-│   ├── responses/                 # Odpovědi LLM
-│   └── invalid/                   # Neplatné výstupy
-├── final/                         # Finální QA dataset
-│   ├── batch_01_babis_output_qa.jsonl
-│   └── ...
 ├── data/                          # Sloučená data
 │   ├── all.jsonl                  # Kompletní dataset
 │   ├── moderated_training_data.jsonl
 │   └── moderated_training_data_report.txt
+│   ├── generated_batches/             # Mezivýstupy
+│   │   ├── batch_01_babis_output.jsonl
+│   │   ├── batch_02_babis_output.jsonl
+│   │   └── ...
+│   └── final/                         # Finální QA dataset
+│       ├── batch_01_babis_output_qa.jsonl
+│       └── ...
 └── Skripty pro zpracování
     ├── generate_qa_dataset.py
     ├── generate_answers.py
