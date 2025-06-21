@@ -8,6 +8,7 @@ import os
 import json
 import torch
 import numpy as np
+import shutil
 from datasets import Dataset
 from transformers import (
     AutoModelForCausalLM,
@@ -27,6 +28,54 @@ from dotenv import load_dotenv
 from huggingface_hub import login
 import wandb
 import argparse
+
+def check_disk_space():
+    """Zkontroluje dostupné místo na disku"""
+    import subprocess
+    try:
+        result = subprocess.run(['df', '-h', '/'], capture_output=True, text=True)
+        lines = result.stdout.strip().split('\n')
+        if len(lines) > 1:
+            parts = lines[1].split()
+            if len(parts) >= 5:
+                used_percent = int(parts[4].rstrip('%'))
+                print(f"💾 Použito místa na root: {parts[4]}")
+                if used_percent > 95:
+                    print("⚠️ VAROVÁNÍ: Root filesystem je téměř plný!")
+                    return False
+        return True
+    except Exception as e:
+        print(f"⚠️ Nelze zkontrolovat místo na disku: {e}")
+        return True
+
+def cleanup_cache():
+    """Vyčistí cache pro uvolnění místa"""
+    print("🧹 Čistím cache...")
+    cache_dirs = [
+        os.path.expanduser("~/.cache/huggingface"),
+        "/tmp",
+        "/root/.cache"
+    ]
+    
+    for cache_dir in cache_dirs:
+        if os.path.exists(cache_dir):
+            try:
+                # Vypočítáme velikost před vyčištěním
+                total_size = 0
+                for dirpath, dirnames, filenames in os.walk(cache_dir):
+                    for filename in filenames:
+                        filepath = os.path.join(dirpath, filename)
+                        try:
+                            total_size += os.path.getsize(filepath)
+                        except:
+                            pass
+                
+                if total_size > 0:
+                    print(f"🗑️ Mažu cache v {cache_dir} (velikost: {total_size / 1024**3:.1f} GB)")
+                    shutil.rmtree(cache_dir, ignore_errors=True)
+                    os.makedirs(cache_dir, exist_ok=True)
+            except Exception as e:
+                print(f"⚠️ Nelze vyčistit {cache_dir}: {e}")
 
 def load_babis_data(file_path):
     """Načte data z JSONL souboru nebo jednoho velkého JSON objektu"""
@@ -132,14 +181,15 @@ def main():
     parser = argparse.ArgumentParser(description='Fine-tuning 3 8B pro Andreje Babiše')
     parser.add_argument('--data_path', type=str, default='data/all.jsonl', help='Cesta k datům')
     parser.add_argument('--output_dir', type=str, default='./babis-finetuned', help='Výstupní adresář')
-    parser.add_argument('--model_name', type=str, default='mistralai/Mistral-7B-Instruct-v0.3', help='Název base modelu')
+    parser.add_argument('--model_name', type=str, default='microsoft/DialoGPT-medium', help='Název base modelu')
     parser.add_argument('--epochs', type=int, default=3, help='Počet epoch')
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=2e-4, help='Learning rate')
-    parser.add_argument('--max_length', type=int, default=2048, help='Maximální délka sekvence')
+    parser.add_argument('--max_length', type=int, default=1024, help='Maximální délka sekvence')
     parser.add_argument('--use_wandb', action='store_true', help='Použít Weights & Biases')
     parser.add_argument('--push_to_hub', action='store_true', help='Nahrát model na HF Hub')
     parser.add_argument('--hub_model_id', type=str, default='babis-lora', help='Název modelu na HF Hub')
+    parser.add_argument('--cleanup_cache', action='store_true', help='Vyčistit cache před spuštěním')
     
     args = parser.parse_args()
     
@@ -147,6 +197,30 @@ def main():
     print(f"📁 Data: {args.data_path}")
     print(f"📁 Výstup: {args.output_dir}")
     print(f"🤖 Model: {args.model_name}")
+    
+    # Kontrola místa na disku
+    if not check_disk_space():
+        print("⚠️ Root filesystem je plný. Zkouším vyčistit cache...")
+        cleanup_cache()
+        if not check_disk_space():
+            print("❌ Stále není dost místa. Použijte menší model nebo vyčistěte disk.")
+            return
+    
+    # Vyčištění cache pokud požadováno
+    if args.cleanup_cache:
+        cleanup_cache()
+    
+    # Nastavení cache adresáře na workspace (více místa)
+    os.environ['HF_HOME'] = '/workspace/.cache/huggingface'
+    os.environ['TRANSFORMERS_CACHE'] = '/workspace/.cache/huggingface/transformers'
+    os.environ['HF_DATASETS_CACHE'] = '/workspace/.cache/huggingface/datasets'
+    
+    # Vytvoření cache adresářů
+    os.makedirs('/workspace/.cache/huggingface', exist_ok=True)
+    os.makedirs('/workspace/.cache/huggingface/transformers', exist_ok=True)
+    os.makedirs('/workspace/.cache/huggingface/datasets', exist_ok=True)
+    
+    print(f"💾 Cache nastaven na: {os.environ['HF_HOME']}")
     
     # Načtení proměnných prostředí
     load_dotenv()
@@ -185,6 +259,16 @@ def main():
     
     # 4. Načtení modelu
     print(f"\n🤖 Načítám model: {args.model_name}")
+    
+    # Použití menšího modelu pro úsporu místa
+    if "mistral" in args.model_name.lower() or "llama" in args.model_name.lower():
+        print("⚠️ Detekován velký model. Doporučuji použít menší model pro úsporu místa.")
+        print("💡 Dostupné menší modely:")
+        print("   - microsoft/DialoGPT-medium (355M)")
+        print("   - microsoft/DialoGPT-large (774M)")
+        print("   - gpt2-medium (355M)")
+        print("   - distilgpt2 (82M)")
+    
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_use_double_quant=True,
@@ -192,15 +276,29 @@ def main():
         bnb_4bit_quant_type="nf4",
     )
     
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_name,
-        quantization_config=bnb_config,
-        torch_dtype=torch.float16,
-        device_map="auto",
-        trust_remote_code=True
-    )
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_name,
+            quantization_config=bnb_config,
+            torch_dtype=torch.float16,
+            device_map="auto",
+            trust_remote_code=True,
+            cache_dir='/workspace/.cache/huggingface/transformers'
+        )
+    except OSError as e:
+        if "No space left on device" in str(e):
+            print("❌ Stále není dost místa. Zkuste:")
+            print("   1. Použít menší model: --model_name microsoft/DialoGPT-medium")
+            print("   2. Vyčistit cache: --cleanup_cache")
+            print("   3. Restartovat kontejner")
+            return
+        else:
+            raise e
     
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(
+        args.model_name,
+        cache_dir='/workspace/.cache/huggingface/transformers'
+    )
     
     # Přidání pad tokenu
     if tokenizer.pad_token is None:
@@ -211,13 +309,14 @@ def main():
     
     # 5. Konfigurace LoRA
     print("\n🔧 Konfiguruji LoRA...")
-    lora_config = LoraConfig(
-        task_type=TaskType.CAUSAL_LM,
-        inference_mode=False,
-        r=16,
-        lora_alpha=32,
-        lora_dropout=0.1,
-        target_modules=[
+    
+    # Dynamické nastavení target_modules podle typu modelu
+    if "dialogpt" in args.model_name.lower():
+        target_modules = ["c_attn", "c_proj", "wte", "wpe"]
+    elif "gpt2" in args.model_name.lower():
+        target_modules = ["c_attn", "c_proj", "wte", "wpe"]
+    else:
+        target_modules = [
             "q_proj",
             "k_proj", 
             "v_proj",
@@ -226,6 +325,14 @@ def main():
             "up_proj",
             "down_proj"
         ]
+    
+    lora_config = LoraConfig(
+        task_type=TaskType.CAUSAL_LM,
+        inference_mode=False,
+        r=8,  # Menší r pro úsporu paměti
+        lora_alpha=16,
+        lora_dropout=0.1,
+        target_modules=target_modules
     )
     
     model = prepare_model_for_kbit_training(model)
