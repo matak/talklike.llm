@@ -251,13 +251,20 @@ def load_babis_data(file_path, debugger=None):
     
     return conversations
 
-def prepare_training_data(conversations, debugger=None):
+def prepare_training_data(conversations, debugger=None, model_name="microsoft/DialoGPT-medium"):
     """Připraví data pro fine-tuning"""
     training_data = []
     
     # Debug: Uložení vstupních konverzací
     if debugger:
         debugger.save_step("05_input_conversations", conversations, f"Vstupních {len(conversations)} konverzací pro prepare_training_data")
+    
+    # Detekce typu modelu pro správný formát
+    is_mistral = "mistral" in model_name.lower()
+    is_llama = "llama" in model_name.lower()
+    is_dialogpt = "dialogpt" in model_name.lower()
+    
+    print(f"🔧 Detekován model typ: {'Mistral' if is_mistral else 'Llama' if is_llama else 'DialoGPT' if is_dialogpt else 'Unknown'}")
     
     for conv in conversations:
         messages = conv['messages']
@@ -266,21 +273,42 @@ def prepare_training_data(conversations, debugger=None):
         if not any(msg['role'] == 'assistant' for msg in messages):
             continue
             
-        # Vytvoříme text pro fine-tuning
+        # Vytvoříme text pro fine-tuning podle typu modelu
         text = ""
-        for msg in messages:
-            if msg['role'] == 'system':
-                text += f"<|system|>\n{msg['content']}<|end|>\n"
-            elif msg['role'] == 'user':
-                text += f"<|user|>\n{msg['content']}<|end|>\n"
-            elif msg['role'] == 'assistant':
-                text += f"<|assistant|>\n{msg['content']}<|end|>\n"
+        
+        if is_mistral:
+            # Mistral používá ChatML formát
+            for msg in messages:
+                if msg['role'] == 'system':
+                    text += f"<s>[INST] {msg['content']} [/INST]"
+                elif msg['role'] == 'user':
+                    text += f"<s>[INST] {msg['content']} [/INST]"
+                elif msg['role'] == 'assistant':
+                    text += f" {msg['content']} </s>"
+        elif is_llama:
+            # Llama používá podobný formát jako Mistral
+            for msg in messages:
+                if msg['role'] == 'system':
+                    text += f"<s>[INST] <<SYS>>\n{msg['content']}\n<</SYS>>\n\n [/INST]"
+                elif msg['role'] == 'user':
+                    text += f"<s>[INST] {msg['content']} [/INST]"
+                elif msg['role'] == 'assistant':
+                    text += f" {msg['content']} </s>"
+        else:
+            # DialoGPT a jiné modely - původní formát
+            for msg in messages:
+                if msg['role'] == 'system':
+                    text += f"<|system|>\n{msg['content']}<|end|>\n"
+                elif msg['role'] == 'user':
+                    text += f"<|user|>\n{msg['content']}<|end|>\n"
+                elif msg['role'] == 'assistant':
+                    text += f"<|assistant|>\n{msg['content']}<|end|>\n"
         
         training_data.append({"text": text})
     
     # Debug: Uložení připravených dat
     if debugger:
-        debugger.save_step("06_training_data", training_data, f"Připravených {len(training_data)} trénovacích vzorků")
+        debugger.save_step("06_training_data", training_data, f"Připravených {len(training_data)} trénovacích vzorků pro {model_name}")
         if len(training_data) > 0:
             debugger.save_sample("06_training_data", training_data[0], 0)
             if len(training_data) > 1:
@@ -354,6 +382,166 @@ def setup_tokenizer_and_model(model_name, base_model):
         print(f"🔧 Opraveno: pad_token_id nastaven na {base_tokenizer.pad_token_id}")
     
     return base_tokenizer, base_model
+
+def check_unknown_tokens(dataset, tokenizer, debugger=None, max_samples_to_check=100):
+    """Kontroluje, zda dataset obsahuje neznámé tokeny pro tokenizer"""
+    print(f"\n🔍 Kontroluji neznámé tokeny v datasetu...")
+    
+    unknown_tokens_found = []
+    total_unknown_count = 0
+    samples_with_unknown = 0
+    
+    # Kontrolujeme pouze prvních max_samples_to_check vzorků pro rychlost
+    samples_to_check = min(max_samples_to_check, len(dataset))
+    print(f"📊 Kontroluji {samples_to_check} vzorků z {len(dataset)} celkem")
+    
+    for i in range(samples_to_check):
+        sample = dataset[i]
+        input_ids = sample['input_ids']
+        
+        # Kontrola každého tokenu
+        unknown_in_sample = []
+        for token_id in input_ids:
+            if token_id == tokenizer.unk_token_id:
+                unknown_in_sample.append(token_id)
+        
+        if unknown_in_sample:
+            samples_with_unknown += 1
+            total_unknown_count += len(unknown_in_sample)
+            unknown_tokens_found.append({
+                "sample_index": i,
+                "unknown_count": len(unknown_in_sample),
+                "total_tokens": len(input_ids),
+                "unknown_percentage": len(unknown_in_sample) / len(input_ids) * 100
+            })
+    
+    # Výpis výsledků
+    print(f"📊 Výsledky kontroly neznámých tokenů:")
+    print(f"  Vzorků s neznámými tokeny: {samples_with_unknown}/{samples_to_check}")
+    print(f"  Celkový počet neznámých tokenů: {total_unknown_count}")
+    print(f"  Procento vzorků s neznámými tokeny: {samples_with_unknown/samples_to_check*100:.1f}%")
+    
+    if unknown_tokens_found:
+        print(f"⚠️ NALEZENY NEZNÁMÉ TOKENY!")
+        print(f"📋 Detailní informace o prvních 5 vzorcích s neznámými tokeny:")
+        
+        for i, info in enumerate(unknown_tokens_found[:5]):
+            sample = dataset[info['sample_index']]
+            decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
+            
+            print(f"  Vzorek {info['sample_index']}:")
+            print(f"    Neznámých tokenů: {info['unknown_count']}/{info['total_tokens']} ({info['unknown_percentage']:.1f}%)")
+            print(f"    Text (prvních 200 znaků): {decoded_text[:200]}...")
+            print()
+        
+        # Uložení detailních informací do debug
+        if debugger:
+            debugger.save_step("unknown_tokens_check", {
+                "samples_checked": samples_to_check,
+                "samples_with_unknown": samples_with_unknown,
+                "total_unknown_count": total_unknown_count,
+                "unknown_percentage": samples_with_unknown/samples_to_check*100,
+                "detailed_info": unknown_tokens_found[:10],  # Prvních 10 detailů
+                "tokenizer_unk_token_id": tokenizer.unk_token_id,
+                "tokenizer_unk_token": tokenizer.unk_token
+            }, f"Kontrola neznámých tokenů - nalezeno {samples_with_unknown} vzorků s neznámými tokeny")
+        
+        # Doporučení pro opravu
+        print(f"💡 Doporučení pro opravu:")
+        print(f"   1. Zkontrolujte formát dat - možná používáte špatné tagy")
+        print(f"   2. Ověřte, že používáte správný tokenizer pro váš model")
+        print(f"   3. Zkontrolujte, zda data neobsahují speciální znaky")
+        print(f"   4. Pro Mistral/Llama modely zkontrolujte ChatML formát")
+        
+        # Kontrola, zda pokračovat
+        if samples_with_unknown > samples_to_check * 0.5:  # Více než 50% vzorků má neznámé tokeny
+            print(f"❌ KRITICKÁ CHYBA: Více než 50% vzorků obsahuje neznámé tokeny!")
+            print(f"   Zastavuji fine-tuning. Opravte data před pokračováním.")
+            return False
+        else:
+            print(f"⚠️ VAROVÁNÍ: Některé vzorky obsahují neznámé tokeny, ale pokračuji...")
+            return True
+    else:
+        print(f"✅ Žádné neznámé tokeny nenalezeny!")
+        
+        if debugger:
+            debugger.save_step("unknown_tokens_check", {
+                "samples_checked": samples_to_check,
+                "samples_with_unknown": 0,
+                "total_unknown_count": 0,
+                "unknown_percentage": 0.0,
+                "status": "OK"
+            }, "Kontrola neznámých tokenů - žádné problémy")
+        
+        return True
+
+def check_tokenizer_compatibility(tokenizer, model_name, debugger=None):
+    """Kontroluje kompatibilitu tokenizeru s modelem"""
+    print(f"\n🔧 Kontroluji kompatibilitu tokenizeru s modelem...")
+    
+    # Detekce typu modelu
+    is_mistral = "mistral" in model_name.lower()
+    is_llama = "llama" in model_name.lower()
+    is_dialogpt = "dialogpt" in model_name.lower()
+    
+    print(f"📊 Model: {model_name}")
+    print(f"📊 Typ modelu: {'Mistral' if is_mistral else 'Llama' if is_llama else 'DialoGPT' if is_dialogpt else 'Unknown'}")
+    print(f"📊 Vocab size: {len(tokenizer)}")
+    print(f"📊 UNK token: {tokenizer.unk_token} (ID: {tokenizer.unk_token_id})")
+    print(f"📊 PAD token: {tokenizer.pad_token} (ID: {tokenizer.pad_token_id})")
+    print(f"📊 EOS token: {tokenizer.eos_token} (ID: {tokenizer.eos_token_id})")
+    
+    # Kontrola speciálních tokenů
+    issues = []
+    
+    if tokenizer.pad_token is None:
+        issues.append("Chybí PAD token")
+    
+    if tokenizer.eos_token is None:
+        issues.append("Chybí EOS token")
+    
+    # Kontrola očekávaných tokenů podle typu modelu
+    if is_mistral or is_llama:
+        # Mistral/Llama by měl mít ChatML tokeny
+        if not any("[INST]" in tokenizer.decode([i]) for i in range(min(1000, len(tokenizer)))):
+            issues.append("Možná chybí ChatML tokeny ([INST], [/INST])")
+    elif is_dialogpt:
+        # DialoGPT by měl mít speciální tokeny
+        if not any("<|" in tokenizer.decode([i]) for i in range(min(1000, len(tokenizer)))):
+            issues.append("Možná chybí DialoGPT tokeny (<|system|>, <|user|>, atd.)")
+    
+    if issues:
+        print(f"⚠️ Nalezeny problémy s tokenizerem:")
+        for issue in issues:
+            print(f"   - {issue}")
+        
+        if debugger:
+            debugger.save_step("tokenizer_compatibility_check", {
+                "model_name": model_name,
+                "model_type": "Mistral" if is_mistral else "Llama" if is_llama else "DialoGPT" if is_dialogpt else "Unknown",
+                "vocab_size": len(tokenizer),
+                "unk_token": tokenizer.unk_token,
+                "pad_token": tokenizer.pad_token,
+                "eos_token": tokenizer.eos_token,
+                "issues": issues
+            }, f"Kontrola kompatibility tokenizeru - nalezeno {len(issues)} problémů")
+        
+        return False
+    else:
+        print(f"✅ Tokenizer je kompatibilní s modelem")
+        
+        if debugger:
+            debugger.save_step("tokenizer_compatibility_check", {
+                "model_name": model_name,
+                "model_type": "Mistral" if is_mistral else "Llama" if is_llama else "DialoGPT" if is_dialogpt else "Unknown",
+                "vocab_size": len(tokenizer),
+                "unk_token": tokenizer.unk_token,
+                "pad_token": tokenizer.pad_token,
+                "eos_token": tokenizer.eos_token,
+                "status": "OK"
+            }, "Kontrola kompatibility tokenizeru - OK")
+        
+        return True
 
 def main():
     # Kontrola, že jsme v root directory projektu
@@ -446,7 +634,7 @@ def main():
     
     # 2. Příprava dat
     print("🔧 Připravuji data...")
-    training_data = prepare_training_data(conversations, debugger)
+    training_data = prepare_training_data(conversations, debugger, args.model_name)
     print(f"✅ Připraveno {len(training_data)} trénovacích vzorků")
     
     # 3. Vytvoření Dataset
@@ -465,22 +653,46 @@ def main():
         first_sample = dataset[0]
         print(f"Text (prvních 200 znaků): {first_sample['text'][:200]}...")
         
-        # Kontrola přítomnosti system, user, assistant tagů
+        # Detekce typu modelu pro správnou kontrolu tagů
+        is_mistral = "mistral" in args.model_name.lower()
+        is_llama = "llama" in args.model_name.lower()
+        is_dialogpt = "dialogpt" in args.model_name.lower()
+        
         text = first_sample['text']
-        has_system = "<|system|>" in text
-        has_user = "<|user|>" in text
-        has_assistant = "<|assistant|>" in text
-        has_end = "<|end|>" in text
         
-        print(f"✅ System tag: {has_system}")
-        print(f"✅ User tag: {has_user}")
-        print(f"✅ Assistant tag: {has_assistant}")
-        print(f"✅ End tag: {has_end}")
-        
-        # Počítání tagů v celém datasetu
-        system_count = sum(1 for sample in dataset if "<|system|>" in sample['text'])
-        user_count = sum(1 for sample in dataset if "<|user|>" in sample['text'])
-        assistant_count = sum(1 for sample in dataset if "<|assistant|>" in sample['text'])
+        if is_mistral or is_llama:
+            # Mistral/Llama používá ChatML formát
+            has_system = "[INST]" in text and ("<<SYS>>" in text or "system" in text.lower())
+            has_user = "[INST]" in text
+            has_assistant = "[/INST]" in text
+            has_end = "</s>" in text
+            
+            print(f"✅ [INST] tag: {has_user}")
+            print(f"✅ [/INST] tag: {has_assistant}")
+            print(f"✅ </s> tag: {has_end}")
+            print(f"✅ System instruction: {has_system}")
+            
+            # Počítání tagů v celém datasetu
+            system_count = sum(1 for sample in dataset if "[INST]" in sample['text'] and ("<<SYS>>" in sample['text'] or "system" in sample['text'].lower()))
+            user_count = sum(1 for sample in dataset if "[INST]" in sample['text'])
+            assistant_count = sum(1 for sample in dataset if "[/INST]" in sample['text'])
+            
+        else:
+            # DialoGPT a jiné modely - původní formát
+            has_system = "<|system|>" in text
+            has_user = "<|user|>" in text
+            has_assistant = "<|assistant|>" in text
+            has_end = "<|end|>" in text
+            
+            print(f"✅ System tag: {has_system}")
+            print(f"✅ User tag: {has_user}")
+            print(f"✅ Assistant tag: {has_assistant}")
+            print(f"✅ End tag: {has_end}")
+            
+            # Počítání tagů v celém datasetu
+            system_count = sum(1 for sample in dataset if "<|system|>" in sample['text'])
+            user_count = sum(1 for sample in dataset if "<|user|>" in sample['text'])
+            assistant_count = sum(1 for sample in dataset if "<|assistant|>" in sample['text'])
         
         print(f"📊 Statistiky tagů v celém datasetu:")
         print(f"  System messages: {system_count}")
@@ -497,6 +709,7 @@ def main():
             "system_messages": system_count,
             "user_messages": user_count,
             "assistant_messages": assistant_count,
+            "model_type": "Mistral" if is_mistral else "Llama" if is_llama else "DialoGPT" if is_dialogpt else "Unknown",
             "text_lengths": {
                 "min": min(lengths),
                 "max": max(lengths),
@@ -507,6 +720,32 @@ def main():
     # Vytvoření shrnutí debug informací
     debugger.create_summary()
     print(f"📋 Debug shrnutí vytvořeno: {debugger.debug_dir}/debug_summary.txt")
+    print(f"🔍 Všechny debug soubory jsou uloženy v: {debugger.debug_dir}")
+    
+    # Kontrola kompatibility a neznámých tokenů před trénováním
+    print(f"\n🔍 FINÁLNÍ KONTROLY PŘED TRÉNOVÁNÍM")
+    print(f"=" * 50)
+    
+    # 1. Kontrola kompatibility tokenizeru
+    tokenizer_ok = check_tokenizer_compatibility(tokenizer, args.model_name, debugger)
+    if not tokenizer_ok:
+        print(f"⚠️ VAROVÁNÍ: Problémy s tokenizerem, ale pokračuji...")
+    
+    # 2. Kontrola neznámých tokenů v train datasetu
+    train_ok = check_unknown_tokens(train_dataset, tokenizer, debugger, max_samples_to_check=50)
+    if not train_ok:
+        print(f"❌ KRITICKÁ CHYBA: Příliš mnoho neznámých tokenů v train datasetu!")
+        print(f"   Zastavuji fine-tuning. Opravte data před pokračováním.")
+        return
+    
+    # 3. Kontrola neznámých tokenů v validation datasetu
+    eval_ok = check_unknown_tokens(eval_dataset, tokenizer, debugger, max_samples_to_check=20)
+    if not eval_ok:
+        print(f"❌ KRITICKÁ CHYBA: Příliš mnoho neznámých tokenů v validation datasetu!")
+        print(f"   Zastavuji fine-tuning. Opravte data před pokračováním.")
+        return
+    
+    print(f"✅ Všechny kontroly prošly - pokračuji s trénováním")
     
     # 4. Načtení modelu
     print(f"\n🤖 Načítám model: {args.model_name}")
@@ -630,15 +869,34 @@ def main():
     if len(tokenized_dataset) > 0:
         sample_tokens = tokenized_dataset[0]
         decoded_text = tokenizer.decode(sample_tokens['input_ids'], skip_special_tokens=False)
+        
+        # Detekce typu modelu pro správnou kontrolu tagů
+        is_mistral = "mistral" in args.model_name.lower()
+        is_llama = "llama" in args.model_name.lower()
+        
+        if is_mistral or is_llama:
+            # Mistral/Llama používá ChatML formát
+            has_system = "[INST]" in decoded_text and ("<<SYS>>" in decoded_text or "system" in decoded_text.lower())
+            has_user = "[INST]" in decoded_text
+            has_assistant = "[/INST]" in decoded_text
+            has_end = "</s>" in decoded_text
+        else:
+            # DialoGPT a jiné modely - původní formát
+            has_system = "<|system|>" in decoded_text
+            has_user = "<|user|>" in decoded_text
+            has_assistant = "<|assistant|>" in decoded_text
+            has_end = "<|end|>" in decoded_text
+        
         debugger.save_step("10_tokenized_sample", {
             "input_ids_length": len(sample_tokens['input_ids']),
             "attention_mask_length": len(sample_tokens['attention_mask']),
             "labels_length": len(sample_tokens['labels']),
             "decoded_text": decoded_text[:500] + "..." if len(decoded_text) > 500 else decoded_text,
-            "has_system": "<|system|>" in decoded_text,
-            "has_user": "<|user|>" in decoded_text,
-            "has_assistant": "<|assistant|>" in decoded_text,
-            "has_end": "<|end|>" in decoded_text
+            "has_system": has_system,
+            "has_user": has_user,
+            "has_assistant": has_assistant,
+            "has_end": has_end,
+            "model_type": "Mistral" if is_mistral else "Llama" if is_llama else "DialoGPT"
         }, "Ukázka tokenizovaného vzorku")
     
     # Kontrola a oprava padding po tokenizaci
@@ -728,16 +986,35 @@ def main():
         for i, sample in enumerate(train_dataset):
             # Dekódování tokenů zpět na text pro čitelnost
             decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
+            
+            # Detekce typu modelu pro správnou kontrolu tagů
+            is_mistral = "mistral" in args.model_name.lower()
+            is_llama = "llama" in args.model_name.lower()
+            
+            if is_mistral or is_llama:
+                # Mistral/Llama používá ChatML formát
+                has_system = "[INST]" in decoded_text and ("<<SYS>>" in decoded_text or "system" in decoded_text.lower())
+                has_user = "[INST]" in decoded_text
+                has_assistant = "[/INST]" in decoded_text
+                has_end = "</s>" in decoded_text
+            else:
+                # DialoGPT a jiné modely - původní formát
+                has_system = "<|system|>" in decoded_text
+                has_user = "<|user|>" in decoded_text
+                has_assistant = "<|assistant|>" in decoded_text
+                has_end = "<|end|>" in decoded_text
+            
             sample_data = {
                 "index": i,
                 "input_ids_length": len(sample['input_ids']),
                 "attention_mask_length": len(sample['attention_mask']),
                 "labels_length": len(sample['labels']),
                 "decoded_text": decoded_text,
-                "has_system": "<|system|>" in decoded_text,
-                "has_user": "<|user|>" in decoded_text,
-                "has_assistant": "<|assistant|>" in decoded_text,
-                "has_end": "<|end|>" in decoded_text,
+                "has_system": has_system,
+                "has_user": has_user,
+                "has_assistant": has_assistant,
+                "has_end": has_end,
+                "model_type": "Mistral" if is_mistral else "Llama" if is_llama else "DialoGPT",
                 "token_ids": sample['input_ids'][:100] + ["..."] if len(sample['input_ids']) > 100 else sample['input_ids']  # Prvních 100 tokenů
             }
             f.write(json.dumps(sample_data, ensure_ascii=False) + '\n')
@@ -749,16 +1026,35 @@ def main():
         for i, sample in enumerate(eval_dataset):
             # Dekódování tokenů zpět na text pro čitelnost
             decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
+            
+            # Detekce typu modelu pro správnou kontrolu tagů
+            is_mistral = "mistral" in args.model_name.lower()
+            is_llama = "llama" in args.model_name.lower()
+            
+            if is_mistral or is_llama:
+                # Mistral/Llama používá ChatML formát
+                has_system = "[INST]" in decoded_text and ("<<SYS>>" in decoded_text or "system" in decoded_text.lower())
+                has_user = "[INST]" in decoded_text
+                has_assistant = "[/INST]" in decoded_text
+                has_end = "</s>" in decoded_text
+            else:
+                # DialoGPT a jiné modely - původní formát
+                has_system = "<|system|>" in decoded_text
+                has_user = "<|user|>" in decoded_text
+                has_assistant = "<|assistant|>" in decoded_text
+                has_end = "<|end|>" in decoded_text
+            
             sample_data = {
                 "index": i,
                 "input_ids_length": len(sample['input_ids']),
                 "attention_mask_length": len(sample['attention_mask']),
                 "labels_length": len(sample['labels']),
                 "decoded_text": decoded_text,
-                "has_system": "<|system|>" in decoded_text,
-                "has_user": "<|user|>" in decoded_text,
-                "has_assistant": "<|assistant|>" in decoded_text,
-                "has_end": "<|end|>" in decoded_text,
+                "has_system": has_system,
+                "has_user": has_user,
+                "has_assistant": has_assistant,
+                "has_end": has_end,
+                "model_type": "Mistral" if is_mistral else "Llama" if is_llama else "DialoGPT",
                 "token_ids": sample['input_ids'][:100] + ["..."] if len(sample['input_ids']) > 100 else sample['input_ids']  # Prvních 100 tokenů
             }
             f.write(json.dumps(sample_data, ensure_ascii=False) + '\n')
@@ -811,6 +1107,33 @@ def main():
     train_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in train_dataset]
     eval_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in eval_dataset]
     
+    # Detekce typu modelu pro správnou kontrolu tagů
+    is_mistral = "mistral" in args.model_name.lower()
+    is_llama = "llama" in args.model_name.lower()
+    
+    if is_mistral or is_llama:
+        # Mistral/Llama používá ChatML formát
+        train_system_count = sum(1 for text in train_texts if "[INST]" in text and ("<<SYS>>" in text or "system" in text.lower()))
+        train_user_count = sum(1 for text in train_texts if "[INST]" in text)
+        train_assistant_count = sum(1 for text in train_texts if "[/INST]" in text)
+        train_end_count = sum(1 for text in train_texts if "</s>" in text)
+        
+        eval_system_count = sum(1 for text in eval_texts if "[INST]" in text and ("<<SYS>>" in text or "system" in text.lower()))
+        eval_user_count = sum(1 for text in eval_texts if "[INST]" in text)
+        eval_assistant_count = sum(1 for text in eval_texts if "[/INST]" in text)
+        eval_end_count = sum(1 for text in eval_texts if "</s>" in text)
+    else:
+        # DialoGPT a jiné modely - původní formát
+        train_system_count = sum(1 for text in train_texts if "<|system|>" in text)
+        train_user_count = sum(1 for text in train_texts if "<|user|>" in text)
+        train_assistant_count = sum(1 for text in train_texts if "<|assistant|>" in text)
+        train_end_count = sum(1 for text in train_texts if "<|end|>" in text)
+        
+        eval_system_count = sum(1 for text in eval_texts if "<|system|>" in text)
+        eval_user_count = sum(1 for text in eval_texts if "<|user|>" in text)
+        eval_assistant_count = sum(1 for text in eval_texts if "<|assistant|>" in text)
+        eval_end_count = sum(1 for text in eval_texts if "<|end|>" in text)
+    
     stats = {
         "train_dataset": {
             "size": len(train_dataset),
@@ -821,10 +1144,10 @@ def main():
                 "median": sorted(train_lengths)[len(train_lengths)//2] if train_lengths else 0
             },
             "tags": {
-                "system": sum(1 for text in train_texts if "<|system|>" in text),
-                "user": sum(1 for text in train_texts if "<|user|>" in text),
-                "assistant": sum(1 for text in train_texts if "<|assistant|>" in text),
-                "end": sum(1 for text in train_texts if "<|end|>" in text)
+                "system": train_system_count,
+                "user": train_user_count,
+                "assistant": train_assistant_count,
+                "end": train_end_count
             }
         },
         "validation_dataset": {
@@ -836,11 +1159,16 @@ def main():
                 "median": sorted(eval_lengths)[len(eval_lengths)//2] if eval_lengths else 0
             },
             "tags": {
-                "system": sum(1 for text in eval_texts if "<|system|>" in text),
-                "user": sum(1 for text in eval_texts if "<|user|>" in text),
-                "assistant": sum(1 for text in eval_texts if "<|assistant|>" in text),
-                "end": sum(1 for text in eval_texts if "<|end|>" in text)
+                "system": eval_system_count,
+                "user": eval_user_count,
+                "assistant": eval_assistant_count,
+                "end": eval_end_count
             }
+        },
+        "model_info": {
+            "model_name": args.model_name,
+            "model_type": "Mistral" if is_mistral else "Llama" if is_llama else "DialoGPT",
+            "format": "ChatML" if (is_mistral or is_llama) else "Custom"
         },
         "split_info": split_info,
         "tokenizer_info": {
@@ -912,6 +1240,31 @@ def main():
     debugger.create_summary()
     print(f"📋 Kompletní debug shrnutí vytvořeno: {debugger.debug_dir}/debug_summary.txt")
     print(f"🔍 Všechny debug soubory jsou uloženy v: {debugger.debug_dir}")
+    
+    # Kontrola kompatibility a neznámých tokenů před trénováním
+    print(f"\n🔍 FINÁLNÍ KONTROLY PŘED TRÉNOVÁNÍM")
+    print(f"=" * 50)
+    
+    # 1. Kontrola kompatibility tokenizeru
+    tokenizer_ok = check_tokenizer_compatibility(tokenizer, args.model_name, debugger)
+    if not tokenizer_ok:
+        print(f"⚠️ VAROVÁNÍ: Problémy s tokenizerem, ale pokračuji...")
+    
+    # 2. Kontrola neznámých tokenů v train datasetu
+    train_ok = check_unknown_tokens(train_dataset, tokenizer, debugger, max_samples_to_check=50)
+    if not train_ok:
+        print(f"❌ KRITICKÁ CHYBA: Příliš mnoho neznámých tokenů v train datasetu!")
+        print(f"   Zastavuji fine-tuning. Opravte data před pokračováním.")
+        return
+    
+    # 3. Kontrola neznámých tokenů v validation datasetu
+    eval_ok = check_unknown_tokens(eval_dataset, tokenizer, debugger, max_samples_to_check=20)
+    if not eval_ok:
+        print(f"❌ KRITICKÁ CHYBA: Příliš mnoho neznámých tokenů v validation datasetu!")
+        print(f"   Zastavuji fine-tuning. Opravte data před pokračováním.")
+        return
+    
+    print(f"✅ Všechny kontroly prošly - pokračuji s trénováním")
     
     # 7. Data Collator
     print("\n🔧 Konfiguruji data collator...")
