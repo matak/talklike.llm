@@ -29,14 +29,61 @@ import wandb
 import argparse
 
 def load_babis_data(file_path):
-    """Načte data z JSONL souboru a převede je do formátu pro fine-tuning"""
+    """Načte data z JSONL souboru nebo jednoho velkého JSON objektu"""
     conversations = []
     
     with open(file_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            if line.strip():
-                data = json.loads(line)
-                conversations.append(data)
+        content = f.read().strip()
+    
+    try:
+        # Zkusíme parsovat jako jeden velký JSON objekt
+        data = json.loads(content)
+        
+        if 'messages' in data:
+            # Máme jeden velký objekt s messages - rozdělíme na konverzace
+            messages = data['messages']
+            print(f"📊 Načteno {len(messages)} zpráv v jednom objektu")
+            
+            # Rozdělení na konverzace (každých 3 zprávy = 1 konverzace)
+            i = 0
+            while i < len(messages):
+                # Najdeme system zprávu
+                if i < len(messages) and messages[i]['role'] == 'system':
+                    system_msg = messages[i]
+                    i += 1
+                    
+                    # Najdeme user a assistant zprávy
+                    conv_messages = [system_msg]
+                    while i < len(messages) and messages[i]['role'] in ['user', 'assistant']:
+                        conv_messages.append(messages[i])
+                        i += 1
+                    
+                    # Vytvoříme konverzaci
+                    if len(conv_messages) >= 3:  # system + user + assistant
+                        conversations.append({
+                            "messages": conv_messages
+                        })
+                else:
+                    i += 1
+            
+            print(f"✅ Vytvořeno {len(conversations)} konverzací")
+            return conversations
+            
+    except json.JSONDecodeError:
+        # Není jeden velký JSON objekt, zkusíme JSONL formát
+        print("📊 Zkouším JSONL formát...")
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    try:
+                        data = json.loads(line)
+                        conversations.append(data)
+                    except json.JSONDecodeError as e:
+                        print(f"⚠️ Chyba při parsování řádku: {e}")
+                        continue
+        
+        print(f"✅ Načteno {len(conversations)} konverzací z JSONL")
+        return conversations
     
     return conversations
 
