@@ -9,14 +9,6 @@ import json
 import glob
 from typing import List, Dict, Any
 
-def load_system_prompt() -> Dict[str, str]:
-    """Načte systémový prompt pro fine-tuning."""
-    system_prompt = {
-        "role": "system",
-        "content": "Jsi Andrej Babiš, český politik a podnikatel. Mluvíš jako on - používáš jeho charakteristické fráze, styl komunikace a názory. Vždy odpovídáš v první osobě jako Andrej Babiš a na konci svých odpovědí vždy přidáváš 'Andrej Babiš.' jako podpis. Používáš jeho typické výrazy jako 'Hele', 'To je skandál!', 'Já makám', 'Opozice krade', 'V Bruselu', 'Inflace je jak když kráva hraje na klavír' a podobné. Tvůj styl je přímý, někdy konfrontační, ale vždy se snažíš obhajovat své názory a práci. Mluvíš o své rodině, podnikání, politice a ekonomice způsobem, jakým to dělá skutečný Andrej Babiš."
-    }
-    return system_prompt
-
 def merge_final_files():
     """Sloučí všechny soubory z adresáře data/final do data/all.jsonl"""
     input_dir = "data/final"
@@ -35,12 +27,8 @@ def merge_final_files():
     # Vytvoření výstupního adresáře
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     
-    # Načtení systémového promptu
-    system_message = load_system_prompt()
-    print("Načten systémový prompt")
-    
-    # Sbírání všech zpráv, začínaje systémovou zprávou
-    all_messages = [system_message]
+    # Sbírání všech konverzací
+    all_conversations = []
     total_qa_pairs = 0
     
     for qa_file in qa_files:
@@ -59,18 +47,21 @@ def merge_final_files():
                                 print(f"Varování: Neplatná struktura v souboru {qa_file}, řádek {line_num}")
                                 continue
                             
-                            # Přidání uživatelské zprávy
-                            all_messages.append({
-                                "role": "user",
-                                "content": qa_pair["question"]
-                            })
+                            # Vytvoření konverzace bez system promptu
+                            conversation = {
+                                "messages": [
+                                    {
+                                        "role": "user",
+                                        "content": qa_pair["question"]
+                                    },
+                                    {
+                                        "role": "assistant", 
+                                        "content": qa_pair["answer"]
+                                    }
+                                ]
+                            }
                             
-                            # Přidání asistentovy zprávy
-                            all_messages.append({
-                                "role": "assistant", 
-                                "content": qa_pair["answer"]
-                            })
-                            
+                            all_conversations.append(conversation)
                             total_qa_pairs += 1
                             
                         except json.JSONDecodeError as e:
@@ -81,13 +72,15 @@ def merge_final_files():
             print(f"Chyba při zpracování {qa_file}: {e}")
             continue
     
-    # Zápis všech zpráv jako jeden JSON objekt
+    # Zápis všech konverzací do JSONL formátu
     with open(output_file, 'w', encoding='utf-8') as out_f:
-        json.dump({"messages": all_messages}, out_f, ensure_ascii=False, indent=4)
+        for conversation in all_conversations:
+            json.dump(conversation, out_f, ensure_ascii=False)
+            out_f.write('\n')
     
     print(f"\n=== Sloučení dokončeno ===")
     print(f"Vytvořen soubor: {output_file}")
-    print(f"Celkem zpráv: {len(all_messages)} (včetně systémové zprávy)")
+    print(f"Celkem konverzací: {len(all_conversations)}")
     print(f"Celkem QA párů: {total_qa_pairs}")
     print(f"Zpracované soubory:")
     for qa_file in qa_files:
@@ -98,58 +91,60 @@ def validate_dataset(file_path: str) -> Dict[str, Any]:
     print(f"\n=== Validace datasetu ===")
     
     try:
+        conversations = []
         with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+            for line_num, line in enumerate(f, 1):
+                line = line.strip()
+                if line:
+                    try:
+                        conversation = json.loads(line)
+                        conversations.append(conversation)
+                    except json.JSONDecodeError as e:
+                        print(f"Chyba JSON v řádku {line_num}: {e}")
+                        continue
         
-        messages = data.get("messages", [])
-        
-        if not messages:
-            return {"valid": False, "error": "Dataset neobsahuje žádné zprávy"}
-        
-        # Kontrola první zprávy (systémová)
-        if messages[0]["role"] != "system":
-            return {"valid": False, "error": "První zpráva není systémová"}
+        if not conversations:
+            return {"valid": False, "error": "Dataset neobsahuje žádné konverzace"}
         
         # Kontrola struktury konverzací
         conversation_count = 0
         total_user_messages = 0
         total_assistant_messages = 0
         
-        for i in range(1, len(messages), 2):
-            if i + 1 < len(messages):
-                user_msg = messages[i]
-                assistant_msg = messages[i + 1]
+        for i, conversation in enumerate(conversations):
+            messages = conversation.get("messages", [])
+            
+            if len(messages) != 2:
+                print(f"Varování: Konverzace {i+1} nemá správný počet zpráv: {len(messages)}")
+                continue
+            
+            user_msg = messages[0]
+            assistant_msg = messages[1]
+            
+            if user_msg["role"] == "user" and assistant_msg["role"] == "assistant":
+                conversation_count += 1
+                total_user_messages += 1
+                total_assistant_messages += 1
                 
-                if user_msg["role"] == "user" and assistant_msg["role"] == "assistant":
-                    conversation_count += 1
-                    total_user_messages += 1
-                    total_assistant_messages += 1
-                    
-                    # Kontrola, zda asistentova odpověď končí "Andrej Babiš"
-                    if not assistant_msg["content"].strip().endswith("Andrej Babiš"):
-                        print(f"Varování: Odpověď {conversation_count} nekončí 'Andrej Babiš'")
-                else:
-                    print(f"Varování: Neplatná struktura konverzace na pozici {i}")
-        
-        # Kontrola poslední zprávy
-        if messages[-1]["role"] != "assistant":
-            return {"valid": False, "error": "Dataset nekončí asistentovou zprávou"}
+                # Kontrola, zda asistentova odpověď končí "Andrej Babiš"
+                if not assistant_msg["content"].strip().endswith("Andrej Babiš"):
+                    print(f"Varování: Odpověď {conversation_count} nekončí 'Andrej Babiš'")
+            else:
+                print(f"Varování: Neplatná struktura konverzace {i+1}")
         
         validation_result = {
             "valid": True,
-            "total_messages": len(messages),
-            "conversation_count": conversation_count,
+            "total_conversations": len(conversations),
+            "valid_conversations": conversation_count,
             "user_messages": total_user_messages,
-            "assistant_messages": total_assistant_messages,
-            "system_messages": 1
+            "assistant_messages": total_assistant_messages
         }
         
         print(f"Validace úspěšná:")
-        print(f"  - Celkem zpráv: {validation_result['total_messages']}")
-        print(f"  - Konverzací: {validation_result['conversation_count']}")
+        print(f"  - Celkem konverzací: {validation_result['total_conversations']}")
+        print(f"  - Validních konverzací: {validation_result['valid_conversations']}")
         print(f"  - Uživatelských zpráv: {validation_result['user_messages']}")
         print(f"  - Asistentových zpráv: {validation_result['assistant_messages']}")
-        print(f"  - Systémových zpráv: {validation_result['system_messages']}")
         
         return validation_result
         

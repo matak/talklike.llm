@@ -33,89 +33,54 @@ import argparse
 from lib.disk_manager import DiskManager, setup_for_ml_project, check_and_cleanup
 
 def load_babis_data(file_path):
-    """Načte data z JSONL souboru nebo jednoho velkého JSON objektu"""
+    """Načte data z JSONL souboru"""
     conversations = []
     
-    with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read().strip()
+    print(f"📊 Načítám data z: {file_path}")
     
     try:
-        # Zkusíme parsovat jako jeden velký JSON objekt
-        data = json.loads(content)
-        
-        if 'messages' in data:
-            # Máme jeden velký objekt s messages - rozdělíme na konverzace
-            messages = data['messages']
-            print(f"📊 Načteno {len(messages)} zpráv v jednom objektu")
-            
-            # Najdeme system zprávu (měla by být první)
-            system_msg = None
-            for msg in messages:
-                if msg['role'] == 'system':
-                    system_msg = msg
-                    break
-            
-            if not system_msg:
-                print("❌ Nenalezena system zpráva!")
-                return conversations
-            
-            # Projdeme všechny zprávy a najdeme user-assistant páry
-            i = 0
-            while i < len(messages):
-                # Hledáme user zprávu
-                if i < len(messages) and messages[i]['role'] == 'user':
-                    user_msg = messages[i]
-                    i += 1
-                    
-                    # Hledáme následující assistant zprávu
-                    if i < len(messages) and messages[i]['role'] == 'assistant':
-                        assistant_msg = messages[i]
-                        i += 1
-                        
-                        # Vytvoříme konverzaci s system + user + assistant
-                        conv_messages = [system_msg, user_msg, assistant_msg]
-                        conversations.append({
-                            "messages": conv_messages
-                        })
-                    else:
-                        # Chybí assistant zpráva, přeskočíme user zprávu
-                        i += 1
-                else:
-                    # Není user zpráva, přeskočíme
-                    i += 1
-            
-            print(f"✅ Vytvořeno {len(conversations)} konverzací")
-            
-            # Debug informace
-            if len(conversations) > 0:
-                print(f"📝 Ukázka první konverzace:")
-                first_conv = conversations[0]
-                for msg in first_conv['messages']:
-                    print(f"  {msg['role']}: {msg['content'][:100]}...")
-                
-                if len(conversations) > 1:
-                    print(f"📝 Ukázka druhé konverzace:")
-                    second_conv = conversations[1]
-                    for msg in second_conv['messages']:
-                        print(f"  {msg['role']}: {msg['content'][:100]}...")
-            
-            return conversations
-            
-    except json.JSONDecodeError:
-        # Není jeden velký JSON objekt, zkusíme JSONL formát
-        print("📊 Zkouším JSONL formát...")
         with open(file_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                if line.strip():
+            for line_num, line in enumerate(f, 1):
+                line = line.strip()
+                if line:
                     try:
-                        data = json.loads(line)
-                        conversations.append(data)
+                        # Parsování konverzace z JSONL
+                        conversation = json.loads(line)
+                        
+                        # Kontrola struktury
+                        if "messages" not in conversation:
+                            print(f"Varování: Neplatná struktura v řádku {line_num}")
+                            continue
+                        
+                        messages = conversation["messages"]
+                        
+                        # Kontrola, že máme user a assistant zprávy
+                        if len(messages) != 2:
+                            print(f"Varování: Konverzace v řádku {line_num} nemá správný počet zpráv: {len(messages)}")
+                            continue
+                        
+                        if messages[0]["role"] != "user" or messages[1]["role"] != "assistant":
+                            print(f"Varování: Neplatné role v řádku {line_num}")
+                            continue
+                        
+                        conversations.append(conversation)
+                        
                     except json.JSONDecodeError as e:
-                        print(f"⚠️ Chyba při parsování řádku: {e}")
+                        print(f"Chyba JSON v řádku {line_num}: {e}")
                         continue
-        
-        print(f"✅ Načteno {len(conversations)} konverzací z JSONL")
-        return conversations
+                        
+    except Exception as e:
+        print(f"Chyba při načítání souboru: {e}")
+        return []
+    
+    print(f"✅ Načteno {len(conversations)} konverzací z JSONL")
+    
+    # Debug informace
+    if len(conversations) > 0:
+        print(f"📝 Ukázka první konverzace:")
+        first_conv = conversations[0]
+        for msg in first_conv['messages']:
+            print(f"  {msg['role']}: {msg['content'][:100]}...")
     
     return conversations
 
@@ -130,15 +95,13 @@ def prepare_training_data(conversations):
         if not any(msg['role'] == 'assistant' for msg in messages):
             continue
             
-        # Vytvoříme text pro fine-tuning
+        # Vytvoříme text pro fine-tuning v Mistral/LLaMA chat formátu
         text = ""
         for msg in messages:
-            if msg['role'] == 'system':
-                text += f"<|system|>\n{msg['content']}<|end|>\n"
-            elif msg['role'] == 'user':
-                text += f"<|user|>\n{msg['content']}<|end|>\n"
+            if msg['role'] == 'user':
+                text += f"<s>[INST] {msg['content']} [/INST]"
             elif msg['role'] == 'assistant':
-                text += f"<|assistant|>\n{msg['content']}<|end|>\n"
+                text += f" {msg['content']} </s>"
         
         training_data.append({"text": text})
     
@@ -313,27 +276,29 @@ def main():
         first_sample = dataset[0]
         print(f"Text (prvních 200 znaků): {first_sample['text'][:200]}...")
         
-        # Kontrola přítomnosti system, user, assistant tagů
+        # Kontrola přítomnosti Mistral/LLaMA chat tagů
         text = first_sample['text']
-        has_system = "<|system|>" in text
-        has_user = "<|user|>" in text
-        has_assistant = "<|assistant|>" in text
-        has_end = "<|end|>" in text
+        has_inst = "[INST]" in text
+        has_inst_end = "[/INST]" in text
+        has_s_start = "<s>" in text
+        has_s_end = "</s>" in text
         
-        print(f"✅ System tag: {has_system}")
-        print(f"✅ User tag: {has_user}")
-        print(f"✅ Assistant tag: {has_assistant}")
-        print(f"✅ End tag: {has_end}")
+        print(f"✅ [INST] tag: {has_inst}")
+        print(f"✅ [/INST] tag: {has_inst_end}")
+        print(f"✅ <s> tag: {has_s_start}")
+        print(f"✅ </s> tag: {has_s_end}")
         
         # Počítání tagů v celém datasetu
-        system_count = sum(1 for sample in dataset if "<|system|>" in sample['text'])
-        user_count = sum(1 for sample in dataset if "<|user|>" in sample['text'])
-        assistant_count = sum(1 for sample in dataset if "<|assistant|>" in sample['text'])
+        inst_count = sum(1 for sample in dataset if "[INST]" in sample['text'])
+        inst_end_count = sum(1 for sample in dataset if "[/INST]" in sample['text'])
+        s_start_count = sum(1 for sample in dataset if "<s>" in sample['text'])
+        s_end_count = sum(1 for sample in dataset if "</s>" in sample['text'])
         
         print(f"📊 Statistiky tagů v celém datasetu:")
-        print(f"  System messages: {system_count}")
-        print(f"  User messages: {user_count}")
-        print(f"  Assistant messages: {assistant_count}")
+        print(f"  [INST] messages: {inst_count}")
+        print(f"  [/INST] messages: {inst_end_count}")
+        print(f"  <s> tags: {s_start_count}")
+        print(f"  </s> tags: {s_end_count}")
         
         # Kontrola délky textů
         lengths = [len(sample['text']) for sample in dataset]
