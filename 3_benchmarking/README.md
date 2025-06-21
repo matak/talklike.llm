@@ -4,7 +4,7 @@
 
 ## 📋 Přehled
 
-Tento projekt implementuje **kompletní benchmarking fine-tuned modelu** pro srovnání výkonu před a po fine-tuningu. Benchmarking je zaměřen na evaluaci napodobení komunikačního stylu Andreje Babiše.
+Tento projekt implementuje **kompletní benchmarking vašeho natrénovaného adaptéru** `mcmatak/babis-mistral-adapter` pro srovnání výkonu před a po fine-tuningu. Benchmarking je zaměřen na evaluaci napodobení komunikačního stylu Andreje Babiše.
 
 ### 🎯 Cíl
 - Srovnat odpovědi modelu před/po fine-tuningu
@@ -19,26 +19,33 @@ Tento projekt implementuje **kompletní benchmarking fine-tuned modelu** pro sro
 ### Workflow
 1. **Testovací data** → 2. **Generování odpovědí** → 3. **Evaluace stylu** → 4. **Srovnání** → 5. **Reporty**
 
+### Váš adaptér
+- **Base model**: `mistralai/Mistral-7B-Instruct-v0.3`
+- **Adapter**: `mcmatak/babis-mistral-adapter`
+- **Cache**: `/workspace/.cache/huggingface`
+- **System prompt**: Optimalizovaný pro Babišův styl
+
 ### Struktura projektu
 ```
 3_benchmarking/
 ├── 📄 Hlavní skripty
 │   ├── run_benchmark.py              # Hlavní benchmarking script
+│   ├── run_benchmark_with_adapter.sh # Automatické spuštění s cache
 │   ├── evaluate_style.py             # Evaluace Babišova stylu
 │   ├── compare_models.py             # Srovnání před/po
-│   ├── generate_responses.py         # Generování odpovědí
+│   ├── generate_responses.py         # Generování odpovědí (INTEGROVÁNO)
 │   └── create_benchmark_dataset.py   # Vytvoření testovacích dat
 ├── 📄 Testovací skripty
 │   ├── test_benchmark.py             # Test benchmarkingu
-│   └── test_evaluation.py            # Test evaluace
+│   ├── test_adapter_integration.py   # Test integrace s adaptérem
+│   └── quick_test_adapter.py         # Rychlý test adaptéru
 ├── 📄 Data a konfigurace
 │   ├── benchmark_questions.json      # 15 standardizovaných otázek
-│   ├── style_evaluation_criteria.json # Kritéria hodnocení
-│   └── config.yaml                   # Konfigurace
-├── 📄 Prompty
-│   ├── LLM.Benchmark.systemPrompt.md # System prompt
-│   ├── LLM.EvaluateStyle.systemPrompt.md # Prompt pro evaluaci
-│   └── LLM.CompareModels.systemPrompt.md # Prompt pro srovnání
+│   └── requirements_benchmarking.txt # Dependencies
+├── 📄 Dokumentace
+│   ├── README.md                     # Tento soubor
+│   ├── QUICKSTART.md                 # Rychlý start
+│   └── CHANGES_FOR_ADAPTER.md        # Shrnutí změn pro adaptér
 └── 📄 Výstupy (results/)
     ├── before_finetune/              # Odpovědi před fine-tuningem
     ├── after_finetune/               # Odpovědi po fine-tuningem
@@ -53,16 +60,30 @@ Tento projekt implementuje **kompletní benchmarking fine-tuned modelu** pro sro
 
 ### 1. Instalace
 ```bash
+cd 3_benchmarking
 pip install -r requirements_benchmarking.txt
 ```
 
-### 2. Spuštění benchmarkingu
+### 2. Test integrace
 ```bash
+# Rychlý test adaptéru
+python quick_test_adapter.py
+
+# Kompletní test integrace
+python test_adapter_integration.py
+```
+
+### 3. Spuštění benchmarkingu
+```bash
+# Automatické spuštění s cache nastavením
+./run_benchmark_with_adapter.sh
+
+# NEBO manuální spuštění
 python run_benchmark.py
 ```
 
-### 3. Výstupy
-- **Excel tabulka**: `results/reports/comparison_table.xlsx`
+### 4. Výstupy
+- **Excel tabulka**: `results/reports/benchmark_report.xlsx`
 - **JSON data**: `results/comparison/style_evaluation.json`
 - **Vizualizace**: `results/visualizations/`
 
@@ -117,6 +138,30 @@ python run_benchmark.py
 
 ---
 
+## 📈 Očekávané výsledky
+
+### Před fine-tuningem (base model)
+```
+Otázka: "Pane Babiši, jak hodnotíte současnou inflaci?"
+Odpověď: "Inflace je vážný problém, který postihuje všechny občany."
+Skóre: 2.5/10 (F)
+```
+
+### Po fine-tuningem (váš adaptér)
+```
+Otázka: "Pane Babiši, jak hodnotíte současnou inflaci?"
+Odpověď: "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál! Andrej Babiš"
+Skóre: 9.2/10 (A)
+```
+
+### Očekávané zlepšení
+- **Celkové skóre**: +6.7 bodů
+- **Babišovy fráze**: +2.8 frází/odpověď
+- **Slovenské odchylky**: +0.3 slov/odpověď
+- **Emotivní tón**: +1.5 výrazů/odpověď
+
+---
+
 ## 📈 Výstupy pro odevzdání
 
 ### 1. Excel tabulka
@@ -165,9 +210,9 @@ self.babis_phrases = [
 
 ### Integrace s reálnými modely
 ```python
-# V generate_responses.py
-def generate_real_responses(model_type: str, output_dir: str):
-    # Implementujte volání OpenAI API nebo Hugging Face
+# V generate_responses.py - JIŽ IMPLEMENTOVÁNO
+def generate_real_response(model, tokenizer, question: str, model_type: str):
+    # Používá váš adaptér mcmatak/babis-mistral-adapter
     pass
 ```
 
@@ -177,22 +222,43 @@ def generate_real_responses(model_type: str, output_dir: str):
 
 ### Časté problémy
 
-#### 1. Chybí testovací data
+#### 1. Model se nenačte
+```bash
+# Zkontrolujte cache
+ls -la /workspace/.cache/huggingface/
+
+# Zkuste manuální načtení
+python quick_test_adapter.py
+```
+
+#### 2. Chyba při generování
+```bash
+# Zkontrolujte dostupnou paměť
+nvidia-smi
+
+# Snižte batch size nebo použijte CPU
+export CUDA_VISIBLE_DEVICES=""
+```
+
+#### 3. Prázdné výsledky
+```bash
+# Spusťte test integrace
+python test_adapter_integration.py
+
+# Zkontrolujte logy
+tail -f results/benchmark.log
+```
+
+#### 4. Chybí testovací data
 ```bash
 # Spusťte nejdříve vytvoření datasetu
 python create_benchmark_dataset.py
 ```
 
-#### 2. Chybí odpovědi
+#### 5. Chybí odpovědi
 ```bash
 # Vygenerujte odpovědi
 python generate_responses.py
-```
-
-#### 3. Chyba při evaluaci
-```bash
-# Zkontrolujte formát dat
-python test_evaluation.py
 ```
 
 ---
@@ -218,3 +284,48 @@ Skóre: 9.2/10 (A)
 - **Babišovy fráze**: +2.8 frází/odpověď
 - **Slovenské odchylky**: +0.3 slov/odpověď
 - **Emotivní tón**: +1.5 výrazů/odpověď
+
+---
+
+## 🎯 Checklist pro odevzdání
+
+- [ ] ✅ Adaptér testován (`python quick_test_adapter.py`)
+- [ ] ✅ Benchmarking spuštěn (`./run_benchmark_with_adapter.sh`)
+- [ ] ✅ Excel report vygenerován (`results/reports/benchmark_report.xlsx`)
+- [ ] ✅ Grafy vytvořeny (`results/visualizations/`)
+- [ ] ✅ Shrnutí připraveno (`results/reports/benchmark_summary.txt`)
+- [ ] ✅ Screenshoty pořízeny
+- [ ] ✅ Výsledky zkontrolovány
+
+---
+
+## 🚀 Rychlé příkazy
+
+```bash
+# Test adaptéru
+python quick_test_adapter.py
+
+# Kompletní test integrace
+python test_adapter_integration.py
+
+# Spuštění benchmarkingu
+./run_benchmark_with_adapter.sh
+
+# Zobrazení výsledků
+ls -la results/reports/
+cat results/reports/benchmark_summary.txt
+
+# Otevření Excel reportu
+open results/reports/benchmark_report.xlsx
+```
+
+---
+
+## 📞 Podpora
+
+Pro problémy:
+1. Spusťte `python quick_test_adapter.py`
+2. Zkontrolujte logy v terminálu
+3. Ověřte dostupnost modelu: `mcmatak/babis-mistral-adapter`
+
+**Benchmarking je připraven pro odevzdání úkolu!** 🎉

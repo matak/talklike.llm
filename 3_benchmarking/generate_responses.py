@@ -2,17 +2,118 @@
 # -*- coding: utf-8 -*-
 """
 Generování odpovědí pro benchmarking TalkLike.LLM
-Simuluje odpovědi před a po fine-tuningu
+Používá skutečný model s adaptérem pro generování odpovědí
 """
 
 import json
 import os
 import random
+import sys
+import torch
 from datetime import datetime
 from typing import List, Dict
+from pathlib import Path
+
+# Přidání cesty k 2_finetunning pro import
+sys.path.append(str(Path(__file__).parent.parent / "2_finetunning"))
+
+try:
+    from test_adapter import load_model_with_adapter, generate_response
+    MODEL_AVAILABLE = True
+except ImportError:
+    print("⚠️  Model není dostupný, používám mock odpovědi")
+    MODEL_AVAILABLE = False
+
+def load_benchmark_model(model_type: str):
+    """Načte model pro benchmarking"""
+    if not MODEL_AVAILABLE:
+        return None, None
+    
+    try:
+        if model_type == "finetuned":
+            # Váš natrénovaný adaptér
+            base_model = "mistralai/Mistral-7B-Instruct-v0.3"
+            adapter_path = "mcmatak/babis-mistral-adapter"
+            
+            print(f"🤖 Načítám fine-tuned model...")
+            print(f"   Base model: {base_model}")
+            print(f"   Adapter: {adapter_path}")
+            
+            model, tokenizer = load_model_with_adapter(base_model, adapter_path)
+            
+        elif model_type == "base":
+            # Základní model bez adaptéru
+            base_model = "mistralai/Mistral-7B-Instruct-v0.3"
+            
+            print(f"🤖 Načítám základní model...")
+            print(f"   Base model: {base_model}")
+            
+            from transformers import AutoModelForCausalLM, AutoTokenizer
+            
+            tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
+            if tokenizer.pad_token is None:
+                tokenizer.pad_token = tokenizer.eos_token
+            
+            model = AutoModelForCausalLM.from_pretrained(
+                base_model,
+                torch_dtype=torch.float16,
+                device_map="auto",
+                trust_remote_code=True
+            )
+            model.eval()
+            
+        else:
+            raise ValueError(f"Neznámý typ modelu: {model_type}")
+        
+        return model, tokenizer
+        
+    except Exception as e:
+        print(f"❌ Chyba při načítání modelu {model_type}: {e}")
+        return None, None
+
+def generate_real_response(model, tokenizer, question: str, model_type: str) -> str:
+    """Generuje skutečnou odpověď pomocí modelu"""
+    
+    try:
+        if model_type == "finetuned":
+            # Pro fine-tuned model použijeme system prompt
+            system_prompt = """Jsi Andrej Babiš, český politik a podnikatel. Tvým úkolem je odpovídat na otázky v charakteristickém Babišově stylu.
+
+Charakteristické prvky tvého stylu:
+- Typické fráze: "Hele, ...", "To je skandál!", "Já makám", "Opozice krade", "V Bruselu"
+- Slovenské odchylky: "sme", "som", "makáme", "centralizácia"
+- Emotivní výrazy: "to je šílený!", "tragédyje!", "kampááň!"
+- Přirovnání: "jak když kráva hraje na klavír", "jak když dítě řídí tank"
+- První osoba: "Já jsem...", "Moje rodina...", "Já makám..."
+- Podpis: Každou odpověď zakonči "Andrej Babiš"
+
+Odpovídej vždy v první osobě jako Andrej Babiš, používej jeho charakteristické fráze, buď emotivní a přímý."""
+
+            prompt = f"<s>[INST] {system_prompt}\n\nOtázka: {question} [/INST]"
+            
+        else:  # base model
+            # Pro základní model použijeme jednoduchý prompt
+            prompt = f"<s>[INST] Otázka: {question} [/INST]"
+        
+        # Generování odpovědi
+        response = generate_response(
+            model, tokenizer, prompt,
+            max_length=300, temperature=0.8
+        )
+        
+        # Vyčištění odpovědi
+        response = response.strip()
+        if response.startswith("Otázka:"):
+            response = response[response.find("[/INST]") + 7:].strip()
+        
+        return response if response else "Omlouvám se, nemohu odpovědět."
+        
+    except Exception as e:
+        print(f"❌ Chyba při generování odpovědi: {e}")
+        return f"Chyba při generování: {str(e)}"
 
 def generate_mock_response(question: str, model_type: str) -> str:
-    """Generuje mock odpověď pro testovací účely"""
+    """Generuje mock odpověď pro testovací účely (fallback)"""
     
     # Základní Babišovy fráze
     babis_phrases = [
@@ -91,10 +192,24 @@ def generate_responses(model_type: str, output_dir: str):
             {"id": "Q5", "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?"}
         ]
     
+    # Načtení modelu
+    model, tokenizer = load_benchmark_model(model_type)
+    use_real_model = model is not None and tokenizer is not None
+    
+    if use_real_model:
+        print(f"✅ Používám skutečný model: {model_type}")
+    else:
+        print(f"⚠️  Používám mock odpovědi pro: {model_type}")
+    
     responses = []
     
-    for question in questions:
-        response = generate_mock_response(question["question"], model_type)
+    for i, question in enumerate(questions):
+        print(f"   Generuji odpověď {i+1}/{len(questions)}: {question['question'][:50]}...")
+        
+        if use_real_model:
+            response = generate_real_response(model, tokenizer, question["question"], model_type)
+        else:
+            response = generate_mock_response(question["question"], model_type)
         
         responses.append({
             "id": question["id"],
@@ -119,17 +234,16 @@ def generate_responses(model_type: str, output_dir: str):
         print(f"      → {resp['response']}")
         print()
     
+    # Uvolnění paměti
+    if use_real_model:
+        del model, tokenizer
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    
     return responses
 
 def generate_real_responses(model_type: str, output_dir: str):
-    """Generuje skutečné odpovědi pomocí LLM (pro budoucí použití)"""
-    
-    # TODO: Implementovat skutečné generování pomocí OpenAI API nebo Hugging Face
-    # Prozatím používáme mock odpovědi
-    
-    print(f"⚠️  Skutečné generování pomocí LLM není implementováno")
-    print(f"   Používám mock odpovědi pro {model_type}")
-    
+    """Wrapper pro skutečné generování (pro kompatibilitu)"""
     return generate_responses(model_type, output_dir)
 
 if __name__ == "__main__":
