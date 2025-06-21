@@ -9,6 +9,7 @@ import json
 import torch
 import numpy as np
 import shutil
+from datetime import datetime
 from datasets import Dataset
 from transformers import (
     AutoModelForCausalLM,
@@ -32,61 +33,228 @@ import argparse
 # Import disk manager knihovny
 from lib.disk_manager import DiskManager, setup_for_ml_project, check_and_cleanup
 
-def load_babis_data(file_path):
-    """Načte data z JSONL souboru"""
+class DatasetDebugger:
+    """Třída pro debugování a ukládání mezikroků zpracování datasetu"""
+    
+    def __init__(self, debug_dir="debug_dataset"):
+        self.debug_dir = debug_dir
+        self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.debug_dir = f"{debug_dir}_{self.timestamp}"
+        
+        # Vytvoření debug adresáře
+        os.makedirs(self.debug_dir, exist_ok=True)
+        print(f"🔍 Debug adresář vytvořen: {self.debug_dir}")
+    
+    def save_step(self, step_name, data, description=""):
+        """Uloží krok zpracování datasetu"""
+        step_file = os.path.join(self.debug_dir, f"step_{step_name}.json")
+        
+        # Přidání metadat
+        debug_info = {
+            "step_name": step_name,
+            "timestamp": datetime.now().isoformat(),
+            "description": description,
+            "data_type": type(data).__name__,
+            "data_count": len(data) if hasattr(data, '__len__') else "N/A"
+        }
+        
+        # Uložení dat podle typu
+        if isinstance(data, list):
+            if len(data) > 0 and isinstance(data[0], dict):
+                # Seznam slovníků - uložíme jako JSON
+                debug_info["data"] = data
+            else:
+                # Jiný typ dat - uložíme jako text
+                debug_info["data"] = [str(item) for item in data]
+        elif isinstance(data, dict):
+            debug_info["data"] = data
+        else:
+            debug_info["data"] = str(data)
+        
+        with open(step_file, 'w', encoding='utf-8') as f:
+            json.dump(debug_info, f, ensure_ascii=False, indent=2)
+        
+        print(f"💾 Uložen debug krok: {step_name} -> {step_file}")
+        
+        # Vytvoření také čitelné verze pro první 3 položky
+        if isinstance(data, list) and len(data) > 0:
+            readable_file = os.path.join(self.debug_dir, f"step_{step_name}_readable.txt")
+            with open(readable_file, 'w', encoding='utf-8') as f:
+                f.write(f"Debug krok: {step_name}\n")
+                f.write(f"Čas: {debug_info['timestamp']}\n")
+                f.write(f"Popis: {description}\n")
+                f.write(f"Počet položek: {len(data)}\n")
+                f.write("-" * 80 + "\n\n")
+                
+                for i, item in enumerate(data[:3]):  # První 3 položky
+                    f.write(f"Položka {i+1}:\n")
+                    if isinstance(item, dict):
+                        for key, value in item.items():
+                            if key == 'content' and isinstance(value, str) and len(value) > 200:
+                                f.write(f"  {key}: {value[:200]}...\n")
+                            else:
+                                f.write(f"  {key}: {value}\n")
+                    else:
+                        f.write(f"  {item}\n")
+                    f.write("\n")
+                
+                if len(data) > 3:
+                    f.write(f"... a dalších {len(data) - 3} položek\n")
+    
+    def save_sample(self, step_name, sample_data, sample_index=0):
+        """Uloží ukázkovou položku z datasetu"""
+        sample_file = os.path.join(self.debug_dir, f"sample_{step_name}_{sample_index}.json")
+        
+        with open(sample_file, 'w', encoding='utf-8') as f:
+            json.dump(sample_data, f, ensure_ascii=False, indent=2)
+        
+        print(f"📝 Uložena ukázka: {step_name} -> {sample_file}")
+    
+    def create_summary(self):
+        """Vytvoří shrnutí všech debug kroků"""
+        summary_file = os.path.join(self.debug_dir, "debug_summary.txt")
+        
+        with open(summary_file, 'w', encoding='utf-8') as f:
+            f.write("DEBUG SHRNUTÍ ZPRACOVÁNÍ DATASETU\n")
+            f.write("=" * 50 + "\n")
+            f.write(f"Čas vytvoření: {self.timestamp}\n")
+            f.write(f"Debug adresář: {self.debug_dir}\n\n")
+            
+            # Najdeme všechny debug soubory
+            debug_files = [f for f in os.listdir(self.debug_dir) if f.startswith("step_") and f.endswith(".json")]
+            debug_files.sort()
+            
+            for debug_file in debug_files:
+                try:
+                    with open(os.path.join(self.debug_dir, debug_file), 'r', encoding='utf-8') as df:
+                        debug_info = json.load(df)
+                    
+                    f.write(f"Krok: {debug_info['step_name']}\n")
+                    f.write(f"  Čas: {debug_info['timestamp']}\n")
+                    f.write(f"  Popis: {debug_info['description']}\n")
+                    f.write(f"  Typ dat: {debug_info['data_type']}\n")
+                    f.write(f"  Počet: {debug_info['data_count']}\n")
+                    f.write("\n")
+                except Exception as e:
+                    f.write(f"Chyba při čtení {debug_file}: {e}\n\n")
+        
+        print(f"📋 Vytvořeno shrnutí: {summary_file}")
+
+def load_babis_data(file_path, debugger=None):
+    """Načte data z JSONL souboru nebo jednoho velkého JSON objektu"""
     conversations = []
     
-    print(f"📊 Načítám data z: {file_path}")
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read().strip()
+    
+    # Debug: Uložení původního obsahu
+    if debugger:
+        debugger.save_step("01_original_content", {"content": content[:1000] + "..." if len(content) > 1000 else content}, 
+                          "Původní obsah souboru")
     
     try:
+        # Zkusíme parsovat jako jeden velký JSON objekt
+        data = json.loads(content)
+        
+        if 'messages' in data:
+            # Máme jeden velký objekt s messages - rozdělíme na konverzace
+            messages = data['messages']
+            print(f"📊 Načteno {len(messages)} zpráv v jednom objektu")
+            
+            # Debug: Uložení všech zpráv
+            if debugger:
+                debugger.save_step("02_all_messages", messages, f"Všech {len(messages)} zpráv z JSON objektu")
+            
+            # Najdeme system zprávu (měla by být první)
+            system_msg = None
+            for msg in messages:
+                if msg['role'] == 'system':
+                    system_msg = msg
+                    break
+            
+            if not system_msg:
+                print("❌ Nenalezena system zpráva!")
+                return conversations
+            
+            # Debug: Uložení system zprávy
+            if debugger:
+                debugger.save_step("03_system_message", [system_msg], "System zpráva")
+            
+            # Projdeme všechny zprávy a najdeme user-assistant páry
+            i = 0
+            while i < len(messages):
+                # Hledáme user zprávu
+                if i < len(messages) and messages[i]['role'] == 'user':
+                    user_msg = messages[i]
+                    i += 1
+                    
+                    # Hledáme následující assistant zprávu
+                    if i < len(messages) and messages[i]['role'] == 'assistant':
+                        assistant_msg = messages[i]
+                        i += 1
+                        
+                        # Vytvoříme konverzaci s system + user + assistant
+                        conv_messages = [system_msg, user_msg, assistant_msg]
+                        conversations.append({
+                            "messages": conv_messages
+                        })
+                    else:
+                        # Chybí assistant zpráva, přeskočíme user zprávu
+                        i += 1
+                else:
+                    # Není user zpráva, přeskočíme
+                    i += 1
+            
+            print(f"✅ Vytvořeno {len(conversations)} konverzací")
+            
+            # Debug: Uložení vytvořených konverzací
+            if debugger:
+                debugger.save_step("04_conversations", conversations, f"Vytvořených {len(conversations)} konverzací")
+                if len(conversations) > 0:
+                    debugger.save_sample("04_conversations", conversations[0], 0)
+                    if len(conversations) > 1:
+                        debugger.save_sample("04_conversations", conversations[1], 1)
+            
+            # Debug informace
+            if len(conversations) > 0:
+                print(f"📝 Ukázka první konverzace:")
+                first_conv = conversations[0]
+                for msg in first_conv['messages']:
+                    print(f"  {msg['role']}: {msg['content'][:100]}...")
+                
+                if len(conversations) > 1:
+                    print(f"📝 Ukázka druhé konverzace:")
+                    second_conv = conversations[1]
+                    for msg in second_conv['messages']:
+                        print(f"  {msg['role']}: {msg['content'][:100]}...")
+            
+            return conversations
+            
+    except json.JSONDecodeError:
+        # Není jeden velký JSON objekt, zkusíme JSONL formát
+        print("📊 Zkouším JSONL formát...")
         with open(file_path, 'r', encoding='utf-8') as f:
-            for line_num, line in enumerate(f, 1):
-                line = line.strip()
-                if line:
+            for line in f:
+                if line.strip():
                     try:
-                        # Parsování konverzace z JSONL
-                        conversation = json.loads(line)
-                        
-                        # Kontrola struktury
-                        if "messages" not in conversation:
-                            print(f"Varování: Neplatná struktura v řádku {line_num}")
-                            continue
-                        
-                        messages = conversation["messages"]
-                        
-                        # Kontrola, že máme user a assistant zprávy
-                        if len(messages) != 2:
-                            print(f"Varování: Konverzace v řádku {line_num} nemá správný počet zpráv: {len(messages)}")
-                            continue
-                        
-                        if messages[0]["role"] != "user" or messages[1]["role"] != "assistant":
-                            print(f"Varování: Neplatné role v řádku {line_num}")
-                            continue
-                        
-                        conversations.append(conversation)
-                        
+                        data = json.loads(line)
+                        conversations.append(data)
                     except json.JSONDecodeError as e:
-                        print(f"Chyba JSON v řádku {line_num}: {e}")
+                        print(f"⚠️ Chyba při parsování řádku: {e}")
                         continue
-                        
-    except Exception as e:
-        print(f"Chyba při načítání souboru: {e}")
-        return []
-    
-    print(f"✅ Načteno {len(conversations)} konverzací z JSONL")
-    
-    # Debug informace
-    if len(conversations) > 0:
-        print(f"📝 Ukázka první konverzace:")
-        first_conv = conversations[0]
-        for msg in first_conv['messages']:
-            print(f"  {msg['role']}: {msg['content'][:100]}...")
+        
+        print(f"✅ Načteno {len(conversations)} konverzací z JSONL")
+        return conversations
     
     return conversations
 
-def prepare_training_data(conversations):
+def prepare_training_data(conversations, debugger=None):
     """Připraví data pro fine-tuning"""
     training_data = []
+    
+    # Debug: Uložení vstupních konverzací
+    if debugger:
+        debugger.save_step("05_input_conversations", conversations, f"Vstupních {len(conversations)} konverzací pro prepare_training_data")
     
     for conv in conversations:
         messages = conv['messages']
@@ -95,15 +263,25 @@ def prepare_training_data(conversations):
         if not any(msg['role'] == 'assistant' for msg in messages):
             continue
             
-        # Vytvoříme text pro fine-tuning v Mistral/LLaMA chat formátu
+        # Vytvoříme text pro fine-tuning
         text = ""
         for msg in messages:
-            if msg['role'] == 'user':
-                text += f"<s>[INST] {msg['content']} [/INST]"
+            if msg['role'] == 'system':
+                text += f"<|system|>\n{msg['content']}<|end|>\n"
+            elif msg['role'] == 'user':
+                text += f"<|user|>\n{msg['content']}<|end|>\n"
             elif msg['role'] == 'assistant':
-                text += f" {msg['content']} </s>"
+                text += f"<|assistant|>\n{msg['content']}<|end|>\n"
         
         training_data.append({"text": text})
+    
+    # Debug: Uložení připravených dat
+    if debugger:
+        debugger.save_step("06_training_data", training_data, f"Připravených {len(training_data)} trénovacích vzorků")
+        if len(training_data) > 0:
+            debugger.save_sample("06_training_data", training_data[0], 0)
+            if len(training_data) > 1:
+                debugger.save_sample("06_training_data", training_data[1], 1)
     
     return training_data
 
@@ -211,7 +389,7 @@ def main():
     print("🚀 Spouštím fine-tuning pro Andreje Babiše")
     print(f"📁 Data: {args.data_path}")
     print(f"📁 Výstup: {args.output_dir}")
-    print(f"🤖 Model: {args.model_name}")
+    print(f"📁 Model: {args.model_name}")
     
     # Inicializace disk manageru a nastavení pro ML projekt
     dm = setup_for_ml_project("/workspace")
@@ -254,18 +432,26 @@ def main():
         else:
             print("⚠️ WANDB_API_KEY nebyl nalezen")
     
+    # Inicializace debuggeru pro sledování zpracování datasetu
+    debugger = DatasetDebugger(debug_dir="debug_dataset_finetune")
+    print(f"🔍 Debugger inicializován: {debugger.debug_dir}")
+    
     # 1. Načtení dat
     print("\n📊 Načítám data...")
-    conversations = load_babis_data(args.data_path)
+    conversations = load_babis_data(args.data_path, debugger)
     print(f"✅ Načteno {len(conversations)} konverzací")
     
     # 2. Příprava dat
     print("🔧 Připravuji data...")
-    training_data = prepare_training_data(conversations)
+    training_data = prepare_training_data(conversations, debugger)
     print(f"✅ Připraveno {len(training_data)} trénovacích vzorků")
     
     # 3. Vytvoření Dataset
     dataset = Dataset.from_list(training_data)
+    
+    # Debug: Uložení finálního datasetu
+    debugger.save_step("07_final_dataset", {"dataset_size": len(dataset), "columns": dataset.column_names}, 
+                      f"Finální dataset s {len(dataset)} vzorky")
     
     # Debug: Kontrola struktury dat
     print(f"\n🔍 DEBUG: Kontrola struktury dat")
@@ -276,33 +462,48 @@ def main():
         first_sample = dataset[0]
         print(f"Text (prvních 200 znaků): {first_sample['text'][:200]}...")
         
-        # Kontrola přítomnosti Mistral/LLaMA chat tagů
+        # Kontrola přítomnosti system, user, assistant tagů
         text = first_sample['text']
-        has_inst = "[INST]" in text
-        has_inst_end = "[/INST]" in text
-        has_s_start = "<s>" in text
-        has_s_end = "</s>" in text
+        has_system = "<|system|>" in text
+        has_user = "<|user|>" in text
+        has_assistant = "<|assistant|>" in text
+        has_end = "<|end|>" in text
         
-        print(f"✅ [INST] tag: {has_inst}")
-        print(f"✅ [/INST] tag: {has_inst_end}")
-        print(f"✅ <s> tag: {has_s_start}")
-        print(f"✅ </s> tag: {has_s_end}")
+        print(f"✅ System tag: {has_system}")
+        print(f"✅ User tag: {has_user}")
+        print(f"✅ Assistant tag: {has_assistant}")
+        print(f"✅ End tag: {has_end}")
         
         # Počítání tagů v celém datasetu
-        inst_count = sum(1 for sample in dataset if "[INST]" in sample['text'])
-        inst_end_count = sum(1 for sample in dataset if "[/INST]" in sample['text'])
-        s_start_count = sum(1 for sample in dataset if "<s>" in sample['text'])
-        s_end_count = sum(1 for sample in dataset if "</s>" in sample['text'])
+        system_count = sum(1 for sample in dataset if "<|system|>" in sample['text'])
+        user_count = sum(1 for sample in dataset if "<|user|>" in sample['text'])
+        assistant_count = sum(1 for sample in dataset if "<|assistant|>" in sample['text'])
         
         print(f"📊 Statistiky tagů v celém datasetu:")
-        print(f"  [INST] messages: {inst_count}")
-        print(f"  [/INST] messages: {inst_end_count}")
-        print(f"  <s> tags: {s_start_count}")
-        print(f"  </s> tags: {s_end_count}")
+        print(f"  System messages: {system_count}")
+        print(f"  User messages: {user_count}")
+        print(f"  Assistant messages: {assistant_count}")
         
         # Kontrola délky textů
         lengths = [len(sample['text']) for sample in dataset]
         print(f"📏 Délka textů: min={min(lengths)}, max={max(lengths)}, avg={sum(lengths)/len(lengths):.1f}")
+        
+        # Debug: Uložení statistik
+        debugger.save_step("08_dataset_stats", {
+            "total_samples": len(dataset),
+            "system_messages": system_count,
+            "user_messages": user_count,
+            "assistant_messages": assistant_count,
+            "text_lengths": {
+                "min": min(lengths),
+                "max": max(lengths),
+                "avg": sum(lengths)/len(lengths)
+            }
+        }, "Statistiky datasetu")
+    
+    # Vytvoření shrnutí debug informací
+    debugger.create_summary()
+    print(f"📋 Debug shrnutí vytvořeno: {debugger.debug_dir}/debug_summary.txt")
     
     # 4. Načtení modelu
     print(f"\n🤖 Načítám model: {args.model_name}")
@@ -415,6 +616,28 @@ def main():
         batch_size=100  # Menší batch size pro lepší kontrolu
     )
     
+    # Debug: Uložení tokenizovaného datasetu
+    debugger.save_step("09_tokenized_dataset", {
+        "dataset_size": len(tokenized_dataset),
+        "columns": tokenized_dataset.column_names,
+        "max_length": args.max_length
+    }, f"Tokenizovaný dataset s {len(tokenized_dataset)} vzorky")
+    
+    # Debug: Ukázka tokenizovaného vzorku
+    if len(tokenized_dataset) > 0:
+        sample_tokens = tokenized_dataset[0]
+        decoded_text = tokenizer.decode(sample_tokens['input_ids'], skip_special_tokens=False)
+        debugger.save_step("10_tokenized_sample", {
+            "input_ids_length": len(sample_tokens['input_ids']),
+            "attention_mask_length": len(sample_tokens['attention_mask']),
+            "labels_length": len(sample_tokens['labels']),
+            "decoded_text": decoded_text[:500] + "..." if len(decoded_text) > 500 else decoded_text,
+            "has_system": "<|system|>" in decoded_text,
+            "has_user": "<|user|>" in decoded_text,
+            "has_assistant": "<|assistant|>" in decoded_text,
+            "has_end": "<|end|>" in decoded_text
+        }, "Ukázka tokenizovaného vzorku")
+    
     # Kontrola a oprava padding po tokenizaci
     print("🔧 Kontroluji a opravuji padding...")
     def fix_padding(example):
@@ -442,6 +665,13 @@ def main():
         desc="Opravuji padding"
     )
     
+    # Debug: Uložení finálního tokenizovaného datasetu
+    debugger.save_step("11_final_tokenized_dataset", {
+        "dataset_size": len(tokenized_dataset),
+        "columns": tokenized_dataset.column_names,
+        "max_length": args.max_length
+    }, f"Finální tokenizovaný dataset s padding")
+    
     # Rozdělení na train/validation s kontrolou velikosti
     print(f"📊 Celkový počet vzorků: {len(tokenized_dataset)}")
     
@@ -449,6 +679,7 @@ def main():
         print("⚠️ Málo vzorků pro rozdělení. Používám celý dataset pro trénování.")
         train_dataset = tokenized_dataset
         eval_dataset = tokenized_dataset  # Použijeme stejný dataset pro evaluaci
+        split_info = {"type": "no_split", "reason": "too_few_samples", "train_size": len(train_dataset), "eval_size": len(eval_dataset)}
     elif len(tokenized_dataset) < 10:
         # Pro velmi malé datasety použijeme 80/20 split
         split_ratio = 0.2
@@ -457,6 +688,7 @@ def main():
         eval_dataset = split_dataset["test"]
         print(f"✅ Train dataset: {len(train_dataset)} vzorků ({100-split_ratio*100:.0f}%)")
         print(f"✅ Validation dataset: {len(eval_dataset)} vzorků ({split_ratio*100:.0f}%)")
+        split_info = {"type": "80_20_split", "split_ratio": split_ratio, "train_size": len(train_dataset), "eval_size": len(eval_dataset)}
     else:
         # Standardní 90/10 split
         split_dataset = tokenized_dataset.train_test_split(test_size=0.1, seed=42)
@@ -464,6 +696,10 @@ def main():
         eval_dataset = split_dataset["test"]
         print(f"✅ Train dataset: {len(train_dataset)} vzorků (90%)")
         print(f"✅ Validation dataset: {len(eval_dataset)} vzorků (10%)")
+        split_info = {"type": "90_10_split", "split_ratio": 0.1, "train_size": len(train_dataset), "eval_size": len(eval_dataset)}
+    
+    # Debug: Uložení informací o rozdělení
+    debugger.save_step("12_train_validation_split", split_info, f"Rozdělení datasetu: {split_info['type']}")
     
     # Kontrola minimální velikosti datasetu
     if len(train_dataset) == 0:
@@ -473,114 +709,193 @@ def main():
     if len(eval_dataset) == 0:
         print("⚠️ Validation dataset je prázdný. Používám train dataset pro evaluaci.")
         eval_dataset = train_dataset
+        debugger.save_step("13_split_fallback", {"action": "use_train_for_eval", "reason": "empty_eval_dataset"}, "Použití train datasetu pro evaluaci")
     
     # Debug: Kontrola train/validation split
     print(f"\n🔍 DEBUG: Kontrola train/validation split")
     print(f"📊 Train dataset: {len(train_dataset)} vzorků")
     print(f"📊 Validation dataset: {len(eval_dataset)} vzorků")
     
-    # Detailní debug informace o train datasetu
-    if len(train_dataset) > 0:
-        print(f"\n📋 DETAILNÍ DEBUG - TRAIN DATASET:")
-        print(f"📊 Celkový počet vzorků: {len(train_dataset)}")
+    # Debug: Uložení train a validation datasetů do souborů
+    print(f"\n💾 Ukládám train a validation datasety...")
+    
+    # Uložení train datasetu
+    train_data_file = os.path.join(debugger.debug_dir, "train_dataset.jsonl")
+    with open(train_data_file, 'w', encoding='utf-8') as f:
+        for i, sample in enumerate(train_dataset):
+            # Dekódování tokenů zpět na text pro čitelnost
+            decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
+            sample_data = {
+                "index": i,
+                "input_ids_length": len(sample['input_ids']),
+                "attention_mask_length": len(sample['attention_mask']),
+                "labels_length": len(sample['labels']),
+                "decoded_text": decoded_text,
+                "has_system": "<|system|>" in decoded_text,
+                "has_user": "<|user|>" in decoded_text,
+                "has_assistant": "<|assistant|>" in decoded_text,
+                "has_end": "<|end|>" in decoded_text,
+                "token_ids": sample['input_ids'][:100] + ["..."] if len(sample['input_ids']) > 100 else sample['input_ids']  # Prvních 100 tokenů
+            }
+            f.write(json.dumps(sample_data, ensure_ascii=False) + '\n')
+    print(f"✅ Train dataset uložen: {train_data_file}")
+    
+    # Uložení validation datasetu
+    eval_data_file = os.path.join(debugger.debug_dir, "validation_dataset.jsonl")
+    with open(eval_data_file, 'w', encoding='utf-8') as f:
+        for i, sample in enumerate(eval_dataset):
+            # Dekódování tokenů zpět na text pro čitelnost
+            decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
+            sample_data = {
+                "index": i,
+                "input_ids_length": len(sample['input_ids']),
+                "attention_mask_length": len(sample['attention_mask']),
+                "labels_length": len(sample['labels']),
+                "decoded_text": decoded_text,
+                "has_system": "<|system|>" in decoded_text,
+                "has_user": "<|user|>" in decoded_text,
+                "has_assistant": "<|assistant|>" in decoded_text,
+                "has_end": "<|end|>" in decoded_text,
+                "token_ids": sample['input_ids'][:100] + ["..."] if len(sample['input_ids']) > 100 else sample['input_ids']  # Prvních 100 tokenů
+            }
+            f.write(json.dumps(sample_data, ensure_ascii=False) + '\n')
+    print(f"✅ Validation dataset uložen: {eval_data_file}")
+    
+    # Vytvoření čitelné verze pro rychlé prohlížení
+    train_readable_file = os.path.join(debugger.debug_dir, "train_dataset_readable.txt")
+    with open(train_readable_file, 'w', encoding='utf-8') as f:
+        f.write("TRAIN DATASET - ČITELNÁ VERZE\n")
+        f.write("=" * 50 + "\n")
+        f.write(f"Celkový počet vzorků: {len(train_dataset)}\n\n")
         
-        # Ukázka prvních 3 vzorků
-        for i in range(min(3, len(train_dataset))):
-            print(f"\n📝 Train vzorek {i+1}:")
+        for i in range(min(5, len(train_dataset))):  # Prvních 5 vzorků
             sample = train_dataset[i]
             decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
-            print(f"  Délka tokenů: {len(sample['input_ids'])}")
-            print(f"  Text (prvních 300 znaků): {decoded_text[:300]}...")
-            
-            # Kontrola přítomnosti tagů
-            has_system = "<|system|>" in decoded_text
-            has_user = "<|user|>" in decoded_text
-            has_assistant = "<|assistant|>" in decoded_text
-            has_end = "<|end|>" in decoded_text
-            print(f"  Tagy: System={has_system}, User={has_user}, Assistant={has_assistant}, End={has_end}")
+            f.write(f"VZOREK {i+1}:\n")
+            f.write(f"Délka tokenů: {len(sample['input_ids'])}\n")
+            f.write(f"Text:\n{decoded_text}\n")
+            f.write("-" * 80 + "\n\n")
         
-        # Statistiky délky tokenů v train datasetu
-        train_lengths = [len(sample['input_ids']) for sample in train_dataset]
-        print(f"\n📏 Statistiky délky tokenů v train datasetu:")
-        print(f"  Min: {min(train_lengths)}")
-        print(f"  Max: {max(train_lengths)}")
-        print(f"  Průměr: {sum(train_lengths)/len(train_lengths):.1f}")
-        print(f"  Medián: {sorted(train_lengths)[len(train_lengths)//2]}")
-        
-        # Kontrola přítomnosti tagů v celém train datasetu
-        train_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in train_dataset]
-        train_system_count = sum(1 for text in train_texts if "<|system|>" in text)
-        train_user_count = sum(1 for text in train_texts if "<|user|>" in text)
-        train_assistant_count = sum(1 for text in train_texts if "<|assistant|>" in text)
-        train_end_count = sum(1 for text in train_texts if "<|end|>" in text)
-        
-        print(f"\n📊 Tagy v celém train datasetu:")
-        print(f"  System: {train_system_count}/{len(train_dataset)} ({train_system_count/len(train_dataset)*100:.1f}%)")
-        print(f"  User: {train_user_count}/{len(train_dataset)} ({train_user_count/len(train_dataset)*100:.1f}%)")
-        print(f"  Assistant: {train_assistant_count}/{len(train_dataset)} ({train_assistant_count/len(train_dataset)*100:.1f}%)")
-        print(f"  End: {train_end_count}/{len(train_dataset)} ({train_end_count/len(train_dataset)*100:.1f}%)")
+        if len(train_dataset) > 5:
+            f.write(f"... a dalších {len(train_dataset) - 5} vzorků\n")
     
-    # Detailní debug informace o validation datasetu
-    if len(eval_dataset) > 0:
-        print(f"\n📋 DETAILNÍ DEBUG - VALIDATION DATASET:")
-        print(f"📊 Celkový počet vzorků: {len(eval_dataset)}")
+    eval_readable_file = os.path.join(debugger.debug_dir, "validation_dataset_readable.txt")
+    with open(eval_readable_file, 'w', encoding='utf-8') as f:
+        f.write("VALIDATION DATASET - ČITELNÁ VERZE\n")
+        f.write("=" * 50 + "\n")
+        f.write(f"Celkový počet vzorků: {len(eval_dataset)}\n\n")
         
-        # Ukázka prvních 3 vzorků
-        for i in range(min(3, len(eval_dataset))):
-            print(f"\n📝 Validation vzorek {i+1}:")
+        for i in range(min(5, len(eval_dataset))):  # Prvních 5 vzorků
             sample = eval_dataset[i]
             decoded_text = tokenizer.decode(sample['input_ids'], skip_special_tokens=False)
-            print(f"  Délka tokenů: {len(sample['input_ids'])}")
-            print(f"  Text (prvních 300 znaků): {decoded_text[:300]}...")
-            
-            # Kontrola přítomnosti tagů
-            has_system = "<|system|>" in decoded_text
-            has_user = "<|user|>" in decoded_text
-            has_assistant = "<|assistant|>" in decoded_text
-            has_end = "<|end|>" in decoded_text
-            print(f"  Tagy: System={has_system}, User={has_user}, Assistant={has_assistant}, End={has_end}")
+            f.write(f"VZOREK {i+1}:\n")
+            f.write(f"Délka tokenů: {len(sample['input_ids'])}\n")
+            f.write(f"Text:\n{decoded_text}\n")
+            f.write("-" * 80 + "\n\n")
         
-        # Statistiky délky tokenů v validation datasetu
-        eval_lengths = [len(sample['input_ids']) for sample in eval_dataset]
-        print(f"\n📏 Statistiky délky tokenů v validation datasetu:")
-        print(f"  Min: {min(eval_lengths)}")
-        print(f"  Max: {max(eval_lengths)}")
-        print(f"  Průměr: {sum(eval_lengths)/len(eval_lengths):.1f}")
-        print(f"  Medián: {sorted(eval_lengths)[len(eval_lengths)//2]}")
-        
-        # Kontrola přítomnosti tagů v celém validation datasetu
-        eval_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in eval_dataset]
-        eval_system_count = sum(1 for text in eval_texts if "<|system|>" in text)
-        eval_user_count = sum(1 for text in eval_texts if "<|user|>" in text)
-        eval_assistant_count = sum(1 for text in eval_texts if "<|assistant|>" in text)
-        eval_end_count = sum(1 for text in eval_texts if "<|end|>" in text)
-        
-        print(f"\n📊 Tagy v celém validation datasetu:")
-        print(f"  System: {eval_system_count}/{len(eval_dataset)} ({eval_system_count/len(eval_dataset)*100:.1f}%)")
-        print(f"  User: {eval_user_count}/{len(eval_dataset)} ({eval_user_count/len(eval_dataset)*100:.1f}%)")
-        print(f"  Assistant: {eval_assistant_count}/{len(eval_dataset)} ({eval_assistant_count/len(eval_dataset)*100:.1f}%)")
-        print(f"  End: {eval_end_count}/{len(eval_dataset)} ({eval_end_count/len(eval_dataset)*100:.1f}%)")
+        if len(eval_dataset) > 5:
+            f.write(f"... a dalších {len(eval_dataset) - 5} vzorků\n")
     
-    # Porovnání train vs validation
-    print(f"\n🔍 POROVNÁNÍ TRAIN vs VALIDATION:")
-    print(f"📊 Poměr velikostí: {len(train_dataset)}:{len(eval_dataset)} ({len(train_dataset)/len(eval_dataset):.1f}:1)")
+    print(f"✅ Čitelné verze vytvořeny:")
+    print(f"   - {train_readable_file}")
+    print(f"   - {eval_readable_file}")
     
-    if len(train_dataset) > 0 and len(eval_dataset) > 0:
-        train_avg_length = sum(len(sample['input_ids']) for sample in train_dataset) / len(train_dataset)
-        eval_avg_length = sum(len(sample['input_ids']) for sample in eval_dataset) / len(eval_dataset)
-        print(f"📏 Průměrná délka: Train={train_avg_length:.1f}, Validation={eval_avg_length:.1f}")
-        
-        # Kontrola, zda jsou data podobná
-        train_sample = tokenizer.decode(train_dataset[0]['input_ids'], skip_special_tokens=False)
-        eval_sample = tokenizer.decode(eval_dataset[0]['input_ids'], skip_special_tokens=False)
-        
-        print(f"📝 Ukázka struktury:")
-        print(f"  Train první vzorek: {train_sample[:100]}...")
-        print(f"  Validation první vzorek: {eval_sample[:100]}...")
+    # Vytvoření statistik souboru
+    stats_file = os.path.join(debugger.debug_dir, "dataset_statistics.json")
+    train_lengths = [len(sample['input_ids']) for sample in train_dataset]
+    eval_lengths = [len(sample['input_ids']) for sample in eval_dataset]
+    
+    train_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in train_dataset]
+    eval_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in eval_dataset]
+    
+    stats = {
+        "train_dataset": {
+            "size": len(train_dataset),
+            "token_lengths": {
+                "min": min(train_lengths) if train_lengths else 0,
+                "max": max(train_lengths) if train_lengths else 0,
+                "avg": sum(train_lengths)/len(train_lengths) if train_lengths else 0,
+                "median": sorted(train_lengths)[len(train_lengths)//2] if train_lengths else 0
+            },
+            "tags": {
+                "system": sum(1 for text in train_texts if "<|system|>" in text),
+                "user": sum(1 for text in train_texts if "<|user|>" in text),
+                "assistant": sum(1 for text in train_texts if "<|assistant|>" in text),
+                "end": sum(1 for text in train_texts if "<|end|>" in text)
+            }
+        },
+        "validation_dataset": {
+            "size": len(eval_dataset),
+            "token_lengths": {
+                "min": min(eval_lengths) if eval_lengths else 0,
+                "max": max(eval_lengths) if eval_lengths else 0,
+                "avg": sum(eval_lengths)/len(eval_lengths) if eval_lengths else 0,
+                "median": sorted(eval_lengths)[len(eval_lengths)//2] if eval_lengths else 0
+            },
+            "tags": {
+                "system": sum(1 for text in eval_texts if "<|system|>" in text),
+                "user": sum(1 for text in eval_texts if "<|user|>" in text),
+                "assistant": sum(1 for text in eval_texts if "<|assistant|>" in text),
+                "end": sum(1 for text in eval_texts if "<|end|>" in text)
+            }
+        },
+        "split_info": split_info,
+        "tokenizer_info": {
+            "vocab_size": len(tokenizer),
+            "pad_token_id": tokenizer.pad_token_id,
+            "eos_token_id": tokenizer.eos_token_id,
+            "max_length": args.max_length
+        }
+    }
+    
+    with open(stats_file, 'w', encoding='utf-8') as f:
+        json.dump(stats, f, ensure_ascii=False, indent=2)
+    print(f"✅ Statistiky uloženy: {stats_file}")
+    
+    # Debug: Uložení informací o datasetech
+    debugger.save_step("15_train_validation_files", {
+        "train_dataset_file": train_data_file,
+        "validation_dataset_file": eval_data_file,
+        "train_readable_file": train_readable_file,
+        "validation_readable_file": eval_readable_file,
+        "statistics_file": stats_file,
+        "train_size": len(train_dataset),
+        "validation_size": len(eval_dataset)
+    }, "Uložené soubory train a validation datasetů")
     
     print(f"\n✅ System messages jsou v obou datasetech - model se učí na kompletních konverzacích")
     print(f"✅ Každá konverzace obsahuje: system + user + assistant")
     print(f"✅ Data jsou připravena pro fine-tuning")
+    
+    # Finální debug shrnutí před trénováním
+    debugger.save_step("16_final_pre_training_summary", {
+        "model_name": args.model_name,
+        "max_length": args.max_length,
+        "batch_size": args.batch_size,
+        "epochs": args.epochs,
+        "learning_rate": args.learning_rate,
+        "train_dataset_size": len(train_dataset),
+        "eval_dataset_size": len(eval_dataset),
+        "total_samples": len(tokenized_dataset),
+        "split_info": split_info,
+        "tokenizer_vocab_size": len(tokenizer),
+        "model_vocab_size": model.config.vocab_size,
+        "pad_token_id": tokenizer.pad_token_id,
+        "eos_token_id": tokenizer.eos_token_id,
+        "training_args": {
+            "output_dir": args.output_dir,
+            "save_steps": save_steps,
+            "eval_steps": eval_steps,
+            "logging_steps": logging_steps,
+            "use_wandb": args.use_wandb,
+            "push_to_hub": args.push_to_hub
+        }
+    }, "Finální shrnutí před začátkem trénování")
+    
+    # Vytvoření finálního shrnutí debug informací
+    debugger.create_summary()
+    print(f"📋 Kompletní debug shrnutí vytvořeno: {debugger.debug_dir}/debug_summary.txt")
+    print(f"🔍 Všechny debug soubory jsou uloženy v: {debugger.debug_dir}")
     
     # 7. Data Collator
     print("\n🔧 Konfiguruji data collator...")
@@ -736,7 +1051,7 @@ def main():
         print(f"✅ Model nahrán: https://huggingface.co/{args.hub_model_id}")
     
     # 12. Testování
-    print("\n🧪 Testuji model...")
+    print("\n🏋️ Testuji model...")
     def generate_response(prompt, max_length=200):
         inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
         with torch.no_grad():
