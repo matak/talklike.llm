@@ -4,11 +4,17 @@ Jednoduchý skript pro testování finetunovaného modelu z Hugging Face
 Umožňuje uživateli zadávat prompty a získávat odpovědi od modelu
 """
 
+# Import setup_environment pro správné nastavení prostředí
+import setup_environment
+
 import argparse
 import sys
+import os
 import torch
+import json
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import warnings
+from peft import PeftModel
 
 # Potlačení varování
 warnings.filterwarnings("ignore")

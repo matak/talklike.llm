@@ -4,6 +4,9 @@ Skript pro vytvoření QLoRA adaptéru z datasetu
 Adaptér se dá snadno připojit k jakémukoli kompatibilnímu modelu
 """
 
+# Import setup_environment pro správné nastavení prostředí
+import setup_environment
+
 import os
 import json
 import torch

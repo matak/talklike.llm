@@ -4,11 +4,16 @@ Skript pro nahrání pouze LoRA adaptéru na Hugging Face Hub
 Tento přístup je mnohem efektivnější než nahrávání celého modelu
 """
 
+# Import setup_environment pro správné nastavení prostředí
+import setup_environment
+
 import os
 import argparse
 from dotenv import load_dotenv
 from huggingface_hub import login, HfApi
 import shutil
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
 
 def upload_adapter_only(adapter_path, hub_model_id, token):
     """Nahraje pouze LoRA adapter na Hugging Face Hub"""

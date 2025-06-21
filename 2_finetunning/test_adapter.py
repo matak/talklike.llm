@@ -4,8 +4,12 @@ Skript pro testování LoRA adaptéru s různými modely
 Umožňuje snadné připojení adaptéru k jakémukoli kompatibilnímu modelu
 """
 
+# Import setup_environment pro správné nastavení prostředí
+import setup_environment
+
 import argparse
 import sys
+import os
 import torch
 import json
 from transformers import AutoModelForCausalLM, AutoTokenizer

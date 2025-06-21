@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """
-Test script pro ověření tokenizace a data collator
+Test tokenizace pro fine-tuning data
 """
 
+# Import setup_environment pro správné nastavení prostředí
+import setup_environment
+
+import os
 import json
 import torch
+from transformers import AutoTokenizer
 from datasets import Dataset
 from transformers import (
     AutoModelForCausalLM,
-    AutoTokenizer,
     DataCollatorForLanguageModeling
 )
 

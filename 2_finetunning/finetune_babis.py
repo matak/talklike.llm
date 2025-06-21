@@ -4,6 +4,9 @@ Fine-tuning script pro model s daty Andreje Babiše
 Spustitelný na RunPod.io nebo lokálně
 """
 
+# Import setup_environment pro správné nastavení prostředí
+import setup_environment
+
 import os
 import json
 import torch

@@ -4,10 +4,13 @@ Skript pro nahrání již vygenerovaného modelu na Hugging Face Hub
 Použijte tento skript, pokud jste zapomněli přidat --push_to_hub do původního příkazu
 """
 
+# Import setup_environment pro správné nastavení prostředí
+import setup_environment
+
 import os
 import argparse
 from dotenv import load_dotenv
-from huggingface_hub import login
+from huggingface_hub import HfApi, login
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 
