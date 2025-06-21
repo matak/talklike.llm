@@ -1,55 +1,90 @@
-# Praktické cvičení - Lekce 6: Fine-tuning jazykového modelu
-## [AI Developer]
+# 🤖 Příprava dat pro Fine-tuning - TalkLike.LLM
 
-**Počet bodů:** 100  
-**Deadline:** 17.6.2025
+## 📋 Přehled
 
----
+Tento projekt vytváří dataset pro fine-tuning jazykového modelu, který napodobuje komunikační styl Andreje Babiše. Vytvořený dataset obsahuje 1,500 QA párů ve strukturovaném formátu s charakteristickým stylem "babíšovštiny".
 
-## 📋 Zadání úkolu
+### 🔄 Vývoj metodologie
 
-Vyberte si metodu fine-tuningu modelu podle svého zamýšleného použití – buď pomocí OpenAI API (např. doladění GPT-4) nebo s využitím Hugging Face (např. transformers a PEFT). Proveďte srovnání odpovědí modelu před a po fine-tuningu a vyhodnoťte změny pomocí benchmarkingu.
-
-**Forma odevzdání:** Vypracovaný úkol odevzdejte ve formě tabulky (excel, Google sheet), screenshotů nebo PDF souboru obsahujícího všechny odpovědi a vaše bodové ohodnocení (benchmarking). Nahrajte soubor na Google Classroom.
-
----
-
-## 🎯 Cíl projektu
-
-Cílem projektu bylo vytvořit fine-tuning dataset pro jazykový model, který by napodoboval charakteristický styl komunikace Andreje Babiše - českého politika a podnikatele. Model měl být schopen generovat satirické odpovědi ve stylu "babíšovštiny" - charakteristického jazykového stylu s mluvenou češtinou, slovensko-českými odchylkami a specifickými rétorickými prvky.
-
----
-
-## 🔄 Metodologie a implementace
-
-### 1. Počáteční přístup a jeho problémy
-
+#### Počáteční přístup a jeho problémy
 **První pokus:** Ruční sběr dat
 - Stáhnuty všechny projevy Andreje Babiše z poslanecké sněmovny
 - Získány rozhovory z období působení na ministerstvu financí
 - Shromážděny články z bulvárních plátků (Parlamentní listy)
-- **Problém:** Mix satirických výroků a předpřipravených textů byl nevyrovnaný, konzistentnost názorů byla problematická (data z roku 2013,2017,2021 jdou názorově proti sobě)
+- **Problém:** Mix satirických výroků a předpřipravených textů byl nevyrovnaný, konzistentnost názorů byla problematická (data z roku 2013, 2017, 2021 jdou názorově proti sobě)
 - **Výsledek:** Ruční třídění se stalo neefektivní a časově náročné
 
-### 2. Přechod k LLM-based metodě
-
+#### Přechod k LLM-based metodě
 **Důvod změny:** LLM nedokáží zpracovat složitější zadání najednou
 **Řešení:** Rozklad procesu na menší, detailní kroky
 - Simplifikace zadání
 - Rozklad na tvorbu šablon a následné generování datasetu
 - Postupné zpracování v dávkách
 
----
+## 🎯 Cíl
 
-## 🛠️ Implementační kroky
+Vytvořit kvalitní dataset pro fine-tuning, který zachovává:
+- Mluvenou češtinu se slovensko-českými odchylkami
+- Specifické rétorické prvky a fráze
+- Satirický, emotivní a sebestředný tón
+- Autentický styl "babíšovštiny"
 
-### Krok 1: Vytvoření šablon (Templates)
+## 🏗️ Architektura řešení
 
-**Soubor:** `1_data_preparation/LLM.Outline.CreateTemplates.md`
-- **Úkol:** Vygenerovat 400 originálních šablon výroků ve stylu Andreje Babiše
-- **Model:** GPT-o3 (GPT-4.5 se ukázal jako nevhodný - nepochopil zadání)
-- **Zajímavost:** GPT-o3 si vytvořil Python skripty pro brute-force skládání slov
-- **Výstup:** Šablony s placeholdery pro různé kategorie (téma, nepřítel, činnost, kritika, atd.)
+### Workflow
+1. **Šablony** → 2. **Odpovědi** → 3. **QA páry** → 4. **Sloučení** → 5. **Validace**
+
+### Struktura projektu
+```
+1_data_preparation/
+├── 📄 Skripty
+│   ├── generate_answers.py          # Generování odpovědí z šablon
+│   ├── generate_qa_dataset.py       # Vytvoření QA párů
+│   ├── dataset_merger.py           # Sloučení dat
+│   ├── data_quality_check.py       # Kontrola kvality
+│   ├── moderate_training_data.py   # Moderace obsahu
+│   └── run_data_preparation.py     # Hlavní runner
+├── 📄 Šablony a prompty
+│   ├── babis_templates_400.json    # 400 šablon výroků
+│   ├── LLM.CreateAnswers.systemPrompt.md
+│   ├── LLM.CreateDialogue.systemPrompt.md
+│   └── LLM.finetunning.systemPrompt.json
+├── 📄 Knihovny (lib/)
+│   ├── babis_dataset_generator.py
+│   ├── babis_dialog_generator.py
+│   ├── openai_cost_calculator.py
+│   └── llm_cost_calculator.py
+└── 📄 Výstupy (data/)
+    ├── generated_batches/          # Mezivýstupy
+    ├── final/                      # QA páry
+    └── all.jsonl                   # Finální dataset
+```
+
+## 🚀 Rychlé spuštění
+
+### 1. Instalace
+```bash
+pip install -r requirements_datapreparation.txt
+```
+
+### 2. Nastavení
+```bash
+# Vytvořte .env soubor s OpenAI API klíčem
+echo "OPENAI_API_KEY=your_api_key_here" > .env
+```
+
+### 3. Spuštění
+```bash
+python run_data_preparation.py
+```
+
+## 📋 Detailní kroky
+
+### Krok 1: Vytvoření šablon
+**Soubor:** `LLM.Outline.CreateTemplates.md`
+- **Úkol:** Vygenerovat 400 originálních šablon výroků
+- **Model:** GPT-o3
+- **Výstup:** Šablony s placeholdery pro různé kategorie
 
 **Klíčové placeholdery:**
 - `{tema}` - inflace, válka, důchody, klima, očkování, daně
@@ -59,113 +94,208 @@ Cílem projektu bylo vytvořit fine-tuning dataset pro jazykový model, který b
 - `{emotivni_vyraz}` - to je šílený!, kampááň!, tragédyje!
 
 ### Krok 2: Generování odpovědí
-
-**Soubor:** `1_data_preparation/LLM.CreateAnswers.systemPrompt.md`
-- **Úkol:** Nahradit placeholdery v šablonách konkrétními hodnotami
-- **Zpracování:** Po 300 šablonách v dávkách
-- **Pravidla:** 
-  - 15% pravděpodobnost jazykové chyby
-  - Rovnoměrný mix 5 stylů (emocionální výlevy, odmítavý postoj, domýšlivost, chaotická logika, ironie)
-  - Zachování autentického stylu "babíšovštiny"
-
-### Krok 3: Vytvoření dialogů
-
-**Soubor:** `1_data_preparation/LLM.CreateDialogue.systemPrompt.md`
-- **Úkol:** Generovat korespondující novinářské otázky k odpovědím
-- **Formát:** JSONL s páry otázka-odpověď
-- **Styl:** Profesionální redaktor v rozhovoru
-
-### Krok 4: Automatizované zpracování
-
-**Skript:** `generate_qa_dataset.py`
-- **Funkce:** Zpracování všech batch souborů
-- **Výstup:** Strukturované QA páry pro fine-tuning
-- **Kontrola:** Výpočet nákladů pomocí tiktokenizer
-
-**Skript:** `generate_answers.py`
-- **Funkce:** Generování odpovědí z šablon
-- **Optimalizace:** Dávkové zpracování pro úsporu nákladů
-
-### Krok 5: Sloučení dat
-
-**Skript:** `dataset_merger.py`
-- **Úkol:** Sloučit všechny vygenerované dávky
-- **Výstup:** `data/all.jsonl` - kompletní dataset
-
-### Krok 6: Moderace obsahu
-
-**Skript:** `moderate_training_data.py`
-- **Úkol:** Kontrola obsahu pomocí OpenAI Moderation API
-- **Endpoint:** `https://api.openai.com/v1/moderations`
-- **Problém:** Dataset byl zablokován moderací
-- **Chyba:** "The job failed due to an invalid validation file. This training file was blocked by our moderation system because it contains too many examples that violate OpenAI's usage policies"
-
----
-
-## 📊 Struktura projektu
-
-### Adresáře a soubory:
-
+```bash
+python generate_answers.py
 ```
-talklike.llm/
-├── 1_data_preparation/                          # Zadání a šablony
-│   ├── babis_templates_400.json   # Vygenerované šablony
-│   ├── LLM.Outline.CreateTemplates.md
-│   ├── LLM.CreateAnswers.systemPrompt.md
-│   ├── LLM.CreateDialogue.systemPrompt.md
-│   └── LLM.finetunning.systemPrompt.json
-├── data/                          # Sloučená data
-│   ├── all.jsonl                  # Kompletní dataset
-│   ├── moderated_training_data.jsonl
-│   └── moderated_training_data_report.txt
-│   ├── generated_batches/             # Mezivýstupy
-│   │   ├── batch_01_babis_output.jsonl
-│   │   ├── batch_02_babis_output.jsonl
-│   │   └── ...
-│   └── final/                         # Finální QA dataset
-│       ├── batch_01_babis_output_qa.jsonl
-│       └── ...
-└── Skripty pro zpracování
-    ├── generate_qa_dataset.py
-    ├── generate_answers.py
-    ├── dataset_merger.py
-    ├── moderate_training_data.py
-    └── llm_cost_calculator.py
+- **Vstup:** 400 šablon z `babis_templates_400.json`
+- **Výstup:** 10 dávek po 150 odpovědích (celkem 1,500)
+- **Pravidla:** 15% pravděpodobnost jazykové chyby, mix 5 stylů
+
+### Krok 3: Vytvoření QA datasetu
+```bash
+python generate_qa_dataset.py
+```
+- **Vstup:** Odpovědi z kroku 2
+- **Výstup:** QA páry v JSONL formátu
+
+### Krok 4: Sloučení dat
+```bash
+python dataset_merger.py
+```
+- **Vstup:** QA páry z kroku 3
+- **Výstup:** `data/all.jsonl` - finální dataset
+
+### Krok 5: Kontrola kvality
+```bash
+python data_quality_check.py
+```
+- **Vstup:** Finální dataset
+- **Výstup:** Report a vizualizace kvality
+
+## 📊 Charakteristika datasetu
+
+### Struktura dat
+```json
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Jsi Andrej Babiš, český politik a podnikatel..."
+    },
+    {
+      "role": "user", 
+      "content": "Pane Babiši, jak hodnotíte současnou inflaci?"
+    },
+    {
+      "role": "assistant",
+      "content": "Hele, inflace je jak když kráva hraje na klavír! Andrej Babiš"
+    }
+  ]
+}
 ```
 
----
+### Klíčové vlastnosti
+- **Počet QA párů:** 1,500
+- **Styl:** Mluvená čeština s "babíšovštinou"
+- **Podpis:** Každá odpověď končí "Andrej Babiš"
+- **Jazykové chyby:** 15% pravděpodobnost
+- **Stylové variace:** 5 různých stylů
+
+### Charakteristické prvky
+- **Fráze:** "Hele", "To je skandál!", "Já makám"
+- **Přirovnání:** "jak když kráva hraje na klavír"
+- **Slovenské odchylky:** "sme", "som", "makáme"
+- **Témata:** Politika, ekonomika, rodina, podnikání
 
 ## 💰 Náklady a optimalizace
 
-### Výpočet nákladů:
-- **Nástroj:** `llm_cost_calculator.py` a `openai_cost_calculator.py`
-- **Metoda:** Použití tiktokenizer pro přesný výpočet tokenů
-- **Optimalizace:** Dávkové zpracování pro minimalizaci nákladů
+### Kalkulátor nákladů
+```python
+from lib.openai_cost_calculator import OpenAICostCalculator
 
-### Logy a monitoring:
-- **Adresář:** `logs/` - detailní logy všech operací
-- **Soubor:** `moderation.log` - výsledky moderace
+calculator = OpenAICostCalculator()
+cost = calculator.estimate_batch_cost(input_text, output_text, "gpt-4o")
+```
 
----
+### Optimalizace
+- **Dávkové zpracování:** Po 150 šablonách
+- **Cachování:** Ukládání surových odpovědí
+- **Validace:** Kontrola před uložením
+- **Logování:** Detailní sledování procesu
 
-## 📈 Výsledky
+## 🔍 Kontrola kvality
 
-### Vytvořený dataset:
-- **Celkový počet párů:** 3,000 QA párů v `data/all.jsonl`
-- **Formát:** JSONL s konverzačními páry (system, user, assistant)
-- **Struktura:** Každá odpověď končí "Andrej Babiš" jako podpis
+### Automatické kontroly
+- ✅ Struktura datasetu
+- ✅ Podpis "Andrej Babiš"
+- ✅ Charakteristické fráze
+- ✅ Slovenské odchylky
+- ✅ Délka odpovědí
 
-### Charakteristika obsahu:
-- **Styl:** Mluvená čeština s "babíšovštinou"
-- **Témata:** Politika, ekonomika, rodina, podnikání
-- **Tón:** Satirický, emotivní, sebestředný
-- **Jazykové prvky:** Slovensko-české odchylky, záměrné chyby
+### Report kvality
+- **Soubor:** `data_quality_report.json`
+- **Vizualizace:** `data_quality_analysis.png`
+- **Metriky:** Úspěšnost, distribuce stylů, délky
 
----
+## 🛠️ Pokročilé možnosti
 
-## 📝 Závěr
+### Vlastní šablony
+```json
+{
+  "tema": ["inflace", "válka", "důchody"],
+  "nepritel": ["Brusel", "Piráti", "Fiala"],
+  "cinnost": ["makal", "pomáhal lidem", "budoval stát"]
+}
+```
 
-Projekt úspěšně demonstroval kompletní workflow pro vytvoření fine-tuning datasetu pomocí LLM. Klíčovým poznatkem bylo, že složité zadání je nutné rozdělit na menší, detailní kroky. Vytvořený dataset obsahuje 3,000 konverzačních párů připravených pro fine-tuning, i když byl následně zablokován OpenAI moderací kvůli satirickému obsahu.
+### Konfigurace modelů
+```json
+{
+  "gpt-4o": {
+    "name": "GPT-4 Optimized",
+    "default": 1,
+    "prices": {
+      "batch": {"input": 1.25, "output": 5.00}
+    }
+  }
+}
+```
 
-**Silné stránky:** Kompletní implementace, kvalitní dataset, dobře strukturovaný kód
-**Oblasti pro zlepšení:** Řešení moderace obsahu, alternativní přístupy k fine-tuningu
+## 🚨 Řešení problémů
+
+### Časté chyby
+1. **OPENAI_API_KEY není nastaven**
+   ```bash
+   export OPENAI_API_KEY="your_key_here"
+   ```
+
+2. **Chybějící soubory**
+   ```bash
+   ls babis_templates_400.json
+   ls LLM.CreateAnswers.systemPrompt.md
+   ```
+
+3. **Nedostatečné kredity**
+   - Zkontrolujte zůstatek na OpenAI
+   - Použijte levnější model v `availablemodels.json`
+
+### Debugování
+```bash
+# Spuštění s detailním výpisem
+python -u generate_answers.py
+
+# Kontrola logů
+tail -f logs/llm_interaction_*.log
+```
+
+## 📈 Výsledky a monitoring
+
+### Finální soubory
+- `data/all.jsonl` - Dataset pro fine-tuning
+- `data_quality_report.json` - Report kvality
+- `data_quality_analysis.png` - Vizualizace
+- `logs/data_preparation_*.json` - Logy
+
+### Metriky kvality
+- **Úspěšnost podpisů:** >95%
+- **Slovenské odchylky:** 10-20%
+- **Charakteristické fráze:** >80%
+- **Průměrná délka:** 50-150 znaků
+
+### Logy a monitoring
+- **Umístění:** `logs/`
+- **Formát:** JSON s timestampem
+- **Obsah:** Prompt, odpověď, chyby, náklady
+
+## 🔄 Údržba a aktualizace
+
+### Přidání nových šablon
+1. Upravte `babis_templates_400.json`
+2. Spusťte `generate_answers.py`
+3. Ověřte kvalitu pomocí `data_quality_check.py`
+
+### Úprava stylu
+1. Upravte systémové prompty
+2. Regenerujte dataset
+3. Porovnejte kvalitu
+
+### Optimalizace nákladů
+1. Zkontrolujte `availablemodels.json`
+2. Upravte velikost dávek
+3. Použijte levnější modely
+
+## ⚠️ Důležité poznámky
+
+### Moderace obsahu
+Dataset byl zablokován OpenAI moderací kvůli satirickému obsahu. Chyba:
+> "The job failed due to an invalid validation file. This training file was blocked by our moderation system because it contains too many examples that violate OpenAI's usage policies"
+
+### Alternativní řešení
+- Použití lokálních modelů pro fine-tuning
+- Úprava obsahu pro splnění moderace
+- Použití alternativních platform
+
+## ✅ Shrnutí
+
+Projekt úspěšně demonstroval kompletní workflow pro vytvoření fine-tuning datasetu pomocí LLM. Klíčovým poznatkem bylo, že složité zadání je nutné rozdělit na menší, detailní kroky.
+
+**Silné stránky:**
+- 🎯 Zaměření na specifický styl
+- 💰 Optimalizované náklady
+- 🔍 Kompletní validace
+- 📊 Detailní monitoring
+- 🛠️ Snadná údržba a rozšiřitelnost
+
+**Oblasti pro zlepšení:**
+- Řešení moderace obsahu
+- Alternativní přístupy k fine-tuningu
