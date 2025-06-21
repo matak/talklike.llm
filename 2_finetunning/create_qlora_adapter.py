@@ -75,7 +75,7 @@ def tokenize_function(examples, tokenizer, max_length=2048):
     tokenized = tokenizer(
         examples["text"],
         truncation=True,
-        padding=True,
+        padding=False,
         max_length=max_length,
         return_tensors=None
     )
@@ -193,7 +193,8 @@ def create_qlora_adapter(
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer,
         mlm=False,
-        pad_to_multiple_of=8
+        pad_to_multiple_of=8,
+        padding=True,
     )
     
     # 9. Training Arguments

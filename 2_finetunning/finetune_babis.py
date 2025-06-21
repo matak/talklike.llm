@@ -242,33 +242,6 @@ def main():
         "max_length": args.max_length
     }, f"Tokenizovaný dataset s {len(tokenized_dataset)} vzorky")
     
-    # Kontrola a oprava padding po tokenizaci
-    print("🔧 Kontroluji a opravuji padding...")
-    def fix_padding(example):
-        """Zajistí, že všechny sekvence mají stejnou délku"""
-        max_len = args.max_length
-        current_len = len(example['input_ids'])
-        
-        if current_len < max_len:
-            # Přidáme padding
-            padding_length = max_len - current_len
-            example['input_ids'] = example['input_ids'] + [tokenizer.pad_token_id] * padding_length
-            example['attention_mask'] = example['attention_mask'] + [0] * padding_length
-            example['labels'] = example['labels'] + [-100] * padding_length  # -100 pro ignorování v loss
-        elif current_len > max_len:
-            # Ořízneme na max_length
-            example['input_ids'] = example['input_ids'][:max_len]
-            example['attention_mask'] = example['attention_mask'][:max_len]
-            example['labels'] = example['labels'][:max_len]
-        
-        return example
-    
-    # Aplikujeme opravu padding na celý dataset
-    tokenized_dataset = tokenized_dataset.map(
-        fix_padding,
-        desc="Opravuji padding"
-    )
-    
     # Rozdělení na train/validation
     print(f"📊 Celkový počet vzorků: {len(tokenized_dataset)}")
     
@@ -321,6 +294,7 @@ def main():
         mlm=False,
         return_tensors="pt",
         pad_to_multiple_of=8,
+        padding=True,  # Explicitně povolíme padding
     )
     
     # 8. Training Arguments

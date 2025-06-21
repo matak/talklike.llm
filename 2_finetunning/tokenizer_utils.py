@@ -214,11 +214,11 @@ def check_tokenizer_compatibility(tokenizer, model_name, debugger=None):
 
 def tokenize_function(examples, tokenizer, max_length=2048):
     """Tokenizuje text pro fine-tuning"""
-    # Tokenizace s padding pro konzistentní délky
+    # Tokenizace BEZ padding - padding se řeší v DataCollator
     tokenized = tokenizer(
         examples["text"],
         truncation=True,
-        padding=True,  # Povolíme padding
+        padding=False,  # Změna: padding=False, protože se řeší v DataCollator
         max_length=max_length,
         return_tensors=None
     )

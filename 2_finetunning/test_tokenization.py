@@ -104,7 +104,7 @@ def test_tokenization():
         tokenized = tokenizer(
             examples["text"],
             truncation=True,
-            padding=True,
+            padding=False,
             max_length=max_length,
             return_tensors=None
         )
@@ -121,26 +121,6 @@ def test_tokenization():
         batch_size=100
     )
     
-    # Oprava padding
-    print("🔧 Opravuji padding...")
-    def fix_padding(example):
-        max_len = 512
-        current_len = len(example['input_ids'])
-        
-        if current_len < max_len:
-            padding_length = max_len - current_len
-            example['input_ids'] = example['input_ids'] + [tokenizer.pad_token_id] * padding_length
-            example['attention_mask'] = example['attention_mask'] + [0] * padding_length
-            example['labels'] = example['labels'] + [-100] * padding_length
-        elif current_len > max_len:
-            example['input_ids'] = example['input_ids'][:max_len]
-            example['attention_mask'] = example['attention_mask'][:max_len]
-            example['labels'] = example['labels'][:max_len]
-        
-        return example
-    
-    tokenized_dataset = tokenized_dataset.map(fix_padding, desc="Opravuji padding")
-    
     # Kontrola délky
     print("\n📏 Kontrola délky tokenů:")
     for i, sample in enumerate(tokenized_dataset):
@@ -153,6 +133,7 @@ def test_tokenization():
         mlm=False,
         return_tensors="pt",
         pad_to_multiple_of=8,
+        padding=True,  # Explicitně povolíme padding
     )
     
     try:
