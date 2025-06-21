@@ -146,11 +146,11 @@ def prepare_training_data(conversations):
 
 def tokenize_function(examples, tokenizer, max_length=2048):
     """Tokenizuje text pro fine-tuning"""
-    # Tokenizace
+    # Tokenizace s padding pro konzistentní délky
     tokenized = tokenizer(
         examples["text"],
         truncation=True,
-        padding=False,
+        padding=True,  # Povolíme padding
         max_length=max_length,
         return_tensors=None
     )
@@ -393,7 +393,35 @@ def main():
     tokenized_dataset = dataset.map(
         tokenize_func,
         batched=True,
-        remove_columns=dataset.column_names
+        remove_columns=dataset.column_names,
+        batch_size=100  # Menší batch size pro lepší kontrolu
+    )
+    
+    # Kontrola a oprava padding po tokenizaci
+    print("🔧 Kontroluji a opravuji padding...")
+    def fix_padding(example):
+        """Zajistí, že všechny sekvence mají stejnou délku"""
+        max_len = args.max_length
+        current_len = len(example['input_ids'])
+        
+        if current_len < max_len:
+            # Přidáme padding
+            padding_length = max_len - current_len
+            example['input_ids'] = example['input_ids'] + [tokenizer.pad_token_id] * padding_length
+            example['attention_mask'] = example['attention_mask'] + [0] * padding_length
+            example['labels'] = example['labels'] + [-100] * padding_length  # -100 pro ignorování v loss
+        elif current_len > max_len:
+            # Ořízneme na max_length
+            example['input_ids'] = example['input_ids'][:max_len]
+            example['attention_mask'] = example['attention_mask'][:max_len]
+            example['labels'] = example['labels'][:max_len]
+        
+        return example
+    
+    # Aplikujeme opravu padding na celý dataset
+    tokenized_dataset = tokenized_dataset.map(
+        fix_padding,
+        desc="Opravuji padding"
     )
     
     # Rozdělení na train/validation s kontrolou velikosti
@@ -542,6 +570,7 @@ def main():
         tokenizer=tokenizer,
         mlm=False,
         return_tensors="pt",
+        pad_to_multiple_of=8,  # Padding na násobky 8 pro lepší výkon
     )
     
     # Test data collator na jednom vzorku
@@ -554,7 +583,30 @@ def main():
             print(f"📊 Labels shape: {test_batch['labels'].shape}")
         except Exception as e:
             print(f"⚠️ Data collator test selhal: {e}")
-            print("ℹ️ Pokračuji s výchozím nastavením")
+            print("🔍 Debugging informace:")
+            print(f"  Sample keys: {list(train_dataset[0].keys())}")
+            print(f"  Input IDs length: {len(train_dataset[0]['input_ids'])}")
+            print(f"  Labels length: {len(train_dataset[0]['labels'])}")
+            print(f"  Sample type: {type(train_dataset[0]['input_ids'])}")
+            
+            # Zkusíme opravit problém s padding
+            print("🔧 Zkouším opravit padding...")
+            try:
+                # Vytvoříme nový data collator s explicitním padding
+                from transformers import DataCollatorForLanguageModeling
+                fixed_collator = DataCollatorForLanguageModeling(
+                    tokenizer=tokenizer,
+                    mlm=False,
+                    return_tensors="pt",
+                    pad_to_multiple_of=8,
+                    padding=True,
+                )
+                test_batch = fixed_collator([train_dataset[0]])
+                print(f"✅ Opravený data collator test úspěšný")
+                data_collator = fixed_collator
+            except Exception as e2:
+                print(f"❌ Oprava selhala: {e2}")
+                print("ℹ️ Pokračuji s výchozím nastavením")
     
     # 8. Training Arguments - nastavení na network storage
     print("\n⚙️ Nastavuji training arguments...")
@@ -602,6 +654,8 @@ def main():
         save_total_limit=2,
         logging_dir=f"{args.output_dir}/logs",
         dataloader_num_workers=0,
+        dataloader_drop_last=True,  # Přidáno pro lepší handling batchů
+        group_by_length=True,  # Přidáno pro lepší padding
     )
     
     # 9. Trainer
