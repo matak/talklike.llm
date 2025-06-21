@@ -37,7 +37,7 @@ Vytvořit fine-tuned jazykový model, který napodobuje komunikační styl Andre
 - **Umístění**: `1_data_preparation/`
 - **README**: [Průvodce přípravou dat](1_data_preparation/README.md)
 - **Účel**: Generování kvalitních trénovacích dat v Babišově stylu
-- **Výstup**: 3,000 QA párů ve strukturovaném formátu
+- **Výstup**: 1,500 QA párů ve strukturovaném formátu
 
 #### [2. Fine-tuning](#fine-tuning)
 - **Umístění**: `2_finetunning/`
