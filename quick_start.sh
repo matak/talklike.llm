@@ -28,17 +28,18 @@ pip install -r requirements.txt
 
 # Spuštění fine-tuningu
 echo "🏋️ Spouštím fine-tuning..."
-python finetune_babis_llama.py \
+python finetune_babis.py \
     --data_path data/all.jsonl \
-    --output_dir ./babis-llama-finetuned \
+    --output_dir ./babis-Mistral-7B-Instruct-finetuned \
     --epochs 3 \
     --batch_size 2 \
     --learning_rate 2e-4 \
     --max_length 2048 \
     --use_wandb \
     --push_to_hub \
-    --hub_model_id babis-llama-3-8b-lora
+    --model_name mistralai/Mistral-7B-Instruct-v0.3 \
+    --hub_model_id babis-mistral-7b-instruct-v0.3-lora
 
 echo "✅ Fine-tuning dokončen!"
-echo "📁 Model je uložen v: ./babis-llama-finetuned-final"
-echo "🌐 Model je dostupný na: https://huggingface.co/babis-llama-3-8b-lora" 
+echo "📁 Model je uložen v: ./babis-finetuned-final"
+echo "🌐 Model je dostupný na: https://huggingface.co/babis-mistral-7b-instruct-v0.3-lora" 

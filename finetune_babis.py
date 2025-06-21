@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Fine-tuning script pro Llama 3 8B model s daty Andreje Babiše
+Fine-tuning script pro model s daty Andreje Babiše
 Spustitelný na RunPod.io nebo lokálně
 """
 
@@ -82,21 +82,21 @@ def tokenize_function(examples, tokenizer, max_length=2048):
     return tokenized
 
 def main():
-    parser = argparse.ArgumentParser(description='Fine-tuning Llama 3 8B pro Andreje Babiše')
+    parser = argparse.ArgumentParser(description='Fine-tuning 3 8B pro Andreje Babiše')
     parser.add_argument('--data_path', type=str, default='data/all.jsonl', help='Cesta k datům')
-    parser.add_argument('--output_dir', type=str, default='./babis-llama-finetuned', help='Výstupní adresář')
-    parser.add_argument('--model_name', type=str, default='meta-llama/Meta-Llama-3-8B-Instruct', help='Název base modelu')
+    parser.add_argument('--output_dir', type=str, default='./babis-finetuned', help='Výstupní adresář')
+    parser.add_argument('--model_name', type=str, default='mistralai/Mistral-7B-Instruct-v0.3', help='Název base modelu')
     parser.add_argument('--epochs', type=int, default=3, help='Počet epoch')
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=2e-4, help='Learning rate')
     parser.add_argument('--max_length', type=int, default=2048, help='Maximální délka sekvence')
     parser.add_argument('--use_wandb', action='store_true', help='Použít Weights & Biases')
     parser.add_argument('--push_to_hub', action='store_true', help='Nahrát model na HF Hub')
-    parser.add_argument('--hub_model_id', type=str, default='babis-llama-3-8b-lora', help='Název modelu na HF Hub')
+    parser.add_argument('--hub_model_id', type=str, default='babis-lora', help='Název modelu na HF Hub')
     
     args = parser.parse_args()
     
-    print("🚀 Spouštím fine-tuning Llama 3 8B pro Andreje Babiše")
+    print("🚀 Spouštím fine-tuning pro Andreje Babiše")
     print(f"📁 Data: {args.data_path}")
     print(f"📁 Výstup: {args.output_dir}")
     print(f"🤖 Model: {args.model_name}")
@@ -118,7 +118,7 @@ def main():
         if WANDB_API_KEY:
             os.environ["WANDB_API_KEY"] = WANDB_API_KEY
             wandb.login()
-            wandb.init(project="babis-llama-finetune", name="babis-llama-3-8b-lora")
+            wandb.init(project="babis-finetune", name=args.model_name)
             print("✅ W&B login úspěšný")
         else:
             print("⚠️ WANDB_API_KEY nebyl nalezen")
