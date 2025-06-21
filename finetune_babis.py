@@ -48,41 +48,40 @@ def load_babis_data(file_path):
             messages = data['messages']
             print(f"📊 Načteno {len(messages)} zpráv v jednom objektu")
             
-            # Rozdělení na konverzace - každá konverzace má system + user + assistant
+            # Najdeme system zprávu (měla by být první)
+            system_msg = None
+            for msg in messages:
+                if msg['role'] == 'system':
+                    system_msg = msg
+                    break
+            
+            if not system_msg:
+                print("❌ Nenalezena system zpráva!")
+                return conversations
+            
+            # Projdeme všechny zprávy a najdeme user-assistant páry
             i = 0
             while i < len(messages):
-                # Najdeme system zprávu
-                if i < len(messages) and messages[i]['role'] == 'system':
-                    system_msg = messages[i]
+                # Hledáme user zprávu
+                if i < len(messages) and messages[i]['role'] == 'user':
+                    user_msg = messages[i]
                     i += 1
                     
-                    # Najdeme následující user a assistant zprávy pro tuto konverzaci
-                    conv_messages = [system_msg]
-                    
-                    # Hledáme user zprávu
-                    if i < len(messages) and messages[i]['role'] == 'user':
-                        user_msg = messages[i]
-                        conv_messages.append(user_msg)
+                    # Hledáme následující assistant zprávu
+                    if i < len(messages) and messages[i]['role'] == 'assistant':
+                        assistant_msg = messages[i]
                         i += 1
                         
-                        # Hledáme assistant zprávu
-                        if i < len(messages) and messages[i]['role'] == 'assistant':
-                            assistant_msg = messages[i]
-                            conv_messages.append(assistant_msg)
-                            i += 1
-                            
-                            # Vytvoříme konverzaci
-                            conversations.append({
-                                "messages": conv_messages
-                            })
-                        else:
-                            # Chybí assistant zpráva, přeskočíme
-                            i += 1
+                        # Vytvoříme konverzaci s system + user + assistant
+                        conv_messages = [system_msg, user_msg, assistant_msg]
+                        conversations.append({
+                            "messages": conv_messages
+                        })
                     else:
-                        # Chybí user zpráva, přeskočíme
+                        # Chybí assistant zpráva, přeskočíme user zprávu
                         i += 1
                 else:
-                    # Není system zpráva, přeskočíme
+                    # Není user zpráva, přeskočíme
                     i += 1
             
             print(f"✅ Vytvořeno {len(conversations)} konverzací")
@@ -93,6 +92,12 @@ def load_babis_data(file_path):
                 first_conv = conversations[0]
                 for msg in first_conv['messages']:
                     print(f"  {msg['role']}: {msg['content'][:100]}...")
+                
+                if len(conversations) > 1:
+                    print(f"📝 Ukázka druhé konverzace:")
+                    second_conv = conversations[1]
+                    for msg in second_conv['messages']:
+                        print(f"  {msg['role']}: {msg['content'][:100]}...")
             
             return conversations
             
