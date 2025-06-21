@@ -537,10 +537,24 @@ def main():
     print(f"✅ Data jsou připravena pro fine-tuning")
     
     # 7. Data Collator
+    print("\n🔧 Konfiguruji data collator...")
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer,
         mlm=False,
+        return_tensors="pt",
     )
+    
+    # Test data collator na jednom vzorku
+    if len(train_dataset) > 0:
+        try:
+            test_batch = data_collator([train_dataset[0]])
+            print(f"✅ Data collator test úspěšný")
+            print(f"📊 Batch keys: {list(test_batch.keys())}")
+            print(f"📊 Input shape: {test_batch['input_ids'].shape}")
+            print(f"📊 Labels shape: {test_batch['labels'].shape}")
+        except Exception as e:
+            print(f"⚠️ Data collator test selhal: {e}")
+            print("ℹ️ Pokračuji s výchozím nastavením")
     
     # 8. Training Arguments - nastavení na network storage
     print("\n⚙️ Nastavuji training arguments...")
@@ -592,13 +606,33 @@ def main():
     
     # 9. Trainer
     print("\n🏋️ Vytvářím Trainer...")
+    
+    # Nastavení label_names pro PeftModel - robustnější přístup
+    try:
+        # Zkusíme nastavit label_names na modelu
+        if hasattr(model, 'label_names'):
+            model.label_names = ['labels']
+        elif hasattr(model, 'config') and hasattr(model.config, 'label_names'):
+            model.config.label_names = ['labels']
+        
+        # Pro PeftModel můžeme také nastavit na base modelu
+        if hasattr(model, 'base_model') and hasattr(model.base_model, 'config'):
+            model.base_model.config.label_names = ['labels']
+        
+        print("✅ Label names nastaveny pro model")
+    except Exception as e:
+        print(f"⚠️ Nelze nastavit label_names: {e}")
+        print("ℹ️ Pokračuji bez explicitního nastavení label_names")
+    
+    # Zajistíme, že model je v training módu
+    model.train()
+    
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=data_collator,
-        tokenizer=tokenizer,
     )
     
     # 10. Fine-tuning
