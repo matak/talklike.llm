@@ -29,111 +29,8 @@ from huggingface_hub import login
 import wandb
 import argparse
 
-def check_disk_space():
-    """Zkontroluje dostupné místo na disku"""
-    import subprocess
-    try:
-        result = subprocess.run(['df', '-h', '/'], capture_output=True, text=True)
-        lines = result.stdout.strip().split('\n')
-        if len(lines) > 1:
-            parts = lines[1].split()
-            if len(parts) >= 5:
-                used_percent = int(parts[4].rstrip('%'))
-                print(f"💾 Použito místa na root: {parts[4]}")
-                if used_percent > 95:
-                    print("⚠️ VAROVÁNÍ: Root filesystem je téměř plný!")
-                    return False
-        return True
-    except Exception as e:
-        print(f"⚠️ Nelze zkontrolovat místo na disku: {e}")
-        return True
-
-def cleanup_cache():
-    """Vyčistí cache pro uvolnění místa"""
-    print("🧹 Čistím cache...")
-    cache_dirs = [
-        os.path.expanduser("~/.cache/huggingface"),
-        "/tmp",
-        "/root/.cache",
-        "/root/.local/share/huggingface",
-        "/var/cache",
-        "/usr/local/lib/python3.10/dist-packages/transformers/.cache"
-    ]
-    
-    for cache_dir in cache_dirs:
-        if os.path.exists(cache_dir):
-            try:
-                # Vypočítáme velikost před vyčištěním
-                total_size = 0
-                for dirpath, dirnames, filenames in os.walk(cache_dir):
-                    for filename in filenames:
-                        filepath = os.path.join(dirpath, filename)
-                        try:
-                            total_size += os.path.getsize(filepath)
-                        except:
-                            pass
-                
-                if total_size > 0:
-                    print(f"🗑️ Mažu cache v {cache_dir} (velikost: {total_size / 1024**3:.1f} GB)")
-                    shutil.rmtree(cache_dir, ignore_errors=True)
-                    os.makedirs(cache_dir, exist_ok=True)
-            except Exception as e:
-                print(f"⚠️ Nelze vyčistit {cache_dir}: {e}")
-    
-    # Další vyčištění
-    try:
-        # Vyčištění pip cache
-        os.system("pip cache purge")
-        print("🗑️ Vyčištěn pip cache")
-    except:
-        pass
-    
-    try:
-        # Vyčištění conda cache
-        os.system("conda clean -a -y")
-        print("🗑️ Vyčištěn conda cache")
-    except:
-        pass
-
-def aggressive_cleanup():
-    """Agresivní vyčištění pro uvolnění maximálního místa"""
-    print("🧹 Agresivní vyčištění...")
-    
-    # Vyčištění všech možných cache adresářů
-    cleanup_dirs = [
-        "/tmp",
-        "/var/tmp", 
-        "/root/.cache",
-        "/root/.local",
-        "/root/.config",
-        "/usr/local/lib/python3.10/dist-packages/transformers/.cache",
-        "/usr/local/lib/python3.10/dist-packages/huggingface_hub/.cache",
-        "/usr/local/lib/python3.10/dist-packages/datasets/.cache"
-    ]
-    
-    for dir_path in cleanup_dirs:
-        if os.path.exists(dir_path):
-            try:
-                print(f"🗑️ Mažu {dir_path}")
-                shutil.rmtree(dir_path, ignore_errors=True)
-                os.makedirs(dir_path, exist_ok=True)
-            except Exception as e:
-                print(f"⚠️ Nelze vyčistit {dir_path}: {e}")
-    
-    # Vyčištění log souborů
-    try:
-        os.system("find /var/log -name '*.log' -delete")
-        os.system("find /var/log -name '*.gz' -delete")
-        print("🗑️ Vyčištěny log soubory")
-    except:
-        pass
-    
-    # Restart služeb pro uvolnění paměti
-    try:
-        os.system("sync")
-        print("💾 Synchronizováno filesystem")
-    except:
-        pass
+# Import disk manager knihovny
+from disk_manager import DiskManager, setup_for_ml_project, check_and_cleanup
 
 def load_babis_data(file_path):
     """Načte data z JSONL souboru nebo jednoho velkého JSON objektu"""
@@ -151,7 +48,7 @@ def load_babis_data(file_path):
             messages = data['messages']
             print(f"📊 Načteno {len(messages)} zpráv v jednom objektu")
             
-            # Rozdělení na konverzace (každých 3 zprávy = 1 konverzace)
+            # Rozdělení na konverzace - každá konverzace má system + user + assistant
             i = 0
             while i < len(messages):
                 # Najdeme system zprávu
@@ -159,21 +56,44 @@ def load_babis_data(file_path):
                     system_msg = messages[i]
                     i += 1
                     
-                    # Najdeme user a assistant zprávy
+                    # Najdeme následující user a assistant zprávy pro tuto konverzaci
                     conv_messages = [system_msg]
-                    while i < len(messages) and messages[i]['role'] in ['user', 'assistant']:
-                        conv_messages.append(messages[i])
-                        i += 1
                     
-                    # Vytvoříme konverzaci
-                    if len(conv_messages) >= 3:  # system + user + assistant
-                        conversations.append({
-                            "messages": conv_messages
-                        })
+                    # Hledáme user zprávu
+                    if i < len(messages) and messages[i]['role'] == 'user':
+                        user_msg = messages[i]
+                        conv_messages.append(user_msg)
+                        i += 1
+                        
+                        # Hledáme assistant zprávu
+                        if i < len(messages) and messages[i]['role'] == 'assistant':
+                            assistant_msg = messages[i]
+                            conv_messages.append(assistant_msg)
+                            i += 1
+                            
+                            # Vytvoříme konverzaci
+                            conversations.append({
+                                "messages": conv_messages
+                            })
+                        else:
+                            # Chybí assistant zpráva, přeskočíme
+                            i += 1
+                    else:
+                        # Chybí user zpráva, přeskočíme
+                        i += 1
                 else:
+                    # Není system zpráva, přeskočíme
                     i += 1
             
             print(f"✅ Vytvořeno {len(conversations)} konverzací")
+            
+            # Debug informace
+            if len(conversations) > 0:
+                print(f"📝 Ukázka první konverzace:")
+                first_conv = conversations[0]
+                for msg in first_conv['messages']:
+                    print(f"  {msg['role']}: {msg['content'][:100]}...")
+            
             return conversations
             
     except json.JSONDecodeError:
@@ -261,39 +181,24 @@ def main():
     print(f"📁 Výstup: {args.output_dir}")
     print(f"🤖 Model: {args.model_name}")
     
-    # Kontrola místa na disku
-    if not check_disk_space():
-        print("⚠️ Root filesystem je plný. Zkouším vyčistit cache...")
-        cleanup_cache()
-        if not check_disk_space():
-            print("⚠️ Stále není dost místa. Zkouším agresivní vyčištění...")
-            aggressive_cleanup()
-            if not check_disk_space():
-                print("❌ Stále není dost místa. Použijte menší model nebo vyčistěte disk.")
-                return
+    # Inicializace disk manageru a nastavení pro ML projekt
+    dm = setup_for_ml_project("/workspace")
+    
+    # Kontrola místa a vyčištění pokud je potřeba
+    if not check_and_cleanup(threshold=95):
+        print("❌ Stále není dost místa. Použijte menší model nebo vyčistěte disk.")
+        return
     
     # Vyčištění cache pokud požadováno
     if args.cleanup_cache:
-        cleanup_cache()
+        dm.cleanup_cache()
     
-    # Agresivní vyčištění pro velké modely
+    # Optimalizace pro velké modely
     if args.aggressive_cleanup or "mistral" in args.model_name.lower() or "llama" in args.model_name.lower():
-        print("🧹 Agresivní vyčištění pro velký model...")
-        aggressive_cleanup()
-    
-    # Nastavení cache adresáře na workspace (více místa)
-    os.environ['HF_HOME'] = '/workspace/.cache/huggingface'
-    os.environ['TRANSFORMERS_CACHE'] = '/workspace/.cache/huggingface/transformers'
-    os.environ['HF_DATASETS_CACHE'] = '/workspace/.cache/huggingface/datasets'
-    os.environ['HF_HUB_CACHE'] = '/workspace/.cache/huggingface/hub'
-    
-    # Vytvoření cache adresářů
-    os.makedirs('/workspace/.cache/huggingface', exist_ok=True)
-    os.makedirs('/workspace/.cache/huggingface/transformers', exist_ok=True)
-    os.makedirs('/workspace/.cache/huggingface/datasets', exist_ok=True)
-    os.makedirs('/workspace/.cache/huggingface/hub', exist_ok=True)
-    
-    print(f"💾 Cache nastaven na: {os.environ['HF_HOME']}")
+        print("🧹 Optimalizace pro velký model...")
+        if not dm.optimize_for_large_models(args.model_name):
+            print("❌ Nedost místa pro velký model. Zkuste menší model.")
+            return
     
     # Načtení proměnných prostředí
     load_dotenv()
@@ -329,6 +234,41 @@ def main():
     
     # 3. Vytvoření Dataset
     dataset = Dataset.from_list(training_data)
+    
+    # Debug: Kontrola struktury dat
+    print(f"\n🔍 DEBUG: Kontrola struktury dat")
+    print(f"📊 Celkový počet vzorků: {len(dataset)}")
+    
+    if len(dataset) > 0:
+        print(f"📝 Ukázka prvního vzorku:")
+        first_sample = dataset[0]
+        print(f"Text (prvních 200 znaků): {first_sample['text'][:200]}...")
+        
+        # Kontrola přítomnosti system, user, assistant tagů
+        text = first_sample['text']
+        has_system = "<|system|>" in text
+        has_user = "<|user|>" in text
+        has_assistant = "<|assistant|>" in text
+        has_end = "<|end|>" in text
+        
+        print(f"✅ System tag: {has_system}")
+        print(f"✅ User tag: {has_user}")
+        print(f"✅ Assistant tag: {has_assistant}")
+        print(f"✅ End tag: {has_end}")
+        
+        # Počítání tagů v celém datasetu
+        system_count = sum(1 for sample in dataset if "<|system|>" in sample['text'])
+        user_count = sum(1 for sample in dataset if "<|user|>" in sample['text'])
+        assistant_count = sum(1 for sample in dataset if "<|assistant|>" in sample['text'])
+        
+        print(f"📊 Statistiky tagů v celém datasetu:")
+        print(f"  System messages: {system_count}")
+        print(f"  User messages: {user_count}")
+        print(f"  Assistant messages: {assistant_count}")
+        
+        # Kontrola délky textů
+        lengths = [len(sample['text']) for sample in dataset]
+        print(f"📏 Délka textů: min={min(lengths)}, max={max(lengths)}, avg={sum(lengths)/len(lengths):.1f}")
     
     # 4. Načtení modelu
     print(f"\n🤖 Načítám model: {args.model_name}")
@@ -374,7 +314,7 @@ def main():
                 print(f"❌ Pokus {attempt + 1} selhal - není dost místa")
                 if attempt < max_retries - 1:
                     print("🧹 Zkouším další vyčištění...")
-                    aggressive_cleanup()
+                    dm.aggressive_cleanup()
                     # Počkáme chvíli
                     import time
                     time.sleep(5)
@@ -451,13 +391,82 @@ def main():
         remove_columns=dataset.column_names
     )
     
-    # Rozdělení na train/validation
-    split_dataset = tokenized_dataset.train_test_split(test_size=0.1, seed=42)
-    train_dataset = split_dataset["train"]
-    eval_dataset = split_dataset["test"]
+    # Rozdělení na train/validation s kontrolou velikosti
+    print(f"📊 Celkový počet vzorků: {len(tokenized_dataset)}")
     
-    print(f"✅ Train dataset: {len(train_dataset)} vzorků")
-    print(f"✅ Validation dataset: {len(eval_dataset)} vzorků")
+    if len(tokenized_dataset) < 5:
+        print("⚠️ Málo vzorků pro rozdělení. Používám celý dataset pro trénování.")
+        train_dataset = tokenized_dataset
+        eval_dataset = tokenized_dataset  # Použijeme stejný dataset pro evaluaci
+    elif len(tokenized_dataset) < 10:
+        # Pro velmi malé datasety použijeme 80/20 split
+        split_ratio = 0.2
+        split_dataset = tokenized_dataset.train_test_split(test_size=split_ratio, seed=42)
+        train_dataset = split_dataset["train"]
+        eval_dataset = split_dataset["test"]
+        print(f"✅ Train dataset: {len(train_dataset)} vzorků ({100-split_ratio*100:.0f}%)")
+        print(f"✅ Validation dataset: {len(eval_dataset)} vzorků ({split_ratio*100:.0f}%)")
+    else:
+        # Standardní 90/10 split
+        split_dataset = tokenized_dataset.train_test_split(test_size=0.1, seed=42)
+        train_dataset = split_dataset["train"]
+        eval_dataset = split_dataset["test"]
+        print(f"✅ Train dataset: {len(train_dataset)} vzorků (90%)")
+        print(f"✅ Validation dataset: {len(eval_dataset)} vzorků (10%)")
+    
+    # Kontrola minimální velikosti datasetu
+    if len(train_dataset) == 0:
+        print("❌ Train dataset je prázdný! Zkontrolujte data.")
+        return
+    
+    if len(eval_dataset) == 0:
+        print("⚠️ Validation dataset je prázdný. Používám train dataset pro evaluaci.")
+        eval_dataset = train_dataset
+    
+    # Debug: Kontrola train/validation split
+    print(f"\n🔍 DEBUG: Kontrola train/validation split")
+    print(f"📊 Train dataset: {len(train_dataset)} vzorků")
+    print(f"📊 Validation dataset: {len(eval_dataset)} vzorků")
+    
+    # Kontrola struktury v train datasetu
+    if len(train_dataset) > 0:
+        print(f"📝 Ukázka prvního train vzorku:")
+        first_train = train_dataset[0]
+        decoded_text = tokenizer.decode(first_train['input_ids'], skip_special_tokens=False)
+        print(f"Tokenizovaný text (prvních 200 znaků): {decoded_text[:200]}...")
+        
+        # Kontrola přítomnosti tagů v train datasetu
+        train_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in train_dataset[:5]]
+        train_system_count = sum(1 for text in train_texts if "<|system|>" in text)
+        train_user_count = sum(1 for text in train_texts if "<|user|>" in text)
+        train_assistant_count = sum(1 for text in train_texts if "<|assistant|>" in text)
+        
+        print(f"📊 Tagy v train datasetu (prvních 5 vzorků):")
+        print(f"  System: {train_system_count}/5")
+        print(f"  User: {train_user_count}/5")
+        print(f"  Assistant: {train_assistant_count}/5")
+    
+    # Kontrola struktury v validation datasetu
+    if len(eval_dataset) > 0:
+        print(f"📝 Ukázka prvního validation vzorku:")
+        first_eval = eval_dataset[0]
+        decoded_text = tokenizer.decode(first_eval['input_ids'], skip_special_tokens=False)
+        print(f"Tokenizovaný text (prvních 200 znaků): {decoded_text[:200]}...")
+        
+        # Kontrola přítomnosti tagů v validation datasetu
+        eval_texts = [tokenizer.decode(sample['input_ids'], skip_special_tokens=False) for sample in eval_dataset[:5]]
+        eval_system_count = sum(1 for text in eval_texts if "<|system|>" in text)
+        eval_user_count = sum(1 for text in eval_texts if "<|user|>" in text)
+        eval_assistant_count = sum(1 for text in eval_texts if "<|assistant|>" in text)
+        
+        print(f"📊 Tagy v validation datasetu (prvních 5 vzorků):")
+        print(f"  System: {eval_system_count}/5")
+        print(f"  User: {eval_user_count}/5")
+        print(f"  Assistant: {eval_assistant_count}/5")
+    
+    print(f"\n✅ System messages jsou v obou datasetech - model se učí na kompletních konverzacích")
+    print(f"✅ Každá konverzace obsahuje: system + user + assistant")
+    print(f"✅ Data jsou připravena pro fine-tuning")
     
     # 7. Data Collator
     data_collator = DataCollatorForLanguageModeling(
@@ -467,17 +476,31 @@ def main():
     
     # 8. Training Arguments - nastavení na network storage
     print("\n⚙️ Nastavuji training arguments...")
+    
+    # Dynamické nastavení podle velikosti datasetu
+    if len(train_dataset) < 10:
+        # Pro malé datasety
+        save_steps = max(1, len(train_dataset) // 2)
+        eval_steps = max(1, len(train_dataset) // 2)
+        logging_steps = 1
+        print(f"📊 Malý dataset - save_steps: {save_steps}, eval_steps: {eval_steps}")
+    else:
+        # Pro větší datasety
+        save_steps = 500
+        eval_steps = 500
+        logging_steps = 10
+    
     training_args = TrainingArguments(
         output_dir=args.output_dir,
         num_train_epochs=args.epochs,
         per_device_train_batch_size=args.batch_size,
         gradient_accumulation_steps=4,
-        warmup_steps=100,
+        warmup_steps=min(100, len(train_dataset) // 2),
         learning_rate=args.learning_rate,
         fp16=True,
-        logging_steps=10,
-        save_steps=500,
-        eval_steps=500,
+        logging_steps=logging_steps,
+        save_steps=save_steps,
+        eval_steps=eval_steps,
         evaluation_strategy="steps",
         save_strategy="steps",
         load_best_model_at_end=True,
@@ -497,6 +520,8 @@ def main():
         # Nastavení pro network storage
         save_total_limit=2,  # Uloží pouze 2 nejlepší checkpointy
         logging_dir=f"{args.output_dir}/logs",
+        # Nastavení pro malé datasety
+        dataloader_num_workers=0,  # Vypnuto pro malé datasety
     )
     
     # 9. Trainer

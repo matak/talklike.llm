@@ -20,6 +20,36 @@ Cílem projektu bylo vytvořit fine-tuning dataset pro jazykový model, který b
 
 ---
 
+## 🛠️ Disk Manager Library
+
+Projekt obsahuje vlastní knihovnu pro správu diskového prostoru, která byla vyvinuta během řešení problémů s místem na disku při fine-tuningu velkých modelů.
+
+### Instalace
+```bash
+cd disk_manager
+pip install -e .
+```
+
+### Použití
+```python
+from disk_manager import DiskManager
+
+dm = DiskManager()
+if dm.check_disk_space():
+    dm.cleanup_cache()
+    dm.setup_network_storage("/workspace")
+```
+
+### Funkce
+- **Kontrola místa na disku** - automatická detekce plného filesystem
+- **Čištění cache** - odstranění HuggingFace, pip, conda cache
+- **Network storage** - nastavení cache na externí úložiště
+- **Optimalizace pro velké modely** - automatická příprava pro Mistral/Llama
+
+Více informací najdete v [disk_manager/README.md](disk_manager/README.md).
+
+---
+
 ## 🔄 Metodologie a implementace
 
 ### 1. Počáteční přístup a jeho problémy
@@ -108,6 +138,15 @@ Cílem projektu bylo vytvořit fine-tuning dataset pro jazykový model, který b
 
 ```
 talklike.llm/
+├── disk_manager/                   # Disk Manager Library
+│   ├── __init__.py
+│   ├── core.py                     # Hlavní funkcionalita
+│   ├── setup.py                    # Setup pro instalaci
+│   ├── pyproject.toml              # Moderní Python packaging
+│   ├── README.md                   # Dokumentace knihovny
+│   └── tests/                      # Testy
+│       ├── __init__.py
+│       └── test_core.py
 ├── TASK/                          # Zadání a šablony
 │   ├── babis_templates_400.json   # Vygenerované šablony
 │   ├── LLM.Outline.CreateTemplates.md
@@ -131,7 +170,8 @@ talklike.llm/
     ├── generate_answers.py
     ├── dataset_merger.py
     ├── moderate_training_data.py
-    └── llm_cost_calculator.py
+    ├── llm_cost_calculator.py
+    └── finetune_babis.py          # Fine-tuning s disk manager
 ```
 
 ---
@@ -164,6 +204,10 @@ talklike.llm/
 **Problém:** Mix satirických a oficiálních textů
 **Řešení:** Přechod k syntetickému generování pomocí šablon
 
+### 4. Problém s místem na disku
+**Problém:** "No space left on device" při načítání velkých modelů
+**Řešení:** Vytvoření Disk Manager Library pro automatickou správu úložiště
+
 ---
 
 ## 📈 Výsledky
@@ -179,11 +223,16 @@ talklike.llm/
 - **Tón:** Satirický, emotivní, sebestředný
 - **Jazykové prvky:** Slovensko-české odchylky, záměrné chyby
 
+### Vytvořené nástroje:
+- **Disk Manager Library** - kompletní knihovna pro správu úložiště
+- **Fine-tuning skript** - automatizovaný proces s retry logikou
+- **Testy** - pokrytí funkcionality knihovny
+
 ---
 
 ## 📝 Závěr
 
 Projekt úspěšně demonstroval kompletní workflow pro vytvoření fine-tuning datasetu pomocí LLM. Klíčovým poznatkem bylo, že složité zadání je nutné rozdělit na menší, detailní kroky. Vytvořený dataset obsahuje 3,000 konverzačních párů připravených pro fine-tuning, i když byl následně zablokován OpenAI moderací kvůli satirickému obsahu.
 
-**Silné stránky:** Kompletní implementace, kvalitní dataset, dobře strukturovaný kód
+**Silné stránky:** Kompletní implementace, kvalitní dataset, dobře strukturovaný kód, vlastní knihovna pro správu úložiště
 **Oblasti pro zlepšení:** Řešení moderace obsahu, alternativní přístupy k fine-tuningu
