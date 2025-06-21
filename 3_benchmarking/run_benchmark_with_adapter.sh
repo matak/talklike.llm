@@ -1,9 +1,7 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
-"""
-Spuštění benchmarkingu s adaptérem pro TalkLike.LLM
-Automaticky nastaví cache a spustí kompletní benchmarking
-"""
+# Spuštění benchmarkingu s adaptérem pro TalkLike.LLM
+# Automaticky nastaví cache a spustí kompletní benchmarking
 
 set -e  # Zastaví skript při chybě
 
