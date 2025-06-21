@@ -160,6 +160,57 @@ def tokenize_function(examples, tokenizer, max_length=2048):
     
     return tokenized
 
+def setup_tokenizer_and_model(model_name, base_model):
+    """Nastaví tokenizer a model pro fine-tuning"""
+    
+    # 1. Načtení tokenizeru
+    base_tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        cache_dir='/workspace/.cache/huggingface/transformers',
+        local_files_only=False,
+        resume_download=True,
+        force_download=False
+    )
+    print(f"📊 Původní délka tokenizeru: {len(base_tokenizer)}")
+    
+    # 2. Kontrola a přidání pad tokenu
+    if base_tokenizer.pad_token is None:
+        # Zkusíme použít existující tokeny
+        if base_tokenizer.eos_token:
+            base_tokenizer.pad_token = base_tokenizer.eos_token
+            print(f"✅ Používám EOS token jako PAD: {base_tokenizer.pad_token}")
+        else:
+            # Přidáme nový pad token
+            base_tokenizer.add_special_tokens({"pad_token": "<pad>"})
+            print(f"✅ Přidán nový pad token: {base_tokenizer.pad_token}")
+            
+            # Důležité: Resize model embeddings
+            base_model.resize_token_embeddings(len(base_tokenizer))
+            print(f"📊 Model embeddings resized na: {len(base_tokenizer)}")
+    else:
+        print(f"ℹ️ Pad token už existuje: {base_tokenizer.pad_token}")
+    
+    # 3. Synchronizace s modelem
+    if hasattr(base_model.config, 'pad_token_id'):
+        old_pad_id = base_model.config.pad_token_id
+        base_model.config.pad_token_id = base_tokenizer.pad_token_id
+        print(f"🔄 Pad token ID změněn: {old_pad_id} → {base_model.config.pad_token_id}")
+    else:
+        print("⚠️ Model nemá pad_token_id v config")
+    
+    # 4. Kontrola konzistence
+    try:
+        assert base_tokenizer.pad_token_id == base_model.config.pad_token_id, \
+            "Tokenizer a model mají různé pad token ID!"
+        print(f"✅ Tokenizer a model synchronizovány")
+    except AssertionError as e:
+        print(f"❌ Chyba synchronizace: {e}")
+        # Pokusíme se opravit
+        base_model.config.pad_token_id = base_tokenizer.pad_token_id
+        print(f"🔧 Opraveno: pad_token_id nastaven na {base_tokenizer.pad_token_id}")
+    
+    return base_tokenizer, base_model
+
 def main():
     parser = argparse.ArgumentParser(description='Fine-tuning 3 8B pro Andreje Babiše')
     parser.add_argument('--data_path', type=str, default='data/all.jsonl', help='Cesta k datům')
@@ -340,18 +391,7 @@ def main():
             else:
                 raise e
     
-    tokenizer = AutoTokenizer.from_pretrained(
-        args.model_name,
-        cache_dir='/workspace/.cache/huggingface/transformers',
-        local_files_only=False,
-        resume_download=True,
-        force_download=False
-    )
-    
-    # Přidání pad tokenu
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-        model.config.pad_token_id = tokenizer.pad_token_id
+    tokenizer, model = setup_tokenizer_and_model(args.model_name, model)
     
     print(f"✅ Model načten. Vocab size: {model.config.vocab_size}")
     
