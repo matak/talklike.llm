@@ -15,7 +15,7 @@ def create_benchmark_dataset():
     print("📋 Vytvářím benchmark dataset...")
     
     # Načtení otázek z JSON souboru
-    with open("benchmark_questions.json", "r", encoding="utf-8") as f:
+    with open("3_benchmarking/benchmark_questions.json", "r", encoding="utf-8") as f:
         data = json.load(f)
     
     questions = data.get("benchmark_questions", [])
@@ -36,10 +36,10 @@ def create_benchmark_dataset():
     }
     
     # Uložení datasetu
-    with open("results/benchmark_dataset.json", "w", encoding="utf-8") as f:
+    with open("3_benchmarking/results/benchmark_dataset.json", "w", encoding="utf-8") as f:
         json.dump(benchmark_dataset, f, ensure_ascii=False, indent=2)
     
-    print(f"💾 Dataset uložen: results/benchmark_dataset.json")
+    print(f"💾 Dataset uložen: 3_benchmarking/results/benchmark_dataset.json")
     
     # Výpis statistik
     print("\n📊 Statistiky datasetu:")
