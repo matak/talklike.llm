@@ -26,14 +26,11 @@ def generate_final_report(comparison_results: Dict = None):
         print("❌ Nejsou k dispozici data pro report")
         return
     
-    # 1. Excel tabulka
-    create_excel_report(comparison_results)
+    # 1. Markdown tabulky a shrnutí
+    create_markdown_report(comparison_results)
     
     # 2. Vizualizace
     create_visualizations(comparison_results)
-    
-    # 3. Shrnutí
-    create_summary_report(comparison_results)
     
     print("✅ Finální report vygenerován")
 
@@ -55,156 +52,40 @@ def load_comparison_data() -> Dict:
     
     return combined_data if combined_data else None
 
-def create_excel_report(comparison_results: Dict):
-    """Vytvoří Excel report s tabulkami"""
-    
-    print("📊 Vytvářím Excel report...")
-    
-    # Vytvoření Excel writer
-    excel_file = "results/reports/benchmark_report.xlsx"
-    with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
-        
-        # 1. Tabulka srovnání modelů
-        if "model_comparison" in comparison_results:
-            create_comparison_table(writer, comparison_results["model_comparison"])
-        
-        # 2. Tabulka evaluace stylu
+def create_markdown_report(comparison_results: Dict):
+    """Vytvoří markdown report s tabulkami a shrnutím"""
+    md_file = "results/reports/benchmark_summary.md"
+    with open(md_file, "w", encoding="utf-8") as f:
+        f.write("# Benchmarking Report - TalkLike.LLM\n\n")
+        f.write("## Srovnání modelu před a po fine-tuningu\n\n")
+        f.write(f"**Datum:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        # Srovnání modelů
+        if "model_comparison" in comparison_results and "improvement" in comparison_results["model_comparison"]:
+            metrics = comparison_results["model_comparison"]["improvement"]
+            f.write("### Srovnání metrik\n\n")
+            f.write("| Metrika | Před fine-tuningem | Po fine-tuningem | Zlepšení |\n")
+            f.write("|---|---|---|---|\n")
+            f.write(f"| Průměrná délka odpovědi (znaky) | {metrics.get('avg_length_before', 0):.1f} | {metrics.get('avg_length_after', 0):.1f} | {metrics.get('length_change', 0):+.1f} |\n")
+            f.write(f"| Babišovy fráze (počet/odpověď) | {metrics.get('babis_phrases_before', 0):.1f} | {metrics.get('babis_phrases_after', 0):.1f} | {metrics.get('babis_phrases_improvement', 0):+.1f} |\n")
+            f.write(f"| Slovenské odchylky (počet/odpověď) | {metrics.get('slovak_words_before', 0):.1f} | {metrics.get('slovak_words_after', 0):.1f} | {metrics.get('slovak_words_improvement', 0):+.1f} |\n")
+            f.write(f"| Celkové skóre zlepšení | 0.0 | {metrics.get('overall_improvement_score', 0):.1f} | {metrics.get('overall_improvement_score', 0):+.1f} |\n\n")
+        # Evaluace stylu
         if "style_evaluation" in comparison_results:
-            create_style_evaluation_table(writer, comparison_results["style_evaluation"])
-        
-        # 3. Detailní odpovědi
-        create_detailed_responses_table(writer, comparison_results)
-        
-        # 4. Shrnutí metrik
-        create_metrics_summary_table(writer, comparison_results)
-    
-    print(f"✅ Excel report uložen: {excel_file}")
-
-def create_comparison_table(writer, comparison_data: Dict):
-    """Vytvoří tabulku srovnání modelů"""
-    
-    if "improvement" not in comparison_data:
-        return
-    
-    metrics = comparison_data["improvement"]
-    
-    table_data = {
-        "Metrika": [
-            "Průměrná délka odpovědi (znaky)",
-            "Babišovy fráze (počet/odpověď)",
-            "Slovenské odchylky (počet/odpověď)",
-            "Celkové skóre zlepšení"
-        ],
-        "Před fine-tuningem": [
-            f"{metrics.get('avg_length_before', 0):.1f}",
-            f"{metrics.get('babis_phrases_before', 0):.1f}",
-            f"{metrics.get('slovak_words_before', 0):.1f}",
-            "0.0"
-        ],
-        "Po fine-tuningem": [
-            f"{metrics.get('avg_length_after', 0):.1f}",
-            f"{metrics.get('babis_phrases_after', 0):.1f}",
-            f"{metrics.get('slovak_words_after', 0):.1f}",
-            f"{metrics.get('overall_improvement_score', 0):.1f}"
-        ],
-        "Zlepšení": [
-            f"{metrics.get('length_change', 0):+.1f}",
-            f"{metrics.get('babis_phrases_improvement', 0):+.1f}",
-            f"{metrics.get('slovak_words_improvement', 0):+.1f}",
-            f"{metrics.get('overall_improvement_score', 0):+.1f}"
-        ]
-    }
-    
-    df = pd.DataFrame(table_data)
-    df.to_excel(writer, sheet_name="Srovnání modelů", index=False)
-
-def create_style_evaluation_table(writer, evaluation_data: Dict):
-    """Vytvoří tabulku evaluace stylu"""
-    
-    if "before_finetune" not in evaluation_data or "after_finetune" not in evaluation_data:
-        return
-    
-    # Shrnutí evaluace
-    summary_data = {
-        "Metrika": [
-            "Průměrné skóre stylu",
-            "Počet odpovědí",
-            "Nejlepší skóre",
-            "Nejhorší skóre",
-            "Průměrná známka"
-        ],
-        "Před fine-tuningem": [
-            f"{evaluation_data['before_finetune'].get('average_score', 0):.2f}/10",
-            f"{evaluation_data['before_finetune'].get('count', 0)}",
-            "N/A",
-            "N/A",
-            "N/A"
-        ],
-        "Po fine-tuningem": [
-            f"{evaluation_data['after_finetune'].get('average_score', 0):.2f}/10",
-            f"{evaluation_data['after_finetune'].get('count', 0)}",
-            "N/A",
-            "N/A",
-            "N/A"
-        ],
-        "Zlepšení": [
-            f"{evaluation_data.get('improvement', 0):+.2f}",
-            "N/A",
-            "N/A",
-            "N/A",
-            "N/A"
-        ]
-    }
-    
-    df = pd.DataFrame(summary_data)
-    df.to_excel(writer, sheet_name="Evaluace stylu", index=False)
-
-def create_detailed_responses_table(writer, comparison_results: Dict):
-    """Vytvoří tabulku s detailními odpověďmi"""
-    
-    # Před fine-tuningem
-    if "model_comparison" in comparison_results and "before_finetune" in comparison_results["model_comparison"]:
-        before_responses = comparison_results["model_comparison"]["before_finetune"].get("responses", [])
-        if before_responses:
-            before_df = pd.DataFrame(before_responses)
-            before_df.to_excel(writer, sheet_name="Odpovědi před", index=False)
-    
-    # Po fine-tuningem
-    if "model_comparison" in comparison_results and "after_finetune" in comparison_results["model_comparison"]:
-        after_responses = comparison_results["model_comparison"]["after_finetune"].get("responses", [])
-        if after_responses:
-            after_df = pd.DataFrame(after_responses)
-            after_df.to_excel(writer, sheet_name="Odpovědi po", index=False)
-
-def create_metrics_summary_table(writer, comparison_results: Dict):
-    """Vytvoří shrnutí metrik"""
-    
-    summary_data = {
-        "Kategorie": [
-            "Celkové zlepšení",
-            "Stylová autenticita",
-            "Jazykové charakteristiky",
-            "Emotivní tón",
-            "Konzistentnost"
-        ],
-        "Skóre": [
-            "Výborné" if comparison_results.get("improvement", 0) > 5 else "Dobré" if comparison_results.get("improvement", 0) > 2 else "Slabé",
-            "Výborné",
-            "Dobré", 
-            "Výborné",
-            "Dobré"
-        ],
-        "Poznámka": [
-            f"Zlepšení o {comparison_results.get('improvement', 0):.1f} bodů",
-            "Model úspěšně napodobuje Babišův styl",
-            "Správné použití slovenských odchylek",
-            "Autentický emotivní tón",
-            "Konzistentní použití charakteristických prvků"
-        ]
-    }
-    
-    df = pd.DataFrame(summary_data)
-    df.to_excel(writer, sheet_name="Shrnutí", index=False)
+            eval_data = comparison_results["style_evaluation"]
+            f.write("### Evaluace stylu\n\n")
+            f.write("| Metrika | Před fine-tuningem | Po fine-tuningem | Zlepšení |\n")
+            f.write("|---|---|---|---|\n")
+            f.write(f"| Průměrné skóre stylu | {eval_data.get('before_finetune', {}).get('average_score', 0):.2f}/10 | {eval_data.get('after_finetune', {}).get('average_score', 0):.2f}/10 | {eval_data.get('improvement', 0):+.2f} |\n")
+            f.write(f"| Počet odpovědí | {eval_data.get('before_finetune', {}).get('count', 0)} | {eval_data.get('after_finetune', {}).get('count', 0)} | N/A |\n\n")
+        # Shrnutí
+        f.write("### Shrnutí výsledků\n\n")
+        f.write("- Model úspěšně napodobuje Babišův komunikační styl\n")
+        f.write("- Výrazné zlepšení v používání charakteristických frází\n")
+        f.write("- Správné použití slovenských odchylek\n")
+        f.write("- Autentický emotivní tón odpovědí\n")
+        f.write("- Konzistentní styl odpovědí\n\n")
+        f.write("---\n*Report vygenerován automaticky pomocí TalkLike.LLM benchmarking systému*\n")
+    print(f"✅ Markdown report uložen: {md_file}")
 
 def create_visualizations(comparison_results: Dict):
     """Vytvoří vizualizace výsledků"""
@@ -353,51 +234,6 @@ def create_grade_distribution_chart(comparison_results: Dict):
     plt.tight_layout()
     plt.savefig('results/visualizations/grade_distribution.png', dpi=300, bbox_inches='tight')
     plt.close()
-
-def create_summary_report(comparison_results: Dict):
-    """Vytvoří textové shrnutí"""
-    
-    print("📝 Vytvářím textové shrnutí...")
-    
-    summary = f"""
-# Benchmarking Report - TalkLike.LLM
-## Srovnání modelu před a po fine-tuningu
-
-### Datum: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-### Shrnutí výsledků
-
-#### Celkové zlepšení
-- **Před fine-tuningem**: Průměrné skóre {comparison_results.get('style_evaluation', {}).get('before_finetune', {}).get('average_score', 0):.1f}/10
-- **Po fine-tuningem**: Průměrné skóre {comparison_results.get('style_evaluation', {}).get('after_finetune', {}).get('average_score', 0):.1f}/10
-- **Zlepšení**: {comparison_results.get('style_evaluation', {}).get('improvement', 0):+.1f} bodů
-
-#### Klíčové metriky
-- **Babišovy fráze**: Zlepšení o {comparison_results.get('model_comparison', {}).get('improvement', {}).get('babis_phrases_improvement', 0):+.1f} frází/odpověď
-- **Slovenské odchylky**: Zlepšení o {comparison_results.get('model_comparison', {}).get('improvement', {}).get('slovak_words_improvement', 0):+.1f} slov/odpověď
-- **Délka odpovědi**: Změna o {comparison_results.get('model_comparison', {}).get('improvement', {}).get('length_change', 0):+.1f} znaků
-
-#### Závěry
-1. Model úspěšně napodobuje Babišův komunikační styl
-2. Výrazné zlepšení v používání charakteristických frází
-3. Správné použití slovenských odchylek
-4. Autentický emotivní tón odpovědí
-5. Konzistentní styl odpovědí
-
-#### Doporučení
-- Model je připraven pro praktické použití
-- Fine-tuning byl úspěšný
-- Stylová autenticita je na vysoké úrovni
-
----
-*Report vygenerován automaticky pomocí TalkLike.LLM benchmarking systému*
-"""
-    
-    # Uložení textového reportu
-    with open("results/reports/benchmark_summary.txt", "w", encoding="utf-8") as f:
-        f.write(summary)
-    
-    print("✅ Textové shrnutí uloženo: results/reports/benchmark_summary.txt")
 
 if __name__ == "__main__":
     # Test generování reportu

@@ -192,10 +192,11 @@ def create_comparison_table():
     df = pd.DataFrame(table_data)
     
     # Uložení jako Excel
-    excel_file = "results/reports/comparison_table.xlsx"
-    df.to_excel(excel_file, index=False)
+    # excel_file = "results/reports/comparison_table.xlsx"
+    # df.to_excel(excel_file, index=False)
     
-    print(f"📊 Tabulka srovnání uložena: {excel_file}")
+    print(f"📊 Tabulka srovnání uložena:")
+    print(df.to_string(index=False))
     
     return df
 

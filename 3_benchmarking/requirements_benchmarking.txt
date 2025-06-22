@@ -7,11 +7,6 @@ numpy
 matplotlib
 seaborn
 
-# Excel a reporty
-openpyxl
-reportlab
-xlsxwriter
-
 # ML a AI - Transformers a PEFT
 transformers
 torch

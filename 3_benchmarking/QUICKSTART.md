@@ -31,7 +31,7 @@ python run_benchmark.py
 ### 3. Výstupy pro odevzdání
 - 📊 **Excel**: `results/reports/benchmark_report.xlsx`
 - 📈 **Grafy**: `results/visualizations/`
-- 📋 **Shrnutí**: `results/reports/benchmark_summary.txt`
+- 📋 **Shrnutí**: `results/reports/benchmark_summary.md`
 
 ---
 
@@ -107,7 +107,7 @@ results/
 │   └── style_evaluation.json   # Evaluace stylu
 ├── reports/
 │   ├── benchmark_report.xlsx   # Excel report pro odevzdání
-│   └── benchmark_summary.txt   # Textové shrnutí
+│   └── benchmark_summary.md   # Markdown shrnutí
 └── visualizations/
     ├── score_comparison.png    # Graf srovnání skóre
     ├── improvement_metrics.png # Graf zlepšení metrik
@@ -193,7 +193,7 @@ python test_adapter_integration.py
 
 # Zobrazení výsledků
 ls -la results/reports/
-cat results/reports/benchmark_summary.txt
+cat results/reports/benchmark_summary.md
 
 # Otevření Excel reportu
 open results/reports/benchmark_report.xlsx

@@ -308,7 +308,7 @@ Skóre: 9.2/10 (A)
 - [ ] ✅ Benchmarking spuštěn (`./run_benchmark_with_adapter.sh`)
 - [ ] ✅ Excel report vygenerován (`results/reports/benchmark_report.xlsx`)
 - [ ] ✅ Grafy vytvořeny (`results/visualizations/`)
-- [ ] ✅ Shrnutí připraveno (`results/reports/benchmark_summary.txt`)
+- [ ] ✅ Shrnutí připraveno (`results/reports/benchmark_summary.md`)
 - [ ] ✅ Screenshoty pořízeny
 - [ ] ✅ Výsledky zkontrolovány
 
@@ -328,7 +328,7 @@ python test_adapter_integration.py
 
 # Zobrazení výsledků
 ls -la results/reports/
-cat results/reports/benchmark_summary.txt
+cat results/reports/benchmark_summary.md
 
 # Otevření Excel reportu
 open results/reports/benchmark_report.xlsx
