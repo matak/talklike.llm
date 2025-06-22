@@ -110,57 +110,38 @@ def load_model_data(file_path, debugger=None):
     
     return conversations
 
-def prepare_training_data(conversations, debugger=None, model_name="microsoft/DialoGPT-medium", tokenizer=None):
+def prepare_training_data(conversations, tokenizer, debugger=None):
     """Připraví data pro fine-tuning pomocí apply_chat_template"""
+    if not hasattr(tokenizer, 'apply_chat_template'):
+        raise RuntimeError("❌ Tokenizer nepodporuje apply_chat_template!")
+
     training_data = []
-    
-    # Debug: Uložení vstupních konverzací
+
     if debugger:
-        debugger.save_step("05_input_conversations", conversations, f"Vstupních {len(conversations)} konverzací pro prepare_training_data")
-    
-    # Kontrola, zda tokenizer podporuje apply_chat_template
-    if not tokenizer or not hasattr(tokenizer, 'apply_chat_template'):
-        error_msg = f"❌ Tokenizer pro model {model_name} nepodporuje apply_chat_template! Skript se ukončuje."
-        print(error_msg)
-        raise RuntimeError(error_msg)
-    
-    print(f"🔧 Používám apply_chat_template pro model: {model_name}")
-    
-    # Speciální handling pro Mistral - přidáme system message do user message
-    is_mistral = "mistral" in model_name.lower()
-    
-    for conv in conversations:
-        messages = conv['messages']
-        
-        # Přeskočíme konverzace bez assistant zpráv
-        if not any(msg['role'] == 'assistant' for msg in messages):
+        debugger.save_step("05_input_conversations", conversations, f"Vstupních {len(conversations)} konverzací")
+
+    for i, conv in enumerate(conversations):
+        messages = conv.get("messages", [])
+        if not any(msg.get("role") == "assistant" for msg in messages):
             continue
-        
+
         try:
-            if is_mistral:
-                # Pro Mistral přidáme system message do user message
-                modified_messages = _add_system_to_user_messages(messages)
-            else:
-                # Pro ostatní modely použijeme původní messages
-                modified_messages = messages
-            
-            # Použijeme apply_chat_template pro správné formátování
-            formatted_text = tokenizer.apply_chat_template(modified_messages, tokenize=False, add_generation_prompt=False)
+            formatted_text = tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=False
+            )
             training_data.append({"text": formatted_text})
-            
+
+            if debugger and i < 2:  # Ulož první dva vzorky
+                debugger.save_sample("06_training_data", {"text": formatted_text}, i)
+
         except Exception as e:
-            error_msg = f"❌ Chyba při formátování: {e}"
-            print(error_msg)
-            raise RuntimeError(error_msg)
-    
-    # Debug: Uložení připravených dat
+            raise RuntimeError(f"❌ Chyba při formátování konverzace č. {i}: {e}")
+
     if debugger:
-        debugger.save_step("06_training_data", training_data, f"Připravených {len(training_data)} trénovacích vzorků pro {model_name}")
-        if len(training_data) > 0:
-            debugger.save_sample("06_training_data", training_data[0], 0)
-            if len(training_data) > 1:
-                debugger.save_sample("06_training_data", training_data[1], 1)
-    
+        debugger.save_step("06_training_data", training_data, f"Připraveno {len(training_data)} trénovacích vzorků")
+
     return training_data
 
 def _add_system_to_user_messages(messages):
