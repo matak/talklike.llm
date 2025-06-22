@@ -101,10 +101,17 @@ python finetune.py \
 
 ### Pro A100 (40GB VRAM)
 ```bash
-python finetune.py \
-    --model_name mistralai/Mistral-7B-Instruct-v0.2 \
-    --batch_size 4 \
-    --max_length 2048
+python 2_finetunning/finetune.py \
+    --data_path data/all.jsonl \
+    --output_dir /workspace/mistral-babis-finetuned \
+    --model_name mistralai/Mistral-7B-Instruct-v0.3 \
+    --epochs 3 \
+    --batch_size 1 \
+    --learning_rate 1e-4 \
+    --max_length 2048 \
+    --aggressive_cleanup \
+    --push_to_hub \
+    --hub_model_id mistral-babis-lora
 ```
 
 ### Pro menší GPU

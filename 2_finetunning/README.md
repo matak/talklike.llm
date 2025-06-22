@@ -77,6 +77,19 @@ python finetune.py \
     --learning_rate 2e-4 \
     --push_to_hub \
     --hub_model_id babis-lora
+
+# Fine-tuning s vlastními parametry
+python 2_finetunning/finetune.py \
+    --data_path data/all.jsonl \
+    --output_dir /workspace/mistral-babis-finetuned \
+    --model_name mistralai/Mistral-7B-Instruct-v0.3 \
+    --epochs 3 \
+    --batch_size 1 \
+    --learning_rate 1e-4 \
+    --max_length 2048 \
+    --aggressive_cleanup \
+    --push_to_hub \
+    --hub_model_id mistral-babis-lora
 ```
 
 ### 3. Testování tokenizace
@@ -156,7 +169,7 @@ Fine-tuning automaticky:
 ### Optimalizace pro velké modely
 ```bash
 python finetune.py \
-    --model_name mistralai/Mistral-7B-Instruct-v0.2 \
+    --model_name mistralai/Mistral-7B-Instruct-v0.3 \
     --aggressive_cleanup \
     --batch_size 1 \
     --max_length 2048

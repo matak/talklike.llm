@@ -18,13 +18,11 @@ fi
 export HF_TOKEN="your_hf_token_here"
 echo "HF_TOKEN=your_hf_token_here"
 
-# Spuštění fine-tuning
-cd 2_finetunning
-
-python finetune.py \
-    --data_path ../data/all.jsonl \
+# Spuštění fine-tuning z root directory
+python 2_finetunning/finetune.py \
+    --data_path data/all.jsonl \
     --output_dir /workspace/mistral-babis-finetuned \
-    --model_name mistralai/Mistral-7B-Instruct-v0.2 \
+    --model_name mistralai/Mistral-7B-Instruct-v0.3 \
     --epochs 3 \
     --batch_size 1 \
     --learning_rate 1e-4 \

@@ -18,11 +18,9 @@ fi
 export HF_TOKEN="your_hf_token_here"
 echo "HF_TOKEN=your_hf_token_here"
 
-# Spuštění fine-tuning
-cd 2_finetunning
-
-python finetune.py \
-    --data_path ../data/all.jsonl \
+# Spuštění fine-tuning z root directory
+python 2_finetunning/finetune.py \
+    --data_path data/all.jsonl \
     --output_dir /workspace/babis-finetuned \
     --model_name microsoft/DialoGPT-medium \
     --epochs 3 \
