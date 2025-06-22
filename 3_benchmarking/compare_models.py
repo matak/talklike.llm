@@ -228,16 +228,14 @@ if __name__ == "__main__":
     # Test srovnání modelů
     print("🧪 Test srovnání modelů...")
     
-    # Nejdříve vygenerovat testovací data
+    # Nejdřív vygenerujeme odpovědi
     from generate_responses import generate_responses
     
-    generate_responses("base", "results/before_finetune/")
-    generate_responses("finetuned", "results/after_finetune/")
+    generate_responses("base", "3_benchmarking/results/before_finetune/")
+    generate_responses("finetuned", "3_benchmarking/results/after_finetune/")
     
-    # Spustit srovnání
-    results = compare_models()
+    # Pak porovnáme modely
+    comparison_results = compare_models()
     
-    # Vytvořit tabulku
-    table_data = create_comparison_table()
-    
-    print("\n📋 Tabulka srovnání vytvořena") 
+    print(f"\n✅ Test srovnání dokončen")
+    print(f"   Výsledky uloženy v: 3_benchmarking/results/comparison/") 

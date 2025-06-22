@@ -42,11 +42,11 @@ from generate_report import generate_final_report
 def setup_directories():
     """Vytvoří potřebné adresáře pro výsledky"""
     directories = [
-        "results/before_finetune",
-        "results/after_finetune", 
-        "results/comparison",
-        "results/reports",
-        "results/visualizations"
+        "3_benchmarking/results/before_finetune",
+        "3_benchmarking/results/after_finetune", 
+        "3_benchmarking/results/comparison",
+        "3_benchmarking/results/reports",
+        "3_benchmarking/results/visualizations"
     ]
     
     for directory in directories:
@@ -70,11 +70,11 @@ def main():
     
     # 3. Generování odpovědí před fine-tuningem
     print("\n🤖 Generuji odpovědi před fine-tuningem...")
-    generate_responses("base", "results/before_finetune/")
+    generate_responses("base", "3_benchmarking/results/before_finetune/")
     
     # 4. Generování odpovědí po fine-tuningem
     print("\n🤖 Generuji odpovědi po fine-tuningem...")
-    generate_responses("finetuned", "results/after_finetune/")
+    generate_responses("finetuned", "3_benchmarking/results/after_finetune/")
     
     # 5. Srovnání modelů
     print("\n📊 Srovnávám modely...")
@@ -99,9 +99,9 @@ def main():
     print("\n" + "=" * 60)
     print("✅ Benchmarking úspěšně dokončen!")
     print(f"⏱️  Celkový čas: {duration}")
-    print(f"📁 Výsledky v: results/")
-    print(f"📊 Reporty v: results/reports/")
-    print(f"📈 Vizualizace v: results/visualizations/")
+    print(f"📁 Výsledky v: 3_benchmarking/results/")
+    print(f"📊 Reporty v: 3_benchmarking/results/reports/")
+    print(f"📈 Vizualizace v: 3_benchmarking/results/visualizations/")
     print("=" * 60)
 
 if __name__ == "__main__":

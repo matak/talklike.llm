@@ -124,7 +124,7 @@ def generate_responses(model_type: str, output_dir: str):
     print(f"🤖 Generuji odpovědi pro model: {model_type}")
     
     # Načtení benchmark datasetu
-    with open("results/benchmark_dataset.json", "r", encoding="utf-8") as f:
+    with open("3_benchmarking/results/benchmark_dataset.json", "r", encoding="utf-8") as f:
         dataset = json.load(f)
     
     questions = dataset.get("questions", [])
@@ -181,10 +181,10 @@ if __name__ == "__main__":
     print("🧪 Test generování odpovědí...")
     
     # Test před fine-tuningem
-    base_responses = generate_responses("base", "results/before_finetune/")
+    base_responses = generate_responses("base", "3_benchmarking/results/before_finetune/")
     
     # Test po fine-tuningem
-    finetuned_responses = generate_responses("finetuned", "results/after_finetune/")
+    finetuned_responses = generate_responses("finetuned", "3_benchmarking/results/after_finetune/")
     
     print(f"\n✅ Test dokončen:")
     print(f"   Před fine-tuningem: {len(base_responses)} odpovědí")
