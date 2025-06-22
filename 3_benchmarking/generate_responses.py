@@ -36,10 +36,14 @@ def load_benchmark_model(model_type: str):
         return None, None
     
     try:
-        # Import PEFT až když je potřeba
-        from peft import PeftModel
-        
         if model_type == "finetuned":
+            # Import PEFT až když je potřeba pro fine-tuned model
+            try:
+                from peft import PeftModel
+            except ImportError as e:
+                print(f"❌ PEFT není dostupný: {e}")
+                return None, None
+                
             # Váš natrénovaný adaptér
             base_model = "mistralai/Mistral-7B-Instruct-v0.3"
             adapter_path = "mcmatak/babis-mistral-adapter"

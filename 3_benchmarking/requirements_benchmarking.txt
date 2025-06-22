@@ -2,53 +2,53 @@
 # Python dependencies pro benchmarking
 
 # Základní knihovny
-pandas>=2.0.0
-numpy>=1.24.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
+pandas
+numpy
+matplotlib
+seaborn
 
 # Excel a reporty
-openpyxl>=3.1.0
-reportlab>=4.0.0
-xlsxwriter>=3.1.0
+openpyxl
+reportlab
+xlsxwriter
 
 # ML a AI - Transformers a PEFT
-transformers>=4.35.0
-torch>=2.1.0
-datasets>=2.14.0
-scikit-learn>=1.3.0
-peft>=0.6.0
-accelerate>=0.24.0
-bitsandbytes>=0.41.0
+transformers
+torch
+datasets
+scikit-learn
+peft
+accelerate
+bitsandbytes
 
 # Text processing
-nltk>=3.8.0
-textstat>=0.7.0
-spacy>=3.7.0
+nltk
+textstat
+spacy
 
 # Vizualizace
-plotly>=5.17.0
-bokeh>=3.2.0
+plotly
+bokeh
 
 # Utilities
-tqdm>=4.66.0
-click>=8.1.0
-pyyaml>=6.0.0
+tqdm
+click
+pyyaml
 
 # OpenAI (pro budoucí integraci)
-openai>=1.3.0
+openai
 
-# Hugging Face - kompatibilní verze
-huggingface-hub==0.19.4
+# Hugging Face
+huggingface-hub
 
 # Jupyter (pro analýzu)
-jupyter>=1.0.0
-ipykernel>=6.25.0
+jupyter
+ipykernel
 
 # Cache a storage
-h5py>=3.10.0
-safetensors>=0.4.0
+h5py
+safetensors
 
 # Další závislosti pro reporty
-jinja2>=3.1.0
-markdown>=3.5.0 
+jinja2
+markdown 
