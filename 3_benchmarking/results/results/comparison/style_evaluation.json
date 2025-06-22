@@ -1,0 +1,500 @@
+{
+  "before_finetune": {
+    "responses": [
+      {
+        "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
+        "response": "Inflace je vážný problém, který postihuje všechny občany.",
+        "evaluation": {
+          "total_score": 1.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Inflace je vážný problém, který postihuje všechny občany.",
+          "length": 57
+        }
+      },
+      {
+        "question": "Co si myslíte o opozici?",
+        "response": "Rodina je důležitá hodnota pro každého člověka.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Rodina je důležitá hodnota pro každého člověka.",
+          "length": 47
+        }
+      },
+      {
+        "question": "Jak se vám daří s rodinou?",
+        "response": "Evropské instituce mají své místo v moderní společnosti.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Evropské instituce mají své místo v moderní společnosti.",
+          "length": 56
+        }
+      },
+      {
+        "question": "Můžete vysvětlit vaši roli v té chemičce?",
+        "response": "Rodina je důležitá hodnota pro každého člověka.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Rodina je důležitá hodnota pro každého člověka.",
+          "length": 47
+        }
+      },
+      {
+        "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
+        "response": "Evropské instituce mají své místo v moderní společnosti.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Evropské instituce mají své místo v moderní společnosti.",
+          "length": 56
+        }
+      },
+      {
+        "question": "Jak hodnotíte současný stav důchodů?",
+        "response": "Rodina je důležitá hodnota pro každého člověka.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Rodina je důležitá hodnota pro každého člověka.",
+          "length": 47
+        }
+      },
+      {
+        "question": "Co říkáte na současné daňové zatížení?",
+        "response": "Rodina je důležitá hodnota pro každého člověka.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Rodina je důležitá hodnota pro každého člověka.",
+          "length": 47
+        }
+      },
+      {
+        "question": "Jak se stavíte k obviněním z korupce?",
+        "response": "Inflace je vážný problém, který postihuje všechny občany.",
+        "evaluation": {
+          "total_score": 1.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Inflace je vážný problém, který postihuje všechny občany.",
+          "length": 57
+        }
+      },
+      {
+        "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
+        "response": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+          "length": 60
+        }
+      },
+      {
+        "question": "Jak vnímáte práci úřadů a státní správy?",
+        "response": "Evropské instituce mají své místo v moderní společnosti.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Evropské instituce mají své místo v moderní společnosti.",
+          "length": 56
+        }
+      },
+      {
+        "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
+        "response": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+          "length": 60
+        }
+      },
+      {
+        "question": "Co si myslíte o klimatických změnách a zelené politice?",
+        "response": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+          "length": 60
+        }
+      },
+      {
+        "question": "Jaký je váš názor na povinné očkování?",
+        "response": "Inflace je vážný problém, který postihuje všechny občany.",
+        "evaluation": {
+          "total_score": 1.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Inflace je vážný problém, který postihuje všechny občany.",
+          "length": 57
+        }
+      },
+      {
+        "question": "Jak vnímáte práci novinářů a médií?",
+        "response": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+          "length": 60
+        }
+      },
+      {
+        "question": "Jak hodnotíte proces centralizace státní správy?",
+        "response": "Evropské instituce mají své místo v moderní společnosti.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Evropské instituce mají své místo v moderní společnosti.",
+          "length": 56
+        }
+      }
+    ],
+    "average_score": 0.23,
+    "count": 15
+  },
+  "after_finetune": {
+    "responses": [
+      {
+        "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
+        "response": "V Bruselu",
+        "evaluation": {
+          "total_score": 1.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "V Bruselu",
+          "length": 9
+        }
+      },
+      {
+        "question": "Co si myslíte o opozici?",
+        "response": "Moje rodina",
+        "evaluation": {
+          "total_score": 1.67,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 3.333333333333333
+          },
+          "grade": "F",
+          "text": "Moje rodina",
+          "length": 11
+        }
+      },
+      {
+        "question": "Jak se vám daří s rodinou?",
+        "response": "V Bruselu",
+        "evaluation": {
+          "total_score": 1.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "V Bruselu",
+          "length": 9
+        }
+      },
+      {
+        "question": "Můžete vysvětlit vaši roli v té chemičce?",
+        "response": "Já makám to je šílený!",
+        "evaluation": {
+          "total_score": 4.58,
+          "breakdown": {
+            "babis_phrases": 6.666666666666666,
+            "slovak_influence": 0.0,
+            "emotional_tone": 5.0,
+            "first_person": 6.666666666666666
+          },
+          "grade": "F",
+          "text": "Já makám to je šílený!",
+          "length": 22
+        }
+      },
+      {
+        "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
+        "response": "Já jsem to nečetl hrozné!",
+        "evaluation": {
+          "total_score": 3.42,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 5.0,
+            "first_person": 6.666666666666666
+          },
+          "grade": "F",
+          "text": "Já jsem to nečetl hrozné!",
+          "length": 25
+        }
+      },
+      {
+        "question": "Jak hodnotíte současný stav důchodů?",
+        "response": "To je skandál! to je šílený!",
+        "evaluation": {
+          "total_score": 4.83,
+          "breakdown": {
+            "babis_phrases": 6.666666666666666,
+            "slovak_influence": 0.0,
+            "emotional_tone": 10.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "To je skandál! to je šílený!",
+          "length": 28
+        }
+      },
+      {
+        "question": "Co říkáte na současné daňové zatížení?",
+        "response": "Moje rodina jak když dítě řídí tank",
+        "evaluation": {
+          "total_score": 2.67,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 3.333333333333333,
+            "comparison_bonus": 1.0
+          },
+          "grade": "F",
+          "text": "Moje rodina jak když dítě řídí tank",
+          "length": 35
+        }
+      },
+      {
+        "question": "Jak se stavíte k obviněním z korupce?",
+        "response": "Moje rodina",
+        "evaluation": {
+          "total_score": 1.67,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 3.333333333333333
+          },
+          "grade": "F",
+          "text": "Moje rodina",
+          "length": 11
+        }
+      },
+      {
+        "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
+        "response": "Hele, jak když kráva hraje na klavír",
+        "evaluation": {
+          "total_score": 2.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0,
+            "comparison_bonus": 1.0
+          },
+          "grade": "F",
+          "text": "Hele, jak když kráva hraje na klavír",
+          "length": 36
+        }
+      },
+      {
+        "question": "Jak vnímáte práci úřadů a státní správy?",
+        "response": "Já jsem to nečetl makáme",
+        "evaluation": {
+          "total_score": 5.08,
+          "breakdown": {
+            "babis_phrases": 6.666666666666666,
+            "slovak_influence": 5.0,
+            "emotional_tone": 0.0,
+            "first_person": 10.0
+          },
+          "grade": "F",
+          "text": "Já jsem to nečetl makáme",
+          "length": 24
+        }
+      },
+      {
+        "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
+        "response": "Moje rodina jak když kráva hraje na klavír kampááň!",
+        "evaluation": {
+          "total_score": 3.92,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 5.0,
+            "first_person": 3.333333333333333,
+            "comparison_bonus": 1.0
+          },
+          "grade": "F",
+          "text": "Moje rodina jak když kráva hraje na klavír kampááň!",
+          "length": 51
+        }
+      },
+      {
+        "question": "Co si myslíte o klimatických změnách a zelené politice?",
+        "response": "Já makám jak když kráva hraje na klavír",
+        "evaluation": {
+          "total_score": 3.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 6.666666666666666,
+            "comparison_bonus": 1.0
+          },
+          "grade": "F",
+          "text": "Já makám jak když kráva hraje na klavír",
+          "length": 39
+        }
+      },
+      {
+        "question": "Jaký je váš názor na povinné očkování?",
+        "response": "To je skandál! kampááň!",
+        "evaluation": {
+          "total_score": 4.83,
+          "breakdown": {
+            "babis_phrases": 6.666666666666666,
+            "slovak_influence": 0.0,
+            "emotional_tone": 10.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "To je skandál! kampááň!",
+          "length": 23
+        }
+      },
+      {
+        "question": "Jak vnímáte práci novinářů a médií?",
+        "response": "V Bruselu som",
+        "evaluation": {
+          "total_score": 2.42,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 5.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "V Bruselu som",
+          "length": 13
+        }
+      },
+      {
+        "question": "Jak hodnotíte proces centralizace státní správy?",
+        "response": "Moje rodina sme",
+        "evaluation": {
+          "total_score": 2.92,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 5.0,
+            "emotional_tone": 0.0,
+            "first_person": 3.333333333333333
+          },
+          "grade": "F",
+          "text": "Moje rodina sme",
+          "length": 15
+        }
+      }
+    ],
+    "average_score": 3.05,
+    "count": 15
+  },
+  "improvement": 2.81,
+  "timestamp": "2025-06-22T17:59:01.416207"
+}

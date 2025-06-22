@@ -52,6 +52,8 @@ def test_model_loading():
     print("\n🤖 Test načítání modelu...")
     
     try:
+        # Import z adresáře 2_finetunning
+        sys.path.append('../2_finetunning')
         from test_adapter import load_model_with_adapter
         
         base_model = "mistralai/Mistral-7B-Instruct-v0.3"
@@ -83,6 +85,10 @@ def test_response_generation():
     print("\n💬 Test generování odpovědí...")
     
     try:
+        print("📝 Test generování odpovědí...")
+        
+        # Import z adresáře 2_finetunning
+        sys.path.append('../2_finetunning')
         from test_adapter import load_model_with_adapter, generate_response
         
         # Načtení modelu

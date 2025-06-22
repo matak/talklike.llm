@@ -1,0 +1,107 @@
+[
+  {
+    "id": "Q1",
+    "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
+    "response": "Evropské instituce mají své místo v moderní společnosti.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407248"
+  },
+  {
+    "id": "Q2",
+    "question": "Co si myslíte o opozici?",
+    "response": "Inflace je vážný problém, který postihuje všechny občany.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407260"
+  },
+  {
+    "id": "Q3",
+    "question": "Jak se vám daří s rodinou?",
+    "response": "Evropské instituce mají své místo v moderní společnosti.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407268"
+  },
+  {
+    "id": "Q4",
+    "question": "Můžete vysvětlit vaši roli v té chemičce?",
+    "response": "Inflace je vážný problém, který postihuje všechny občany.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407278"
+  },
+  {
+    "id": "Q5",
+    "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
+    "response": "Inflace je vážný problém, který postihuje všechny občany.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407286"
+  },
+  {
+    "id": "Q6",
+    "question": "Jak hodnotíte současný stav důchodů?",
+    "response": "Inflace je vážný problém, který postihuje všechny občany.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407296"
+  },
+  {
+    "id": "Q7",
+    "question": "Co říkáte na současné daňové zatížení?",
+    "response": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407303"
+  },
+  {
+    "id": "Q8",
+    "question": "Jak se stavíte k obviněním z korupce?",
+    "response": "Opozice má právo na kritiku, ale měla by být konstruktivní.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407312"
+  },
+  {
+    "id": "Q9",
+    "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
+    "response": "Evropské instituce mají své místo v moderní společnosti.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407320"
+  },
+  {
+    "id": "Q10",
+    "question": "Jak vnímáte práci úřadů a státní správy?",
+    "response": "Rodina je důležitá hodnota pro každého člověka.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407328"
+  },
+  {
+    "id": "Q11",
+    "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
+    "response": "Rodina je důležitá hodnota pro každého člověka.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407335"
+  },
+  {
+    "id": "Q12",
+    "question": "Co si myslíte o klimatických změnách a zelené politice?",
+    "response": "Evropské instituce mají své místo v moderní společnosti.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407343"
+  },
+  {
+    "id": "Q13",
+    "question": "Jaký je váš názor na povinné očkování?",
+    "response": "Opozice má právo na kritiku, ale měla by být konstruktivní.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407350"
+  },
+  {
+    "id": "Q14",
+    "question": "Jak vnímáte práci novinářů a médií?",
+    "response": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407360"
+  },
+  {
+    "id": "Q15",
+    "question": "Jak hodnotíte proces centralizace státní správy?",
+    "response": "Rodina je důležitá hodnota pro každého člověka.",
+    "model_type": "base",
+    "timestamp": "2025-06-22T17:05:40.407367"
+  }
+]

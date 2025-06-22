@@ -18,6 +18,7 @@ def quick_test():
     
     try:
         # Import potřebných modulů
+        sys.path.append('../2_finetunning')
         from test_adapter import load_model_with_adapter, generate_response
         print("✅ Import úspěšný")
         

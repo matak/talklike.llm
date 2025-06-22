@@ -7,10 +7,10 @@ Univerzální návod pro stažení všech typů dat z RunPod na lokální PC pom
 ### Stažení dat na lokální PC
 ```bash
 # Stažení celého projektu
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm ./
+scp -P 40100 -i C:\Users\info\.ssh\runpod -r root@213.192.2.107:/workspace/talklike.llm ./
 
 # Stažení pouze výsledků
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results ./benchmark_results
+scp -P 40100 -i C:\Users\info\.ssh\runpod -r root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results ./3_benchmarking/results
 ```
 
 ## 📋 Typy dat ke stažení
@@ -18,34 +18,34 @@ scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklik
 ### Benchmarking výsledky
 ```bash
 # Celý benchmarking adresář
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results ./benchmark_results
+scp -P 40100 -i C:\Users\info\.ssh\runpod -r root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results ./3_benchmarking/results
 
 # Jednotlivé soubory
-scp -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results/before_finetune/responses.json ./
-scp -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results/after_finetune/responses.json ./
-scp -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results/comparison/style_evaluation.json ./
-scp -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results/reports/benchmark_summary.md ./
+scp -P 40100 -i C:\Users\info\.ssh\runpod root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results/before_finetune/responses.json ./
+scp -P 40100 -i C:\Users\info\.ssh\runpod root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results/after_finetune/responses.json ./
+scp -P 40100 -i C:\Users\info\.ssh\runpod root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results/comparison/style_evaluation.json ./
+scp -P 40100 -i C:\Users\info\.ssh\runpod root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results/reports/benchmark_summary.md ./
 ```
 
 ### Fine-tuning data
 ```bash
 # Debug data z fine-tuningu
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/2_finetunning/debug_dataset_finetune_* ./debug_data
+scp -P 40100 -i C:\Users\info\.ssh\runpod -r root@213.192.2.107:/workspace/talklike.llm/2_finetunning/debug_dataset_finetune_* ./debug_data
 
 # Model adaptéry
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/2_finetunning/adapters ./adapters
+scp -P 40100 -i C:\Users\info\.ssh\runpod -r root@213.192.2.107:/workspace/talklike.llm/2_finetunning/adapters ./adapters
 
 # Logy trénování
-scp -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/2_finetunning/training_logs.txt ./
+scp -P 40100 -i C:\Users\info\.ssh\runpod root@213.192.2.107:/workspace/talklike.llm/2_finetunning/training_logs.txt ./
 ```
 
 ### Data preparation
 ```bash
 # Datasets
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/data ./data
+scp -P 40100 -i C:\Users\info\.ssh\runpod -r root@213.192.2.107:/workspace/talklike.llm/data ./data
 
 # Generated data
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/1_data_preparation/generated_data ./generated_data
+scp -P 40100 -i C:\Users\info\.ssh\runpod -r root@213.192.2.107:/workspace/talklike.llm/1_data_preparation/generated_data ./generated_data
 ```
 
 ## 🔧 Konfigurace SSH
@@ -56,23 +56,23 @@ scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklik
 ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 
 # Kopírování klíče na RunPod
-ssh-copy-id -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io
+ssh-copy-id -i C:\Users\info\.ssh\runpod root@213.192.2.107 -p 40100
 
 # Test připojení
-ssh -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io "echo 'SSH funguje!'"
+ssh -i C:\Users\info\.ssh\runpod root@213.192.2.107 -p 40100 "echo 'SSH funguje!'"
 ```
 
 ### SSH heslo
 ```bash
 # Stažení s heslem (budete vyzváni)
-scp l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results ./benchmark_results
+scp -P 40100 root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results ./3_benchmarking/results
 ```
 
 ## 📁 Struktura stažených dat
 
 ### Benchmarking results
 ```
-benchmark_results/
+3_benchmarking/results/
 ├── before_finetune/
 │   └── responses.json          # Odpovědi před fine-tuningem
 ├── after_finetune/
@@ -105,15 +105,15 @@ debug_data/
 ### Benchmarking výsledky
 ```bash
 # Zobrazení Markdown shrnutí
-cat benchmark_results/reports/benchmark_summary.md
+cat 3_benchmarking/results/reports/benchmark_summary.md
 
 # Analýza JSON dat
-jq '.' benchmark_results/before_finetune/responses.json
-jq '.' benchmark_results/after_finetune/responses.json
-jq '.' benchmark_results/comparison/style_evaluation.json
+jq '.' 3_benchmarking/results/before_finetune/responses.json
+jq '.' 3_benchmarking/results/after_finetune/responses.json
+jq '.' 3_benchmarking/results/comparison/style_evaluation.json
 
 # Rychlý přehled metrik
-jq '.improvement' benchmark_results/comparison/model_comparison.json
+jq '.improvement' 3_benchmarking/results/comparison/model_comparison.json
 ```
 
 ### Fine-tuning data
@@ -133,23 +133,23 @@ head -50 debug_data/debug_dataset_finetune_*/train_dataset_readable.txt
 ### Kontrola velikosti
 ```bash
 # Velikost výsledků na RunPod
-ssh -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io "du -sh /workspace/talklike.llm/3_benchmarking/results"
+ssh -i C:\Users\info\.ssh\runpod root@213.192.2.107 -p 40100 "du -sh /workspace/talklike.llm/3_benchmarking/results"
 
 # Velikost debug dat
-ssh -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io "du -sh /workspace/talklike.llm/2_finetunning/debug_dataset_finetune_*"
+ssh -i C:\Users\info\.ssh\runpod root@213.192.2.107 -p 40100 "du -sh /workspace/talklike.llm/2_finetunning/debug_dataset_finetune_*"
 ```
 
 ### Selektivní stažení
 ```bash
 # Pouze Markdown shrnutí
-scp -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results/reports/benchmark_summary.md ./
+scp -P 40100 root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results/reports/benchmark_summary.md ./
 
 # Pouze grafy
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results/visualizations ./visualizations
+scp -P 40100 -r root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results/visualizations ./visualizations
 
 # Pouze nejnovější debug data
-LATEST_DEBUG=$(ssh -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io "ls -t /workspace/talklike.llm/2_finetunning/debug_dataset_finetune_* | head -1")
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:"$LATEST_DEBUG" ./latest_debug_data
+LATEST_DEBUG=$(ssh -i C:\Users\info\.ssh\runpod root@213.192.2.107 -p 40100 "ls -t /workspace/talklike.llm/2_finetunning/debug_dataset_finetune_* | head -1")
+scp -P 40100 -r root@213.192.2.107:"$LATEST_DEBUG" ./latest_debug_data
 ```
 
 ### Automatické stažení
@@ -157,21 +157,21 @@ scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:"$LATEST_DEBUG" ./
 #!/bin/bash
 # Skript pro automatické stažení všech výsledků
 
-RUNPOD_USER="l6twnmqglae2fo-64411626"
-RUNPOD_HOST="ssh.runpod.io"
-SSH_KEY="~/.ssh/runpod"
+RUNPOD_USER="root"
+RUNPOD_HOST="213.192.2.107"
+SSH_KEY="C:\Users\info\.ssh\runpod"
 LOCAL_DIR="./downloaded_results"
 
 mkdir -p "$LOCAL_DIR"
 
 echo "📥 Stahuji benchmarking výsledky..."
-scp -i $SSH_KEY -r $RUNPOD_USER@$RUNPOD_HOST:/workspace/talklike.llm/3_benchmarking/results "$LOCAL_DIR/benchmark_results"
+scp -P 40100 -i $SSH_KEY -r $RUNPOD_USER@$RUNPOD_HOST:/workspace/talklike.llm/3_benchmarking/results "$LOCAL_DIR/3_benchmarking/results"
 
 echo "📥 Stahuji fine-tuning data..."
-scp -i $SSH_KEY -r $RUNPOD_USER@$RUNPOD_HOST:/workspace/talklike.llm/2_finetunning/debug_dataset_finetune_* "$LOCAL_DIR/debug_data"
+scp -P 40100 -i $SSH_KEY -r $RUNPOD_USER@$RUNPOD_HOST:/workspace/talklike.llm/2_finetunning/debug_dataset_finetune_* "$LOCAL_DIR/debug_data"
 
 echo "📥 Stahuji datasets..."
-scp -i $SSH_KEY -r $RUNPOD_USER@$RUNPOD_HOST:/workspace/talklike.llm/data "$LOCAL_DIR/data"
+scp -P 40100 -i $SSH_KEY -r $RUNPOD_USER@$RUNPOD_HOST:/workspace/talklike.llm/data "$LOCAL_DIR/data"
 
 echo "✅ Všechna data stažena do: $LOCAL_DIR"
 ```
@@ -189,22 +189,22 @@ echo "✅ Všechna data stažena do: $LOCAL_DIR"
 ### Problém: SSH připojení selhává
 ```bash
 # Test připojení
-ssh -i ~/.ssh/runpod -v l6twnmqglae2fo-64411626@ssh.runpod.io
+ssh -i C:\Users\info\.ssh\runpod -v root@213.192.2.107 -p 40100
 
 # Kontrola SSH klíčů
-ls -la ~/.ssh/
+ls -la C:\Users\info\.ssh\
 
 # Reset SSH connection
-ssh-keygen -R ssh.runpod.io
+ssh-keygen -R 213.192.2.107
 ```
 
 ### Problém: Soubory neexistují
 ```bash
 # Kontrola existence souborů na RunPod
-ssh -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io "ls -la /workspace/talklike.llm/3_benchmarking/results/"
+ssh -i C:\Users\info\.ssh\runpod root@213.192.2.107 -p 40100 "ls -la /workspace/talklike.llm/3_benchmarking/results/"
 
 # Kontrola práv
-ssh -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io "ls -la /workspace/talklike.llm/3_benchmarking/results/"
+ssh -i C:\Users\info\.ssh\runpod root@213.192.2.107 -p 40100 "ls -la /workspace/talklike.llm/3_benchmarking/results/"
 ```
 
 ### Problém: Nedostatek místa
@@ -213,29 +213,29 @@ ssh -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io "ls -la /workspace/ta
 df -h
 
 # Kontrola velikosti stažených dat
-du -sh benchmark_results/
+du -sh 3_benchmarking/results/
 ```
 
 ## 📝 Příklady použití
 
 ### Stažení pouze výsledků benchmarkingu
 ```bash
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results ./benchmark_results
+scp -P 40100 -r root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results ./3_benchmarking/results
 ```
 
 ### Stažení celého projektu
 ```bash
-scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm ./talklike_llm_backup
+scp -P 40100 -r root@213.192.2.107:/workspace/talklike.llm ./talklike_llm_backup
 ```
 
 ### Stažení konkrétního souboru
 ```bash
-scp -i ~/.ssh/runpod l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results/reports/benchmark_summary.md ./my_report.md
+scp -P 40100 root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results/reports/benchmark_summary.md ./my_report.md
 ```
 
 ---
 
 **💡 Tip:** Pro časté stahování si vytvořte alias v `~/.bashrc`:
 ```bash
-alias download-benchmark='scp -i ~/.ssh/runpod -r l6twnmqglae2fo-64411626@ssh.runpod.io:/workspace/talklike.llm/3_benchmarking/results ./benchmark_results'
+alias download-benchmark='scp -P 40100 -r root@213.192.2.107:/workspace/talklike.llm/3_benchmarking/results ./3_benchmarking/results'
 ``` 

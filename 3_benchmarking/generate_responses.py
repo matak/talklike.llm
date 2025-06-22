@@ -23,39 +23,41 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 sys.path.append('../2_finetunning')
 from tokenizer_utils import setup_tokenizer_and_model
 
-try:
-    from test_adapter import load_model_with_adapter, generate_response
-    MODEL_AVAILABLE = True
-except ImportError:
-    print("⚠️  Model není dostupný, používám mock odpovědi")
-    MODEL_AVAILABLE = False
+# Nastavení MODEL_AVAILABLE na True, protože budeme používat reálný model
+MODEL_AVAILABLE = True
+print("✅ Reálný model bude načítán z Hugging Face")
 
 def load_benchmark_model(model_type: str):
     """Načte model pro benchmarking"""
     if not MODEL_AVAILABLE:
+        print("❌ Model není dostupný - MODEL_AVAILABLE = False")
         return None, None
     
     try:
         if model_type == "finetuned":
-            # Import PEFT až když je potřeba pro fine-tuned model
-            try:
-                from peft import PeftModel
-            except ImportError as e:
-                print(f"❌ PEFT není dostupný: {e}")
-                return None, None
-                
-            # Váš natrénovaný adaptér
-            base_model = "mistralai/Mistral-7B-Instruct-v0.3"
-            adapter_path = "mcmatak/babis-mistral-adapter"
+            # Reálný fine-tuned model z Hugging Face
+            model_path = "mcmatak/mistral-babis-model"
             
-            print(f"🤖 Načítám fine-tuned model...")
-            print(f"   Base model: {base_model}")
-            print(f"   Adapter: {adapter_path}")
+            print(f"🤖 Načítám reálný fine-tuned model...")
+            print(f"   Model: {model_path}")
             
-            model, tokenizer = load_model_with_adapter(base_model, adapter_path)
+            # Načtení tokenizeru a modelu
+            tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+            model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                torch_dtype=torch.float16,
+                device_map="auto",
+                trust_remote_code=True
+            )
+            
+            # Nastavení pad tokenu
+            if tokenizer.pad_token is None:
+                tokenizer.pad_token = tokenizer.eos_token
+            
+            model.eval()
             
         elif model_type == "base":
-            # Základní model bez adaptéru
+            # Základní model bez fine-tuningu
             base_model = "mistralai/Mistral-7B-Instruct-v0.3"
             
             print(f"🤖 Načítám základní model...")
@@ -105,11 +107,21 @@ Odpovídej vždy v první osobě jako Andrej Babiš, používej jeho charakteris
             # Pro základní model použijeme jednoduchý prompt
             prompt = f"<s>[INST] Otázka: {question} [/INST]"
         
-        # Generování odpovědi
-        response = generate_response(
-            model, tokenizer, prompt,
-            max_length=300, temperature=0.8
-        )
+        # Generování odpovědi pomocí modelu
+        inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
+        
+        with torch.no_grad():
+            outputs = model.generate(
+                **inputs,
+                max_length=300,
+                temperature=0.8,
+                do_sample=True,
+                pad_token_id=tokenizer.eos_token_id,
+                eos_token_id=tokenizer.eos_token_id
+            )
+        
+        # Dekódování odpovědi
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
         # Vylepšené vyčištění odpovědi
         response = response.strip()
@@ -213,24 +225,27 @@ def generate_responses(model_type: str, output_dir: str):
             {"id": "Q5", "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?"}
         ]
     
-    # Načtení modelu
+    # Načtení modelu - VŽDY používáme reálný model
+    print(f"🔧 Načítám reálný model: {model_type}")
     model, tokenizer = load_benchmark_model(model_type)
-    use_real_model = model is not None and tokenizer is not None
     
-    if use_real_model:
-        print(f"✅ Používám skutečný model: {model_type}")
-    else:
-        print(f"⚠️  Používám mock odpovědi pro: {model_type}")
+    if model is None or tokenizer is None:
+        print(f"❌ Nepodařilo se načíst model {model_type}")
+        print("💡 Zkontrolujte:")
+        print("   - Máte přístup k modelu mcmatak/babis-mistral-adapter?")
+        print("   - Jste přihlášeni na Hugging Face?")
+        print("   - Máte dostatek místa v cache?")
+        raise RuntimeError(f"Model {model_type} se nepodařilo načíst")
+    
+    print(f"✅ Reálný model načten: {model_type}")
     
     responses = []
     
     for i, question in enumerate(questions):
         print(f"   Generuji odpověď {i+1}/{len(questions)}: {question['question'][:50]}...")
         
-        if use_real_model:
-            response = generate_real_response(model, tokenizer, question["question"], model_type)
-        else:
-            response = generate_mock_response(question["question"], model_type)
+        # VŽDY používáme reálný model
+        response = generate_real_response(model, tokenizer, question["question"], model_type)
         
         responses.append({
             "id": question["id"],
@@ -256,10 +271,9 @@ def generate_responses(model_type: str, output_dir: str):
         print()
     
     # Uvolnění paměti
-    if use_real_model:
-        del model, tokenizer
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
+    del model, tokenizer
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
     
     return responses
 

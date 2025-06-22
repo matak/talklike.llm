@@ -1,0 +1,238 @@
+{
+  "before_finetune": {
+    "responses": [
+      {
+        "id": "Q1",
+        "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
+        "response": "Evropské instituce mají své místo v moderní společnosti.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407248"
+      },
+      {
+        "id": "Q2",
+        "question": "Co si myslíte o opozici?",
+        "response": "Inflace je vážný problém, který postihuje všechny občany.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407260"
+      },
+      {
+        "id": "Q3",
+        "question": "Jak se vám daří s rodinou?",
+        "response": "Evropské instituce mají své místo v moderní společnosti.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407268"
+      },
+      {
+        "id": "Q4",
+        "question": "Můžete vysvětlit vaši roli v té chemičce?",
+        "response": "Inflace je vážný problém, který postihuje všechny občany.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407278"
+      },
+      {
+        "id": "Q5",
+        "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
+        "response": "Inflace je vážný problém, který postihuje všechny občany.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407286"
+      },
+      {
+        "id": "Q6",
+        "question": "Jak hodnotíte současný stav důchodů?",
+        "response": "Inflace je vážný problém, který postihuje všechny občany.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407296"
+      },
+      {
+        "id": "Q7",
+        "question": "Co říkáte na současné daňové zatížení?",
+        "response": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407303"
+      },
+      {
+        "id": "Q8",
+        "question": "Jak se stavíte k obviněním z korupce?",
+        "response": "Opozice má právo na kritiku, ale měla by být konstruktivní.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407312"
+      },
+      {
+        "id": "Q9",
+        "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
+        "response": "Evropské instituce mají své místo v moderní společnosti.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407320"
+      },
+      {
+        "id": "Q10",
+        "question": "Jak vnímáte práci úřadů a státní správy?",
+        "response": "Rodina je důležitá hodnota pro každého člověka.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407328"
+      },
+      {
+        "id": "Q11",
+        "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
+        "response": "Rodina je důležitá hodnota pro každého člověka.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407335"
+      },
+      {
+        "id": "Q12",
+        "question": "Co si myslíte o klimatických změnách a zelené politice?",
+        "response": "Evropské instituce mají své místo v moderní společnosti.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407343"
+      },
+      {
+        "id": "Q13",
+        "question": "Jaký je váš názor na povinné očkování?",
+        "response": "Opozice má právo na kritiku, ale měla by být konstruktivní.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407350"
+      },
+      {
+        "id": "Q14",
+        "question": "Jak vnímáte práci novinářů a médií?",
+        "response": "Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407360"
+      },
+      {
+        "id": "Q15",
+        "question": "Jak hodnotíte proces centralizace státní správy?",
+        "response": "Rodina je důležitá hodnota pro každého člověka.",
+        "model_type": "base",
+        "timestamp": "2025-06-22T17:05:40.407367"
+      }
+    ],
+    "count": 15
+  },
+  "after_finetune": {
+    "responses": [
+      {
+        "id": "Q1",
+        "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
+        "response": "Já makám",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414063"
+      },
+      {
+        "id": "Q2",
+        "question": "Co si myslíte o opozici?",
+        "response": "V Bruselu",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414073"
+      },
+      {
+        "id": "Q3",
+        "question": "Jak se vám daří s rodinou?",
+        "response": "Hele, makáme tragédyje!",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414084"
+      },
+      {
+        "id": "Q4",
+        "question": "Můžete vysvětlit vaši roli v té chemičce?",
+        "response": "To je skandál!",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414094"
+      },
+      {
+        "id": "Q5",
+        "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
+        "response": "Opozice krade makáme jak když slepice hraje šachy",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414107"
+      },
+      {
+        "id": "Q6",
+        "question": "Jak hodnotíte současný stav důchodů?",
+        "response": "Já jsem to nečetl",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414117"
+      },
+      {
+        "id": "Q7",
+        "question": "Co říkáte na současné daňové zatížení?",
+        "response": "Opozice krade",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414127"
+      },
+      {
+        "id": "Q8",
+        "question": "Jak se stavíte k obviněním z korupce?",
+        "response": "To je skandál!",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414138"
+      },
+      {
+        "id": "Q9",
+        "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
+        "response": "To je skandál! hrozné!",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414149"
+      },
+      {
+        "id": "Q10",
+        "question": "Jak vnímáte práci úřadů a státní správy?",
+        "response": "Já makám tragédyje!",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414157"
+      },
+      {
+        "id": "Q11",
+        "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
+        "response": "To je skandál! som kampááň!",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414167"
+      },
+      {
+        "id": "Q12",
+        "question": "Co si myslíte o klimatických změnách a zelené politice?",
+        "response": "Já makám hrozné!",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414175"
+      },
+      {
+        "id": "Q13",
+        "question": "Jaký je váš názor na povinné očkování?",
+        "response": "V Bruselu",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414182"
+      },
+      {
+        "id": "Q14",
+        "question": "Jak vnímáte práci novinářů a médií?",
+        "response": "Já makám jak když kráva hraje na klavír",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414190"
+      },
+      {
+        "id": "Q15",
+        "question": "Jak hodnotíte proces centralizace státní správy?",
+        "response": "V Bruselu",
+        "model_type": "finetuned",
+        "timestamp": "2025-06-22T17:05:40.414197"
+      }
+    ],
+    "count": 15
+  },
+  "improvement": {
+    "avg_length_before": 55.4,
+    "avg_length_after": 19.2,
+    "length_change": -36.2,
+    "babis_phrases_before": 0.0,
+    "babis_phrases_after": 1.4,
+    "babis_phrases_improvement": 1.4,
+    "slovak_words_before": 0.0,
+    "slovak_words_after": 0.2,
+    "slovak_words_improvement": 0.2,
+    "overall_improvement_score": 3.0999999999999996
+  },
+  "metadata": {
+    "timestamp": "2025-06-22T17:05:40.419473",
+    "total_questions": 0
+  }
+}
