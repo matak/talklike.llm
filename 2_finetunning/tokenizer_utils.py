@@ -224,10 +224,38 @@ def check_tokenizer_compatibility(tokenizer, model_name, debugger=None):
         return True
 
 def tokenize_function(examples, tokenizer, max_length=2048):
-    """Tokenizuje text pro fine-tuning"""
+    """Tokenizuje data pomocí apply_chat_template pro správné formátování"""
+    
+    # Kontrola, zda máme messages nebo text
+    if "messages" in examples:
+        # Použijeme apply_chat_template pro správné formátování
+        texts = []
+        for messages in examples["messages"]:
+            try:
+                # apply_chat_template automaticky použije správný formát podle modelu
+                text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
+                texts.append(text)
+            except Exception as e:
+                print(f"⚠️ Chyba při apply_chat_template: {e}")
+                # Fallback na manuální formátování
+                text = ""
+                for msg in messages:
+                    role = msg['role']
+                    content = msg['content'].strip()
+                    if role == 'system':
+                        text += f"<|system|>\n{content}<|end|>\n"
+                    elif role == 'user':
+                        text += f"<|user|>\n{content}<|end|>\n"
+                    elif role == 'assistant':
+                        text += f"<|assistant|>\n{content}<|end|>\n"
+                texts.append(text)
+    else:
+        # Fallback pro starý formát s textem
+        texts = examples["text"]
+    
     # Tokenizace BEZ padding - padding se řeší v DataCollator
     tokenized = tokenizer(
-        examples["text"],
+        texts,
         truncation=True,
         padding=False,  # Padding se řeší v DataCollator
         max_length=max_length,

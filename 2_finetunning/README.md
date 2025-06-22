@@ -96,6 +96,9 @@ python 2_finetunning/finetune.py \
 ```bash
 # Ověření správné tokenizace dat
 python test_tokenization.py
+
+# Test apply_chat_template s různými modely
+python test_apply_chat_template.py
 ```
 
 ---
@@ -129,6 +132,26 @@ Dataset v `../data/all.jsonl` má strukturu:
 - **Styl**: Autentický Babišův styl
 - **Jazykové chyby**: 15% pravděpodobnost slovenských odchylek
 - **Témata**: Politika, ekonomika, rodina, podnikání
+
+### Tokenizace pomocí apply_chat_template
+Fine-tuning používá moderní přístup s `tokenizer.apply_chat_template()` pro správné formátování dat:
+
+```python
+# Automatické formátování podle typu modelu
+formatted_text = tokenizer.apply_chat_template(messages, tokenize=False)
+```
+
+**Výhody:**
+- ✅ **Automatické formátování** pro každý model (Mistral, Llama, DialoGPT)
+- ✅ **Správné tokeny** pro daný model bez manuálního nastavování
+- ✅ **Konzistentní formát** napříč různými modely
+- ✅ **Fallback mechanismus** pro starší modely
+
+**Podporované modely:**
+- Mistral (ChatML formát)
+- Llama (ChatML formát)
+- DialoGPT (vlastní formát)
+- Jiné modely s chat template podporou
 
 ---
 

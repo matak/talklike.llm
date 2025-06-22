@@ -111,19 +111,14 @@ def load_babis_data(file_path, debugger=None):
     return conversations
 
 def prepare_training_data(conversations, debugger=None, model_name="microsoft/DialoGPT-medium"):
-    """Připraví data pro fine-tuning"""
+    """Připraví data pro fine-tuning - zachovává původní messages formát pro apply_chat_template"""
     training_data = []
     
     # Debug: Uložení vstupních konverzací
     if debugger:
         debugger.save_step("05_input_conversations", conversations, f"Vstupních {len(conversations)} konverzací pro prepare_training_data")
     
-    # Detekce typu modelu pro správný formát
-    is_mistral = "mistral" in model_name.lower()
-    is_llama = "llama" in model_name.lower()
-    is_dialogpt = "dialogpt" in model_name.lower()
-    
-    print(f"🔧 Detekován model typ: {'Mistral' if is_mistral else 'Llama' if is_llama else 'DialoGPT' if is_dialogpt else 'Unknown'}")
+    print(f"🔧 Připravuji data pro apply_chat_template - model: {model_name}")
     
     for conv in conversations:
         messages = conv['messages']
@@ -131,64 +126,10 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
         # Přeskočíme konverzace bez assistant zpráv
         if not any(msg['role'] == 'assistant' for msg in messages):
             continue
-            
-        # Vytvoříme text pro fine-tuning podle typu modelu
-        text = ""
         
-        if is_mistral:
-            # Mistral používá ChatML formát
-            text = ""
-            system_prompt = None
-            first = True
-
-            for msg in messages:
-                role = msg['role']
-                content = msg['content'].strip()
-
-                if role == 'system':
-                    system_prompt = content
-                elif role == 'user':
-                    # Přilepíme system prompt k první user zprávě
-                    if first:
-                        first = False
-                        if system_prompt:
-                            content = f"{system_prompt}\n{content}"
-                        text += f"<s>[INST] {content} [/INST]"
-                    else:
-                        text += f"[INST] {content} [/INST]"
-                elif role == 'assistant':
-                    text += f"{content}</s>"
-
-        elif is_llama:
-            # Llama používá podobný formát jako Mistral
-            text = ""
-            for msg in messages:
-                role = msg['role']
-                content = msg['content'].strip()
-
-                if role == 'system':
-                    text += f"<s>[INST] <<SYS>>\n{content}\n<</SYS>>\n\n [/INST]"
-                elif role == 'user':
-                    text += f"<s>[INST] {content} [/INST]"
-                elif role == 'assistant':
-                    text += f"{content}</s>"
-
-        else:
-            # DialoGPT a jiné modely - původní formát
-
-            text = ""
-            for msg in messages:
-                role = msg['role']
-                content = msg['content'].strip()
-
-                if role == 'system':
-                    text += f"<|system|>\n{content}<|end|>\n"
-                elif role == 'user':
-                    text += f"<|user|>\n{content}<|end|>\n"
-                elif role == 'assistant':
-                    text += f"<|assistant|>\n{content}<|end|>\n"
-       
-        training_data.append({"text": text})
+        # Zachováváme původní messages formát pro apply_chat_template
+        # Tokenizer.apply_chat_template bude použito během tokenizace
+        training_data.append({"messages": messages})
     
     # Debug: Uložení připravených dat
     if debugger:

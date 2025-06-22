@@ -204,7 +204,7 @@ def main():
     
     # Debug: Uložení finálního datasetu
     debugger.save_step("07_final_dataset", {"dataset_size": len(dataset), "columns": dataset.column_names}, 
-                      f"Finální dataset s {len(dataset)} vzorky")
+                      f"Finální dataset s {len(dataset)} vzorky (messages formát pro apply_chat_template)")
     
     # 4. Načtení modelu
     print(f"\n🤖 Načítám model: {args.model_name}")
@@ -311,8 +311,9 @@ def main():
     debugger.save_step("09_tokenized_dataset", {
         "dataset_size": len(tokenized_dataset),
         "columns": tokenized_dataset.column_names,
-        "max_length": args.max_length
-    }, f"Tokenizovaný dataset s {len(tokenized_dataset)} vzorky")
+        "max_length": args.max_length,
+        "method": "apply_chat_template"
+    }, f"Tokenizovaný dataset s {len(tokenized_dataset)} vzorky (pomocí apply_chat_template)")
     
     # Rozdělení na train/validation
     print(f"📊 Celkový počet vzorků: {len(tokenized_dataset)}")
