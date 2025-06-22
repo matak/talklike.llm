@@ -197,7 +197,6 @@ def create_qlora_adapter(
         tokenizer=tokenizer,
         mlm=False,
         pad_to_multiple_of=8,
-        padding=True,
     )
     
     # 10. Training Arguments

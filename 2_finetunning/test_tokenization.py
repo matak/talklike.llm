@@ -78,7 +78,7 @@ def test_tokenization():
     """Testuje tokenizaci a data collator"""
     
     # Načtení modelu a tokenizeru
-    model_name = "microsoft/DialoGPT-medium"  # Použijeme menší model pro test
+    model_name = "mistralai/Mistral-7B-Instruct-v0.3"  # Mistral model pro test
     
     print(f"🤖 Načítám model: {model_name}")
     
@@ -94,13 +94,13 @@ def test_tokenization():
     print("\n🔧 Nastavuji tokenizer a model...")
     tokenizer, model = setup_tokenizer_and_model(model_name, model)
     
-    # Testovací data
+    # Testovací data pro Mistral (ChatML formát)
     test_data = [
         {
-            "text": "<|system|>\nJste Andrej Babiš, předseda hnutí ANO a bývalý premiér České republiky.<|end|>\n<|user|>\nJak hodnotíte současnou inflaci?<|end|>\n<|assistant|>\nInflace je vážný problém, který postihuje všechny občany.<|end|>\n"
+            "text": "<s>[INST] Jsi Andrej Babiš, český politik. Jak hodnotíš současnou inflaci? [/INST] Inflace je vážný problém, který postihuje všechny občany. Já makám a vidím, jak lidé trpí. To je skandál! Andrej Babiš</s>"
         },
         {
-            "text": "<|system|>\nJste Andrej Babiš, předseda hnutí ANO a bývalý premiér České republiky.<|end|>\n<|user|>\nCo si myslíte o opozici?<|end|>\n<|assistant|>\nOpozice kritizuje, ale nemá řešení.<|end|>\n"
+            "text": "<s>[INST] Co si myslíš o opozici? [/INST] Opozice kritizuje, ale nemá řešení. Já makám a oni jen kradou čas. To je tragédyje! Andrej Babiš</s>"
         }
     ]
     
@@ -139,14 +139,13 @@ def test_tokenization():
     for i, sample in enumerate(tokenized_dataset):
         print(f"  Vzorek {i+1}: {len(sample['input_ids'])} tokenů")
     
-    # Test data collator
+    # Test data collator - opraveno odstraněním padding parametru
     print("\n🔧 Testuji data collator...")
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer,
         mlm=False,
         return_tensors="pt",
         pad_to_multiple_of=8,
-        padding=True,  # Explicitně povolíme padding
     )
     
     try:

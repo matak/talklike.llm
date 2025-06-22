@@ -95,6 +95,45 @@ pad_token_id=tokenizer.eos_token_id
 pad_token_id=tokenizer.pad_token_id
 ```
 
+### 4. **Oprava DataCollatorForLanguageModeling**
+
+Odstraněn nepodporovaný `padding` parametr:
+
+```python
+# PŘED (❌ Chyba):
+data_collator = DataCollatorForLanguageModeling(
+    tokenizer=tokenizer,
+    mlm=False,
+    return_tensors="pt",
+    pad_to_multiple_of=8,
+    padding=True,  # ❌ Neexistující parametr
+)
+
+# PO (✅ Správně):
+data_collator = DataCollatorForLanguageModeling(
+    tokenizer=tokenizer,
+    mlm=False,
+    return_tensors="pt",
+    pad_to_multiple_of=8,
+    # padding=True odstraněno
+)
+```
+
+### 5. **Oprava importů**
+
+Přidána správná cesta pro import `setup_environment`:
+
+```python
+# PŘED (❌ Chyba):
+import setup_environment
+
+# PO (✅ Správně):
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import setup_environment
+```
+
 ## 🎯 Výhody sjednocení
 
 ### 1. **Konzistence**
@@ -123,26 +162,30 @@ pad_token_id=tokenizer.pad_token_id
 Pro ověření sjednocení spusťte:
 
 ```bash
-# Test tokenizace
+# Test tokenizace s Mistral modelem
 python test_tokenization.py
 
 # Test modelu
-python test_model.py microsoft/DialoGPT-medium
+python test_model.py mistralai/Mistral-7B-Instruct-v0.3
 
 # Test adaptéru
-python test_adapter.py --base-model microsoft/DialoGPT-medium --adapter path/to/adapter
+python test_adapter.py --base-model mistralai/Mistral-7B-Instruct-v0.3 --adapter path/to/adapter
 
 # Test fine-tuningu
-python finetune.py --model_name microsoft/DialoGPT-medium
+python finetune.py --model_name mistralai/Mistral-7B-Instruct-v0.3
 ```
 
 Všechny tyto testy by měly zobrazovat stejné debug informace o pad_tokenu.
+
+**Poznámka:** Test používá Mistral model, který je primárním cílem projektu pro fine-tuning Andreje Babiše.
 
 ## 📋 Kontrolní seznam
 
 - ✅ Vylepšená funkce `setup_tokenizer_and_model()`
 - ✅ Sjednocení napříč všemi soubory
 - ✅ Oprava `train_utils.py`
+- ✅ Oprava `DataCollatorForLanguageModeling`
+- ✅ Oprava importů `setup_environment`
 - ✅ Debug informace podle návrhu uživatele
 - ✅ Odstranění duplikace kódu
 - ✅ Konzistentní chování

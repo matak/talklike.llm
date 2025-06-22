@@ -138,7 +138,7 @@ def main():
     parser = argparse.ArgumentParser(description='Fine-tuning pro Andreje Babiše')
     parser.add_argument('--data_path', type=str, default='data/all.jsonl', help='Cesta k datům')
     parser.add_argument('--output_dir', type=str, default='/workspace/babis-finetuned', help='Výstupní adresář')
-    parser.add_argument('--model_name', type=str, default='microsoft/DialoGPT-medium', help='Název base modelu')
+    parser.add_argument('--model_name', type=str, default='mistralai/Mistral-7B-Instruct-v0.3', help='Název base modelu')
     parser.add_argument('--epochs', type=int, default=3, help='Počet epoch')
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=2e-4, help='Learning rate')
@@ -396,7 +396,6 @@ def main():
         mlm=False,
         return_tensors="pt",
         pad_to_multiple_of=8,
-        padding=True,  # Explicitně povolíme padding
     )
     
     # 8. Training Arguments
