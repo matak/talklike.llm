@@ -42,7 +42,7 @@ import json
 from lib.disk_manager import DiskManager
 
 # Import modulů
-from data_utils import load_babis_data, prepare_training_data
+from data_utils import load_model_data, prepare_training_data
 from tokenizer_utils import setup_tokenizer_and_model, check_unknown_tokens, check_tokenizer_compatibility, tokenize_function
 from debug_utils import DatasetDebugger
 from train_utils import generate_response, test_model, save_model_info
@@ -176,6 +176,10 @@ def main():
     
     # Načtení proměnných prostředí
     load_dotenv()
+
+    
+    for i in range(torch.cuda.device_count()):
+        print(torch.cuda.get_device_properties(i).name)
     
     # Hugging Face token
     HF_TOKEN = os.getenv("HF_TOKEN")
@@ -191,79 +195,74 @@ def main():
     
     # 1. Načtení dat
     print("\n📊 Načítám data...")
-    conversations = load_babis_data(args.data_path, debugger)
+    conversations = load_model_data(args.data_path, debugger)
     print(f"✅ Načteno {len(conversations)} konverzací")
     
-    # 2. Příprava dat
-    print("🔧 Připravuji data...")
-    training_data = prepare_training_data(conversations, debugger, args.model_name)
-    print(f"✅ Připraveno {len(training_data)} trénovacích vzorků")
-    
-    # 3. Vytvoření Dataset
-    dataset = Dataset.from_list(training_data)
-    
-    # Debug: Uložení finálního datasetu
-    debugger.save_step("07_final_dataset", {"dataset_size": len(dataset), "columns": dataset.column_names}, 
-                      f"Finální dataset s {len(dataset)} vzorky (messages formát pro apply_chat_template)")
-    
-    # 4. Načtení modelu
+    # 2. Načtení modelu a tokenizeru (před přípravou dat)
     print(f"\n🤖 Načítám model: {args.model_name}")
-    
+
+    # Konfigurace 4-bit kvantizace
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_use_double_quant=True,
         bnb_4bit_compute_dtype=torch.float16,
         bnb_4bit_quant_type="nf4",
     )
-    
-    # Pokus o načtení modelu s retry logikou
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            print(f"🔄 Pokus {attempt + 1}/{max_retries} načtení modelu...")
-            
-            model = AutoModelForCausalLM.from_pretrained(
-                args.model_name,
-                quantization_config=bnb_config,
-                torch_dtype=torch.float16,
-                device_map="auto",
-                trust_remote_code=True,
-                cache_dir='/workspace/.cache/huggingface/transformers',
-                local_files_only=False,
-                resume_download=True,
-                force_download=False
-            )
-            print("✅ Model úspěšně načten!")
-            break
-            
-        except OSError as e:
-            if "No space left on device" in str(e):
-                print(f"❌ Pokus {attempt + 1} selhal - není dost místa")
-                if attempt < max_retries - 1:
-                    print("🧹 Zkouším další vyčištění...")
-                    dm.aggressive_cleanup()
-                    import time
-                    time.sleep(5)
-                else:
-                    print("❌ Všechny pokusy selhaly. Zkuste:")
-                    print("   1. Použít menší model: --model_name microsoft/DialoGPT-medium")
-                    print("   2. Restartovat kontejner")
-                    print("   3. Zvýšit velikost root filesystem")
-                    return
-            else:
-                raise e
-        except Exception as e:
-            print(f"❌ Neočekávaná chyba při načítání modelu: {e}")
-            if attempt < max_retries - 1:
-                print("🔄 Zkouším znovu...")
-                import time
-                time.sleep(10)
-            else:
-                raise e
-    
+
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model_name,
+        quantization_config=bnb_config,
+        torch_dtype=torch.float16,
+        device_map="auto",
+        trust_remote_code=True,
+        cache_dir='/workspace/.cache/huggingface/transformers',
+        local_files_only=False,
+        resume_download=True,
+        force_download=False
+    )
+    print("✅ Model úspěšně načten!")
+
     tokenizer, model = setup_tokenizer_and_model(args.model_name, model)
     
     print(f"✅ Model načten. Vocab size: {model.config.vocab_size}")
+    
+    # 3. Příprava dat s tokenizerem (nyní máme přístup k apply_chat_template)
+    print("🔧 Připravuji data s apply_chat_template...")
+    training_data = prepare_training_data(conversations, debugger, args.model_name, tokenizer)
+    print(f"✅ Připraveno {len(training_data)} trénovacích vzorků")
+
+    # DEBUG: Test generování před fine-tuningem
+    print("\n🧪 DEBUG: Testuji generování před fine-tuningem...")
+    try:
+        # Vytvoření testovacího promptu
+        test_prompt = "Pane Babiši, jak hodnotíte současnou inflaci?"
+        print(f"Testovací prompt: {test_prompt}")
+        
+        # Tokenizace promptu
+        input_ids = tokenizer(test_prompt, return_tensors="pt").input_ids.to(model.device)
+        print(f"Input IDs shape: {input_ids.shape}")
+        
+        # Generování textu
+        print("Generuji text...")
+        with torch.no_grad():
+            result = model.generate(input_ids, max_length=300, do_sample=True, temperature=0.7)
+        print(f"Generated result shape: {result.shape}")
+        
+        # Dekódování a výpis generovaného textu
+        output_text = tokenizer.decode(result[0], skip_special_tokens=True)
+        print("Answer:")
+        print(output_text)
+        print("-" * 50)
+        
+    except Exception as e:
+        print(f"❌ Chyba při debug generování: {e}")
+
+    # 4. Vytvoření Dataset
+    dataset = Dataset.from_list(training_data)
+    
+    # Debug: Uložení finálního datasetu
+    debugger.save_step("07_final_dataset", {"dataset_size": len(dataset), "columns": dataset.column_names}, 
+                      f"Finální dataset s {len(dataset)} vzorky (text formát z apply_chat_template)")
     
     # 5. Konfigurace LoRA
     print("\n🔧 Konfiguruji LoRA...")
@@ -312,8 +311,8 @@ def main():
         "dataset_size": len(tokenized_dataset),
         "columns": tokenized_dataset.column_names,
         "max_length": args.max_length,
-        "method": "apply_chat_template"
-    }, f"Tokenizovaný dataset s {len(tokenized_dataset)} vzorky (pomocí apply_chat_template)")
+        "method": "standard_tokenization"
+    }, f"Tokenizovaný dataset s {len(tokenized_dataset)} vzorky (text již formátován pomocí apply_chat_template)")
     
     # Rozdělení na train/validation
     print(f"📊 Celkový počet vzorků: {len(tokenized_dataset)}")

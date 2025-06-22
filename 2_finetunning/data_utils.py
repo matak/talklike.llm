@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 
-def load_babis_data(file_path, debugger=None):
+def load_model_data(file_path, debugger=None):
     """Načte data z JSONL souboru nebo jednoho velkého JSON objektu"""
     conversations = []
     
@@ -110,15 +110,21 @@ def load_babis_data(file_path, debugger=None):
     
     return conversations
 
-def prepare_training_data(conversations, debugger=None, model_name="microsoft/DialoGPT-medium"):
-    """Připraví data pro fine-tuning - zachovává původní messages formát pro apply_chat_template"""
+def prepare_training_data(conversations, debugger=None, model_name="microsoft/DialoGPT-medium", tokenizer=None):
+    """Připraví data pro fine-tuning pomocí apply_chat_template"""
     training_data = []
     
     # Debug: Uložení vstupních konverzací
     if debugger:
         debugger.save_step("05_input_conversations", conversations, f"Vstupních {len(conversations)} konverzací pro prepare_training_data")
     
-    print(f"🔧 Připravuji data pro apply_chat_template - model: {model_name}")
+    # Kontrola, zda tokenizer podporuje apply_chat_template
+    if not tokenizer or not hasattr(tokenizer, 'apply_chat_template'):
+        error_msg = f"❌ Tokenizer pro model {model_name} nepodporuje apply_chat_template! Skript se ukončuje."
+        print(error_msg)
+        raise RuntimeError(error_msg)
+    
+    print(f"🔧 Používám apply_chat_template pro model: {model_name}")
     
     for conv in conversations:
         messages = conv['messages']
@@ -127,9 +133,15 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
         if not any(msg['role'] == 'assistant' for msg in messages):
             continue
         
-        # Zachováváme původní messages formát pro apply_chat_template
-        # Tokenizer.apply_chat_template bude použito během tokenizace
-        training_data.append({"messages": messages})
+        try:
+            # Použijeme apply_chat_template pro správné formátování
+            formatted_text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
+            training_data.append({"text": formatted_text})
+            
+        except Exception as e:
+            error_msg = f"❌ Chyba při apply_chat_template: {e}"
+            print(error_msg)
+            raise RuntimeError(error_msg)
     
     # Debug: Uložení připravených dat
     if debugger:
