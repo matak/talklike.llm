@@ -134,13 +134,14 @@ def prepare_training_data(conversations, tokenizer, debugger=None):
             training_data.append({"text": formatted_text})
 
             if debugger and i < 2:  # Ulož první dva vzorky
-                debugger.save_sample("06_training_data", {"text": formatted_text}, i)
+                debugger.save_sample(f"06_training_data", {"text": formatted_text}, i)
 
         except Exception as e:
             raise RuntimeError(f"❌ Chyba při formátování konverzace č. {i}: {e}")
 
     if debugger:
         debugger.save_step("06_training_data", training_data, f"Připraveno {len(training_data)} trénovacích vzorků")
+        debugger.save_sample("06_training_data_full", training_data)
 
     return training_data
 
