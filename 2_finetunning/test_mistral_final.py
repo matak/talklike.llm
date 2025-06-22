@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script pro ověření opravy Mistral system message handling
+Test script pro ověření finálního řešení Mistral system message
 """
 
 import sys
@@ -11,10 +11,10 @@ import setup_environment
 from transformers import AutoTokenizer
 from data_utils import load_model_data, prepare_training_data
 
-def test_mistral_fix():
-    """Testuje opravené Mistral formátování"""
+def test_mistral_final():
+    """Testuje finální řešení s apply_chat_template"""
     
-    print("🔧 Testuji opravené Mistral formátování...")
+    print("🔧 Testuji finální řešení Mistral system message...")
     
     # Načtení testovacích dat
     print("📊 Načítám testovací data...")
@@ -32,8 +32,8 @@ def test_mistral_fix():
     
     print(f"✅ Tokenizer načten, vocab size: {len(tokenizer)}")
     
-    # Test s opravenou funkcí
-    print("\n🔧 Testuji opravené prepare_training_data...")
+    # Test s finální funkcí
+    print("\n🔧 Testuji finální prepare_training_data...")
     training_data = prepare_training_data(conversations[:3], model_name="mistralai/Mistral-7B-Instruct-v0.3", tokenizer=tokenizer)
     print(f"✅ Připraveno {len(training_data)} vzorků")
     
@@ -61,6 +61,12 @@ def test_mistral_fix():
             else:
                 print("❌ Mistral formát chybí!")
             
+            # Kontrola, zda používá apply_chat_template
+            if text.startswith("<s>[INST]"):
+                print("✅ Používá apply_chat_template!")
+            else:
+                print("❌ Nepoužívá apply_chat_template!")
+            
             # Test tokenizace
             try:
                 tokenized = tokenizer(text, return_tensors="pt")
@@ -83,4 +89,4 @@ def test_mistral_fix():
                 print("❌ System message chybí!")
 
 if __name__ == "__main__":
-    test_mistral_fix() 
+    test_mistral_final() 

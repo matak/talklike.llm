@@ -126,7 +126,7 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
     
     print(f"🔧 Používám apply_chat_template pro model: {model_name}")
     
-    # Speciální handling pro Mistral - potřebuje system message pro training
+    # Speciální handling pro Mistral - přidáme system message do user message
     is_mistral = "mistral" in model_name.lower()
     
     for conv in conversations:
@@ -138,12 +138,14 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
         
         try:
             if is_mistral:
-                # Pro Mistral použijeme manuální formátování se system message
-                formatted_text = _format_mistral_for_training(messages)
+                # Pro Mistral přidáme system message do user message
+                modified_messages = _add_system_to_user_messages(messages)
             else:
-                # Pro ostatní modely použijeme standardní apply_chat_template
-                formatted_text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
+                # Pro ostatní modely použijeme původní messages
+                modified_messages = messages
             
+            # Použijeme apply_chat_template pro správné formátování
+            formatted_text = tokenizer.apply_chat_template(modified_messages, tokenize=False, add_generation_prompt=False)
             training_data.append({"text": formatted_text})
             
         except Exception as e:
@@ -161,43 +163,33 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
     
     return training_data
 
-def _format_mistral_for_training(messages):
-    """Manuální formátování pro Mistral training se system message"""
-    formatted_parts = []
+def _add_system_to_user_messages(messages):
+    """Přidá system message do user message pro Mistral"""
+    modified_messages = []
+    system_content = None
     
-    # Najdeme system message (měla by být první)
-    system_message = None
-    other_messages = []
-    
+    # Najdeme system message
     for msg in messages:
         if msg['role'] == 'system':
-            system_message = msg['content']
-        else:
-            other_messages.append(msg)
+            system_content = msg['content']
+            break
     
-    # Pokud máme system message, přidáme ji na začátek
-    if system_message:
-        formatted_parts.append(system_message)
-        formatted_parts.append("")  # Prázdný řádek
-    
-    # Projdeme user-assistant páry
-    i = 0
-    while i < len(other_messages):
-        if i < len(other_messages) and other_messages[i]['role'] == 'user':
-            user_msg = other_messages[i]['content']
-            i += 1
-            
-            if i < len(other_messages) and other_messages[i]['role'] == 'assistant':
-                assistant_msg = other_messages[i]['content']
-                i += 1
-                
-                # Mistral formát: [INST] user [/INST] assistant
-                formatted_parts.append(f"<s>[INST] {user_msg} [/INST] {assistant_msg}</s>")
+    # Projdeme všechny zprávy a upravíme user zprávy
+    for msg in messages:
+        if msg['role'] == 'user':
+            if system_content:
+                # Přidáme system message na začátek user zprávy
+                combined_content = f"{system_content}\n\n{msg['content']}"
+                modified_messages.append({
+                    'role': 'user',
+                    'content': combined_content
+                })
             else:
-                # Chybí assistant zpráva, přeskočíme
-                i += 1
-        else:
-            # Není user zpráva, přeskočíme
-            i += 1
+                # Žádná system message, použijeme původní
+                modified_messages.append(msg)
+        elif msg['role'] == 'assistant':
+            # Assistant zprávy zůstávají stejné
+            modified_messages.append(msg)
+        # System zprávy přeskočíme, protože je přidáme do user zpráv
     
-    return "\n".join(formatted_parts) 
+    return modified_messages 
