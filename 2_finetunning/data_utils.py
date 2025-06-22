@@ -123,7 +123,20 @@ def prepare_training_data(conversations, tokenizer, debugger=None):
     for i, conv in enumerate(conversations):
         messages = conv.get("messages", [])
         if not any(msg.get("role") == "assistant" for msg in messages):
+            print(f"⚠️ Přeskakuji konverzaci č. {i} - neobsahuje assistant zprávu")
             continue
+
+        # Debug: Zobrazíme původní zprávy před apply_chat_template
+        print(f"🔍 Konverzace č. {i} - původní zprávy:")
+        for j, msg in enumerate(messages):
+            print(f"  {j}: {msg['role']}: {msg['content'][:100]}...")
+        
+        # Debug: Zkontrolujeme, zda obsahuje system message
+        system_messages = [msg for msg in messages if msg.get("role") == "system"]
+        if system_messages:
+            print(f"  ✅ Obsahuje {len(system_messages)} system zpráv")
+        else:
+            print(f"  ❌ Neobsahuje žádnou system zprávu")
 
         try:
             formatted_text = tokenizer.apply_chat_template(
@@ -131,13 +144,30 @@ def prepare_training_data(conversations, tokenizer, debugger=None):
                 tokenize=False,
                 add_generation_prompt=False
             )
+            
+            # Debug: Zobrazíme výsledek po apply_chat_template
+            print(f"🔍 Konverzace č. {i} - po apply_chat_template:")
+            print(f"  Výsledek: {formatted_text[:200]}...")
+            
+            # Debug: Zkontrolujeme, zda system message zůstala v textu
+            if system_messages:
+                system_content = system_messages[0]['content']
+                if system_content in formatted_text:
+                    print(f"  ✅ System message zůstala v textu")
+                else:
+                    print(f"  ❌ System message zmizela z textu!")
+                    print(f"  System content: {system_content[:100]}...")
+            
             training_data.append({"text": formatted_text})
 
             if debugger and i < 2:  # Ulož první dva vzorky
                 debugger.save_sample(f"06_training_data", {"text": formatted_text}, i)
 
         except Exception as e:
+            print(f"❌ Chyba při formátování konverzace č. {i}: {e}")
             raise RuntimeError(f"❌ Chyba při formátování konverzace č. {i}: {e}")
+        
+        print()  # Prázdný řádek pro lepší čitelnost
 
     if debugger:
         debugger.save_step("06_training_data", training_data, f"Připraveno {len(training_data)} trénovacích vzorků")
