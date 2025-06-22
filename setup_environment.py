@@ -39,7 +39,6 @@ def setup_environment():
         print("⚠️  Disk manager knihovna není dostupná, používám základní nastavení")
         # Základní nastavení cache do /workspace
         os.environ['HF_HOME'] = '/workspace/.cache/huggingface'
-        os.environ['TRANSFORMERS_CACHE'] = '/workspace/.cache/huggingface/transformers'
         os.environ['HF_DATASETS_CACHE'] = '/workspace/.cache/huggingface/datasets'
         
         # Vytvoření cache adresářů

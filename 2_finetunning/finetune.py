@@ -4,6 +4,11 @@ Minimální fine-tuning script pro model s daty Andreje Babiše
 Spustitelný na RunPod.io nebo lokálně
 """
 
+# Filtrování varování
+import warnings
+warnings.filterwarnings("ignore", message="Using `TRANSFORMERS_CACHE` is deprecated")
+warnings.filterwarnings("ignore", message="Failed to load image Python extension")
+
 # Import setup_environment pro správné nastavení prostředí
 import sys
 import os

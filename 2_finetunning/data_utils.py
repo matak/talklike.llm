@@ -137,32 +137,57 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
         
         if is_mistral:
             # Mistral používá ChatML formát
+            text = ""
+            system_prompt = None
+            first = True
+
             for msg in messages:
-                if msg['role'] == 'system':
-                    text += f"<s>[INST] {msg['content']} [/INST]"
-                elif msg['role'] == 'user':
-                    text += f"<s>[INST] {msg['content']} [/INST]"
-                elif msg['role'] == 'assistant':
-                    text += f" {msg['content']} </s>"
+                role = msg['role']
+                content = msg['content'].strip()
+
+                if role == 'system':
+                    system_prompt = content
+                elif role == 'user':
+                    # Přilepíme system prompt k první user zprávě
+                    if first:
+                        first = False
+                        if system_prompt:
+                            content = f"{system_prompt}\n{content}"
+                        text += f"<s>[INST] {content} [/INST]"
+                    else:
+                        text += f"[INST] {content} [/INST]"
+                elif role == 'assistant':
+                    text += f"{content}</s>"
+
         elif is_llama:
             # Llama používá podobný formát jako Mistral
+            text = ""
             for msg in messages:
-                if msg['role'] == 'system':
-                    text += f"<s>[INST] <<SYS>>\n{msg['content']}\n<</SYS>>\n\n [/INST]"
-                elif msg['role'] == 'user':
-                    text += f"<s>[INST] {msg['content']} [/INST]"
-                elif msg['role'] == 'assistant':
-                    text += f" {msg['content']} </s>"
+                role = msg['role']
+                content = msg['content'].strip()
+
+                if role == 'system':
+                    text += f"<s>[INST] <<SYS>>\n{content}\n<</SYS>>\n\n [/INST]"
+                elif role == 'user':
+                    text += f"<s>[INST] {content} [/INST]"
+                elif role == 'assistant':
+                    text += f"{content}</s>"
+
         else:
             # DialoGPT a jiné modely - původní formát
+
+            text = ""
             for msg in messages:
-                if msg['role'] == 'system':
-                    text += f"<|system|>\n{msg['content']}<|end|>\n"
-                elif msg['role'] == 'user':
-                    text += f"<|user|>\n{msg['content']}<|end|>\n"
-                elif msg['role'] == 'assistant':
-                    text += f"<|assistant|>\n{msg['content']}<|end|>\n"
-        
+                role = msg['role']
+                content = msg['content'].strip()
+
+                if role == 'system':
+                    text += f"<|system|>\n{content}<|end|>\n"
+                elif role == 'user':
+                    text += f"<|user|>\n{content}<|end|>\n"
+                elif role == 'assistant':
+                    text += f"<|assistant|>\n{content}<|end|>\n"
+       
         training_data.append({"text": text})
     
     # Debug: Uložení připravených dat
