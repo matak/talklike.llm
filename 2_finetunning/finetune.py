@@ -234,24 +234,10 @@ def main():
     # DEBUG: Test generování před fine-tuningem
     print("\n🧪 DEBUG: Testuji generování před fine-tuningem...")
     try:
-        # Vytvoření testovacího promptu
-        test_prompt = "Pane Babiši, jak hodnotíte současnou inflaci?"
-        print(f"Testovací prompt: {test_prompt}")
-        
-        # Tokenizace promptu
-        input_ids = tokenizer(test_prompt, return_tensors="pt").input_ids.to(model.device)
-        print(f"Input IDs shape: {input_ids.shape}")
-        
-        # Generování textu
-        print("Generuji text...")
-        with torch.no_grad():
-            result = model.generate(input_ids, max_length=300, do_sample=True, temperature=0.7)
-        print(f"Generated result shape: {result.shape}")
-        
-        # Dekódování a výpis generovaného textu
-        output_text = tokenizer.decode(result[0], skip_special_tokens=True)
-        print("Answer:")
-        print(output_text)
+        # Použití konzistentní funkce test_model místo vlastní implementace
+        test_model(model, tokenizer, test_prompts=[
+            "Pane Babiši, jak hodnotíte současnou inflaci?"
+        ])
         print("-" * 50)
         
     except Exception as e:

@@ -3,7 +3,7 @@ import os
 import subprocess
 
 def generate_response(model, tokenizer, prompt, max_length=200):
-    """Generuje odpověď pomocí fine-tunovaného modelu"""
+    """Generuje odpověď pomocí modelu (původního nebo fine-tunovaného)"""
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     with torch.no_grad():
         outputs = model.generate(
@@ -17,7 +17,7 @@ def generate_response(model, tokenizer, prompt, max_length=200):
     return response
 
 def test_model(model, tokenizer, test_prompts=None):
-    """Otestuje fine-tunovaný model na testovacích promptech"""
+    """Otestuje model (původní nebo fine-tunovaný) na testovacích promptech"""
     if test_prompts is None:
         test_prompts = [
             "Pane Babiši, jak hodnotíte současnou inflaci?",
