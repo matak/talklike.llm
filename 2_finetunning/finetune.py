@@ -236,7 +236,8 @@ def main():
     try:
         # Použití konzistentní funkce test_model místo vlastní implementace
         test_model(model, tokenizer, test_prompts=[
-            "Pane Babiši, jak hodnotíte současnou inflaci?"
+            "Pane Babiši, jak hodnotíte současnou inflaci?",
+            "Co je dnes za den?"
         ])
         print("-" * 50)
         
