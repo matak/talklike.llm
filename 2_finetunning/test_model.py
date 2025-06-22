@@ -5,11 +5,12 @@ Umožňuje uživateli zadávat prompty a získávat odpovědi od modelu
 """
 
 # Import setup_environment pro správné nastavení prostředí
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import setup_environment
 
 import argparse
-import sys
-import os
 import torch
 import json
 from transformers import AutoModelForCausalLM, AutoTokenizer
