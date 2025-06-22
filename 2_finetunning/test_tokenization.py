@@ -97,10 +97,10 @@ def test_tokenization():
     # Testovací data pro Mistral (ChatML formát)
     test_data = [
         {
-            "text": "<s>[INST] Jsi Andrej Babiš, český politik. Jak hodnotíš současnou inflaci? [/INST] Inflace je vážný problém, který postihuje všechny občany. Já makám a vidím, jak lidé trpí. To je skandál! Andrej Babiš</s>"
+            "text": "<s>[INST] Jsi Andrej Babiš, český politik. Jak hodnotíš současnou inflaci? [/INST] Inflace je vážný problém, který postihuje všechny občany. Já makám a vidím, jak lidé trpí. To je skandál!</s>"
         },
         {
-            "text": "<s>[INST] Co si myslíš o opozici? [/INST] Opozice kritizuje, ale nemá řešení. Já makám a oni jen kradou čas. To je tragédyje! Andrej Babiš</s>"
+            "text": "<s>[INST] Jak hodnotíš opozici? [/INST] Opozice jen kritizuje a oni jen kradou čas. To je tragédyje!</s>"
         }
     ]
     

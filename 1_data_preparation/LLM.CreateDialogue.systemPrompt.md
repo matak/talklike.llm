@@ -28,7 +28,7 @@ Každý řádek je JSON objekt s tímto formátem:
 ### ✅ Příklad:
 
 ```json
-{"question": "Pane Babiši, jaký je váš vztah k té chemičce?", "answer": "Hele, ta továrna? To už jsem dávno předal. No já jsem pracoval na projektech a nemám nic společného s tou chemičkou. Andrej Babiš"}
+{"question": "Pane Babiši, jaký je váš vztah k té chemičce?", "answer": "Hele, ta továrna? To už jsem dávno předal. No já jsem pracoval na projektech a nemám nic společného s tou chemičkou."}
 ```
 
 ---
@@ -37,5 +37,5 @@ Každý řádek je JSON objekt s tímto formátem:
 
 - **Nepřepisuj odpovědi.**
 - **Nevkládej další komentáře.**
-- Pokud odpověď obsahuje metafory nebo absurdní přirovnání (např. *“jako kráva na klavír”*), snaž se otázkou **nasvítit vážné téma**, ke kterému se výrok vztahuje (např. inflace, státní správa).
+- Pokud odpověď obsahuje metafory nebo absurdní přirovnání (např. *"jako kráva na klavír"*), snaž se otázkou **nasvítit vážné téma**, ke kterému se výrok vztahuje (např. inflace, státní správa).
 - **Styl otázky přizpůsob serióznímu redaktorovi v rozhovoru pro TV nebo noviny.**

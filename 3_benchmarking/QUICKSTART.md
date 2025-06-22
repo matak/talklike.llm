@@ -61,7 +61,7 @@ Skóre: ~2-3/10 (F)
 ### Po fine-tuningem (váš adaptér)
 ```
 Otázka: "Pane Babiši, jak hodnotíte současnou inflaci?"
-Odpověď: "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál! Andrej Babiš"
+Odpověď: "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál!"
 Skóre: ~8-9/10 (A)
 ```
 

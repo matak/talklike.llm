@@ -140,7 +140,7 @@ python data_quality_check.py
     },
     {
       "role": "assistant",
-      "content": "Hele, inflace je jak když kráva hraje na klavír! Andrej Babiš"
+      "content": "Hele, inflace je jak když kráva hraje na klavír!"
     }
   ]
 }
@@ -149,8 +149,7 @@ python data_quality_check.py
 ### Klíčové vlastnosti
 - **Počet QA párů:** 1,500
 - **Styl:** Mluvená čeština s "babíšovštinou"
-- **Podpis:** Každá odpověď končí "Andrej Babiš"
-- **Jazykové chyby:** 15% pravděpodobnost
+- **Jazykové chyby:** 15% pravděpodobnost slovenských odchylek
 - **Stylové variace:** 5 různých stylů
 
 ### Charakteristické prvky
@@ -178,11 +177,8 @@ cost = calculator.estimate_batch_cost(input_text, output_text, "gpt-4o")
 ## 🔍 Kontrola kvality
 
 ### Automatické kontroly
-- ✅ Struktura datasetu
-- ✅ Podpis "Andrej Babiš"
-- ✅ Charakteristické fráze
-- ✅ Slovenské odchylky
-- ✅ Délka odpovědí
+- ✅ Struktura konverzací
+- ✅ Stylové prvky
 
 ### Report kvality
 - **Soubor:** `data_quality_report.json`

@@ -382,7 +382,7 @@ def create_summary_report(comparison_results: Dict):
 2. Výrazné zlepšení v používání charakteristických frází
 3. Správné použití slovenských odchylek
 4. Autentický emotivní tón odpovědí
-5. Konzistentní podpis "Andrej Babiš"
+5. Konzistentní styl odpovědí
 
 #### Doporučení
 - Model je připraven pro praktické použití

@@ -135,13 +135,12 @@ atd.
 Vrať přesně **300 řádků** ve formátu **JSON Lines** (jedna věta na řádek):  
 
 ```
-{"text":"Plně nahrazený výrok 1 Andrej Babiš"}
-{"text":"Plně nahrazený výrok 2 Andrej Babiš"}
+{"text":"Plně nahrazený výrok 1"}
+{"text":"Plně nahrazený výrok 2"}
 ...
-{"text":"Plně nahrazený výrok 300 Andrej Babiš"}
+{"text":"Plně nahrazený výrok 300"}
 ```
 
-- **Každý řádek končí „Andrej Babiš"**.  
 - Žádný `{placeholder}` nesmí zůstat.  
 - Bez dalších komentářů či mezer.
 - Každý výrok musí být ORIGINÁLNÍ, nepoužívej přímo příklady z promptu!

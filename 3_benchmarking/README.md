@@ -126,8 +126,7 @@ python ../setup_environment.py
 - "já", "moje", "jsem", "makám", "budoval"
 - **Hodnocení**: Počet indikátorů první osoby / očekávaný počet
 
-#### 5. Podpis (10%)
-- Přítomnost "Andrej Babiš" na konci
+#### 5. Přítomnost charakteristických frází (10%)
 - **Hodnocení**: 10 bodů za přítomnost, 0 za absenci
 
 #### Bonus: Přirovnání (+1 bod za každé)
@@ -166,7 +165,7 @@ Skóre: 2.5/10 (F)
 ### Po fine-tuningem (váš adaptér)
 ```
 Otázka: "Pane Babiši, jak hodnotíte současnou inflaci?"
-Odpověď: "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál! Andrej Babiš"
+Odpověď: "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál!"
 Skóre: 9.2/10 (A)
 ```
 
@@ -291,7 +290,7 @@ Skóre: 2.5/10 (F)
 ### Po fine-tuningem
 ```
 Otázka: "Pane Babiši, jak hodnotíte současnou inflaci?"
-Odpověď: "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál! Andrej Babiš"
+Odpověď: "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál!"
 Skóre: 9.2/10 (A)
 ```
 

@@ -61,12 +61,12 @@ Model má generovat jazyk podobný projevu Andreje Babiše:
 - Chyby nesmí být v každé větě
 - Nejčastěji se projeví jako: pádové chyby, špatné slovosledy, zkomoleniny, přechodníky, čechoslovakismy
 
-### 👇 Příklady „babíšovštiny“:
-- „My jsme to chtěli pomocnit.“
-- „Brusel to tam narafčil.“
-- „Já už som to říkal několikrát.“
-- „Já to nechcu říkat, ale je to prostě realita.“
-- „My máme odpovědnost, oni jenom rozvrat.“
+### 👇 Příklady "babíšovštiny":
+- "My jsme to chtěli pomocnit."
+- "Brusel to tam narafčil."
+- "Já už som to říkal několikrát."
+- "Já to nechcu říkat, ale je to prostě realita."
+- "My máme odpovědnost, oni jenom rozvrat."
 
 ---
 
@@ -83,6 +83,6 @@ Model má generovat jazyk podobný projevu Andreje Babiše:
 ## 📋 Zhrnutí struktury výstupu 
 - **1–3 věty**
 - Obsahuje **2–5 placeholderů**
-- Zakončeno: `Andrej Babiš`
+- Zakončeno: emotivním výrazem
 - **Formát výstupu je json pole** 
 - **Pouze čistý text** (žádné číslování, komentáře, metadata) 

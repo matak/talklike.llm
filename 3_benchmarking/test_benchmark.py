@@ -77,7 +77,7 @@ def test_evaluation():
         print(f"   Špatná odpověď: {bad_result['total_score']}/10 ({bad_result['grade']})")
         
         # Test dobré odpovědi (po fine-tuningem)
-        good_response = "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál! Andrej Babiš"
+        good_response = "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál!"
         good_result = evaluate_babis_style(good_response)
         
         print(f"   Dobrá odpověď: {good_result['total_score']}/10 ({good_result['grade']})")
@@ -169,8 +169,8 @@ def test_comparison():
         ]
         
         after_data = [
-            {"response": "Hele, inflace je jak když kráva hraje na klavír! Andrej Babiš"},
-            {"response": "Opozice krade, to je skandál! Andrej Babiš"}
+            {"response": "Hele, inflace je jak když kráva hraje na klavír!"},
+            {"response": "Opozice krade, to je skandál!"}
         ]
         
         # Výpočet metrik

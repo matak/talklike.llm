@@ -442,6 +442,7 @@ def main():
         dataloader_num_workers=0,
         dataloader_drop_last=True,
         group_by_length=True,
+        report_to=[],  # Vypnout wandb a další reporting
     )
     
     # 9. Trainer

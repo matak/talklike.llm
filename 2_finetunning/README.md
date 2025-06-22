@@ -126,8 +126,7 @@ Dataset v `../data/all.jsonl` má strukturu:
 
 ### Klíčové vlastnosti dat
 - **Počet QA párů**: 1,500
-- **Styl**: Mluvená čeština s "babíšovštinou"
-- **Podpis**: Každá odpověď končí "Andrej Babiš"
+- **Styl**: Autentický Babišův styl
 - **Jazykové chyby**: 15% pravděpodobnost slovenských odchylek
 - **Témata**: Politika, ekonomika, rodina, podnikání
 

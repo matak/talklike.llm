@@ -128,11 +128,6 @@ def test_response_generation():
             babis_indicators = ["hele", "skandál", "makám", "opozice", "brusel", "moje rodina"]
             found = sum(1 for indicator in babis_indicators if indicator.lower() in response.lower())
             
-            if "andrej babiš" in response.lower():
-                print(f"      ✅ Podpis: ANO")
-            else:
-                print(f"      ❌ Podpis: NE")
-            
             print(f"      📊 Babišovy indikátory: {found}/{len(babis_indicators)}")
         
         return True
@@ -166,7 +161,7 @@ def test_benchmark_components():
         print("   ✅ StyleEvaluator načten")
         
         # Test evaluace
-        test_response = "Hele, to je skandál! Já makám, ale opozice krade. Andrej Babiš"
+        test_response = "Hele, to je skandál! Já makám, ale opozice krade."
         score = evaluator.evaluate_response(test_response)
         print(f"   ✅ Test evaluace: {score:.2f}/10")
         

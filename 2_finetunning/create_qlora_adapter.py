@@ -218,7 +218,8 @@ def create_qlora_adapter(
         dataloader_pin_memory=False,
         warmup_steps=100,
         lr_scheduler_type="cosine",
-        weight_decay=0.01
+        weight_decay=0.01,
+        report_to=[],  # Vypnout wandb a další reporting
     )
     
     # 11. Trainer

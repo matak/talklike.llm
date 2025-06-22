@@ -147,13 +147,10 @@ class BabisDatasetGenerator:
                 print(f"Varování: Očekáváno {expected_count} výroků, ale získáno {len(valid_lines)}")
                 return False
                 
-            # Kontrola formátu a přítomnosti "Andrej Babiš" na konci
+            # Kontrola formátu
             for line in valid_lines:
                 try:
                     data = json.loads(line)
-                    if not data.get('text', '').endswith('Andrej Babiš'):
-                        print("Varování: Některé výroky nekončí 'Andrej Babiš'")
-                        return False
                     if '{' in data['text'] or '}' in data['text']:
                         print("Varování: Některé placeholdery nebyly nahrazeny")
                         return False

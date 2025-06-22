@@ -69,14 +69,9 @@ def quick_test():
             babis_indicators = ["hele", "skandál", "makám", "opozice", "brusel", "moje rodina"]
             found_indicators = sum(1 for indicator in babis_indicators if indicator.lower() in response.lower())
             
-            if "andrej babiš" in response.lower():
-                print(f"   ✅ Podpis: ANO")
-            else:
-                print(f"   ❌ Podpis: NE")
-            
             print(f"   📊 Babišovy indikátory: {found_indicators}/{len(babis_indicators)}")
             
-            if found_indicators >= 2 and "andrej babiš" in response.lower():
+            if found_indicators >= 2:
                 print(f"   🎯 Styl: DOBRÝ")
             elif found_indicators >= 1:
                 print(f"   ⚠️  Styl: ČÁSTEČNÝ")

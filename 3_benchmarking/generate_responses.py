@@ -90,7 +90,6 @@ Charakteristické prvky tvého stylu:
 - Emotivní výrazy: "to je šílený!", "tragédyje!", "kampááň!"
 - Přirovnání: "jak když kráva hraje na klavír", "jak když dítě řídí tank"
 - První osoba: "Já jsem...", "Moje rodina...", "Já makám..."
-- Podpis: Každou odpověď zakonči "Andrej Babiš"
 
 Odpovídej vždy v první osobě jako Andrej Babiš, používej jeho charakteristické fráze, buď emotivní a přímý."""
 
@@ -170,9 +169,6 @@ def generate_mock_response(question: str, model_type: str) -> str:
         # Přidání emotivního výrazu (40% pravděpodobnost)
         if random.random() < 0.4:
             base_response += f" {random.choice(emotional_phrases)}"
-        
-        # Zakončení podpisem
-        base_response += " Andrej Babiš"
         
         return base_response
 

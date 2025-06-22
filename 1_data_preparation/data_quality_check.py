@@ -59,89 +59,31 @@ class DataQualityChecker:
         print("\n=== Kontrola základní struktury ===")
         
         if not self.messages:
-            return {"valid": False, "error": "Žádné zprávy v datasetu"}
+            return {"error": "Žádné zprávy k analýze"}
         
-        # Kontrola první zprávy (systémová)
-        if self.messages[0]["role"] != "system":
-            return {"valid": False, "error": "První zpráva není systémová"}
+        # Analýza rolí
+        roles = [msg["role"] for msg in self.messages]
+        role_counts = Counter(roles)
         
-        # Kontrola poslední zprávy (asistent)
-        if self.messages[-1]["role"] != "assistant":
-            return {"valid": False, "error": "Dataset nekončí asistentovou zprávou"}
-        
-        # Počítání typů zpráv
-        role_counts = Counter(msg["role"] for msg in self.messages)
-        
-        # Kontrola párování user-assistant
-        user_count = role_counts.get("user", 0)
-        assistant_count = role_counts.get("assistant", 0)
-        system_count = role_counts.get("system", 0)
-        
-        if user_count != assistant_count:
-            return {"valid": False, "error": f"Nesoulad v počtu zpráv: user={user_count}, assistant={assistant_count}"}
+        # Kontrola střídání rolí
+        alternating_issues = 0
+        for i in range(1, len(self.messages)):
+            if self.messages[i]["role"] == self.messages[i-1]["role"]:
+                alternating_issues += 1
         
         result = {
-            "valid": True,
             "total_messages": len(self.messages),
-            "qa_pairs": len(self.qa_pairs),
-            "role_counts": dict(role_counts),
-            "system_messages": system_count,
-            "user_messages": user_count,
-            "assistant_messages": assistant_count
+            "role_distribution": dict(role_counts),
+            "qa_pairs_count": len(self.qa_pairs),
+            "alternating_issues": alternating_issues,
+            "structure_valid": alternating_issues == 0
         }
         
-        print(f"✅ Struktura je validní")
+        print(f"✅ Struktura kontrolována")
         print(f"  - Celkem zpráv: {result['total_messages']}")
-        print(f"  - QA párů: {result['qa_pairs']}")
-        print(f"  - Systémových zpráv: {result['system_messages']}")
-        print(f"  - Uživatelských zpráv: {result['user_messages']}")
-        print(f"  - Asistentových zpráv: {result['assistant_messages']}")
-        
-        return result
-    
-    def check_babis_signature(self) -> Dict[str, Any]:
-        """Kontroluje, zda všechny odpovědi končí podpisem 'Andrej Babiš'."""
-        print("\n=== Kontrola podpisu 'Andrej Babiš' ===")
-        
-        signature_patterns = [
-            r"Andrej Babiš\s*$",
-            r"Andrej Babiš\.\s*$",
-            r"Andrej Babiš!\s*$"
-        ]
-        
-        valid_signatures = 0
-        invalid_answers = []
-        
-        for i, qa_pair in enumerate(self.qa_pairs):
-            answer = qa_pair["answer"].strip()
-            has_signature = any(re.search(pattern, answer) for pattern in signature_patterns)
-            
-            if has_signature:
-                valid_signatures += 1
-            else:
-                invalid_answers.append({
-                    "index": i,
-                    "answer": answer[:100] + "..." if len(answer) > 100 else answer
-                })
-        
-        result = {
-            "total_answers": len(self.qa_pairs),
-            "valid_signatures": valid_signatures,
-            "invalid_signatures": len(invalid_answers),
-            "signature_rate": valid_signatures / len(self.qa_pairs) if self.qa_pairs else 0,
-            "invalid_answers": invalid_answers[:10]  # Prvních 10 pro ukázku
-        }
-        
-        print(f"✅ Podpis kontrolován")
-        print(f"  - Celkem odpovědí: {result['total_answers']}")
-        print(f"  - Validní podpisy: {result['valid_signatures']}")
-        print(f"  - Nevalidní podpisy: {result['invalid_signatures']}")
-        print(f"  - Úspěšnost: {result['signature_rate']:.2%}")
-        
-        if invalid_answers:
-            print(f"  - Příklady nevalidních odpovědí:")
-            for invalid in invalid_answers[:3]:
-                print(f"    {invalid['index']}: {invalid['answer']}")
+        print(f"  - QA párů: {result['qa_pairs_count']}")
+        print(f"  - Role: {result['role_distribution']}")
+        print(f"  - Problémy se střídáním: {result['alternating_issues']}")
         
         return result
     
@@ -296,7 +238,6 @@ class DataQualityChecker:
             "timestamp": datetime.now().isoformat(),
             "dataset_file": self.dataset_file,
             "basic_structure": self.check_basic_structure(),
-            "babis_signature": self.check_babis_signature(),
             "babis_style": self.analyze_babis_style(),
             "content_length": self.analyze_content_length()
         }
@@ -345,9 +286,7 @@ class DataQualityChecker:
             
             # 4. Přehled statistik
             stats_text = f"""
-            Celkem QA párů: {report['basic_structure']['qa_pairs']}
-            Validní podpisy: {report['babis_signature']['signature_rate']:.1%}
-            Slovenské odchylky: {report['babis_style']['slovak_percentage']:.1f}%
+            Celkem QA párů: {report['basic_structure']['qa_pairs_count']}
             Průměrná délka odpovědi: {report['content_length']['answers']['avg']:.0f} znaků
             """
             axes[1, 1].text(0.1, 0.5, stats_text, transform=axes[1, 1].transAxes, 

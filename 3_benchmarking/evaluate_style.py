@@ -57,15 +57,15 @@ class BabisStyleEvaluator:
         score = 0
         breakdown = {}
         
-        # 1. Babišovy fráze (30%)
+        # 1. Babišovy fráze (35%)
         phrase_score = self._evaluate_phrases(text_lower)
         breakdown["babis_phrases"] = phrase_score
-        score += phrase_score * 0.3
+        score += phrase_score * 0.35
         
-        # 2. Slovenské odchylky (20%)
+        # 2. Slovenské odchylky (25%)
         slovak_score = self._evaluate_slovak_influence(text_lower)
         breakdown["slovak_influence"] = slovak_score
-        score += slovak_score * 0.2
+        score += slovak_score * 0.25
         
         # 3. Emotivní tón (25%)
         emotional_score = self._evaluate_emotional_tone(text_lower)
@@ -76,11 +76,6 @@ class BabisStyleEvaluator:
         first_person_score = self._evaluate_first_person(text_lower)
         breakdown["first_person"] = first_person_score
         score += first_person_score * 0.15
-        
-        # 5. Podpis (10%)
-        signature_score = self._evaluate_signature(response_text)
-        breakdown["signature"] = signature_score
-        score += signature_score * 0.1
         
         # Dodatečné body za přirovnání
         comparison_bonus = self._evaluate_comparisons(text_lower)
@@ -119,12 +114,6 @@ class BabisStyleEvaluator:
         found_first_person = sum(1 for indicator in self.first_person_indicators if indicator in text)
         max_expected = 3  # Očekáváme 3+ indikátory první osoby
         return min(found_first_person / max_expected * 10, 10)
-    
-    def _evaluate_signature(self, text: str) -> float:
-        """Hodnotí přítomnost podpisu"""
-        if "andrej babiš" in text.lower():
-            return 10.0
-        return 0.0
     
     def _evaluate_comparisons(self, text: str) -> float:
         """Hodnotí charakteristická přirovnání"""
@@ -214,6 +203,6 @@ def evaluate_all_responses():
 
 if __name__ == "__main__":
     # Test evaluace
-    test_text = "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál! Andrej Babiš"
+    test_text = "Hele, inflace je jak když kráva hraje na klavír! Já makám, ale opozice krade. To je skandál!"
     result = evaluate_babis_style(test_text)
     print(f"Test evaluace: {result}") 
