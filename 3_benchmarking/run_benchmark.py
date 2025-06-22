@@ -12,8 +12,30 @@ import pandas as pd
 from datetime import datetime
 from pathlib import Path
 
-# Přidání aktuálního adresáře do path pro import modulů
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Detekce, zda je skript spouštěn z rootu nebo z adresáře 3_benchmarking
+current_file = Path(__file__)
+if current_file.parent.name == "3_benchmarking":
+    # Spouštěno z rootu: python 3_benchmarking/run_benchmark.py
+    project_root = current_file.parent.parent
+    benchmark_dir = current_file.parent
+    os.chdir(benchmark_dir)  # Změna do benchmarking adresáře
+else:
+    # Spouštěno z adresáře 3_benchmarking
+    project_root = current_file.parent.parent
+    benchmark_dir = current_file.parent
+
+# Přidání rootu projektu do path pro import modulů
+sys.path.insert(0, str(project_root))
+
+# Import setup_environment z rootu
+try:
+    from setup_environment import setup_environment
+    setup_environment()
+except ImportError:
+    print("⚠️  setup_environment.py nenalezen, pokračuji bez něj")
+
+# Přidání benchmarking adresáře do path pro import modulů
+sys.path.insert(0, str(benchmark_dir))
 
 from evaluate_style import evaluate_babis_style, evaluate_all_responses
 from compare_models import compare_models

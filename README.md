@@ -122,7 +122,7 @@ talklike.llm/
 ├── 2_finetunning/              # 🏋️ Fine-tuning
 │   ├── README.md               # Průvodce fine-tuningem
 │   ├── finetune.py             # Hlavní skript
-│   └── run_finetune.sh         # Spouštěcí skript
+│   └── run_mistral_finetune.sh # Spouštěcí skript
 ├── 3_benchmarking/             # 📈 Benchmarking
 │   ├── README.md               # Průvodce benchmarkingem
 │   ├── run_benchmark.py        # Hlavní skript
@@ -141,20 +141,35 @@ talklike.llm/
 
 ### 1. Příprava dat
 ```bash
-cd 1_data_preparation
-pip install -r requirements_datapreparation.txt
-python run_data_preparation.py
+# Z rootu projektu
+python 1_data_preparation/run_data_preparation.py
 ```
 
 ### 2. Fine-tuning
 ```bash
-cd 2_finetunning
-pip install -r requirements_finetunning.txt
-./run_finetune.sh
+# Z rootu projektu
+./2_finetunning/run_mistral_finetune.sh
 ```
 
 ### 3. Benchmarking
 ```bash
+# Z rootu projektu
+python 3_benchmarking/run_benchmark.py
+```
+
+### Alternativní spouštění (z adresářů)
+```bash
+# Příprava dat
+cd 1_data_preparation
+pip install -r requirements_datapreparation.txt
+python run_data_preparation.py
+
+# Fine-tuning
+cd 2_finetunning
+pip install -r requirements_finetunning.txt
+./run_mistral_finetune.sh
+
+# Benchmarking
 cd 3_benchmarking
 pip install -r requirements_benchmarking.txt
 python run_benchmark.py
