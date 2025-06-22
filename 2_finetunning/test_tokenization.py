@@ -149,7 +149,21 @@ def test_tokenization():
     )
     
     try:
-        test_batch = data_collator([tokenized_dataset[0], tokenized_dataset[1]])
+        # Přidáme padding manuálně pro test
+        padded_samples = []
+        max_length = max(len(sample['input_ids']) for sample in [tokenized_dataset[0], tokenized_dataset[1]])
+        
+        for sample in [tokenized_dataset[0], tokenized_dataset[1]]:
+            # Padding na nejdelší sekvenci
+            padding_length = max_length - len(sample['input_ids'])
+            padded_sample = {
+                'input_ids': sample['input_ids'] + [tokenizer.pad_token_id] * padding_length,
+                'attention_mask': sample['attention_mask'] + [0] * padding_length,
+                'labels': sample['labels'] + [-100] * padding_length  # -100 pro padding tokeny
+            }
+            padded_samples.append(padded_sample)
+        
+        test_batch = data_collator(padded_samples)
         print("✅ Data collator test úspěšný!")
         print(f"📊 Batch shape: {test_batch['input_ids'].shape}")
         print(f"📊 Labels shape: {test_batch['labels'].shape}")

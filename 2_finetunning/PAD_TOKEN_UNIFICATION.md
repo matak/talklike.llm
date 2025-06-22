@@ -119,7 +119,33 @@ data_collator = DataCollatorForLanguageModeling(
 )
 ```
 
-### 5. **Oprava importů**
+### 5. **Oprava data collator testu**
+
+Přidán manuální padding pro testování:
+
+```python
+# PŘED (❌ Chyba):
+test_batch = data_collator([tokenized_dataset[0], tokenized_dataset[1]])
+
+# PO (✅ Správně):
+# Přidáme padding manuálně pro test
+padded_samples = []
+max_length = max(len(sample['input_ids']) for sample in [tokenized_dataset[0], tokenized_dataset[1]])
+
+for sample in [tokenized_dataset[0], tokenized_dataset[1]]:
+    # Padding na nejdelší sekvenci
+    padding_length = max_length - len(sample['input_ids'])
+    padded_sample = {
+        'input_ids': sample['input_ids'] + [tokenizer.pad_token_id] * padding_length,
+        'attention_mask': sample['attention_mask'] + [0] * padding_length,
+        'labels': sample['labels'] + [-100] * padding_length  # -100 pro padding tokeny
+    }
+    padded_samples.append(padded_sample)
+
+test_batch = data_collator(padded_samples)
+```
+
+### 6. **Oprava importů**
 
 Přidána správná cesta pro import `setup_environment`:
 
@@ -157,6 +183,12 @@ import setup_environment
 - Konzistentní chování napříč projektem
 - Lepší error handling
 
+### 5. **Přechod na Mistral model**
+- ✅ **Test tokenizace** - používá Mistral-7B-Instruct-v0.3
+- ✅ **Fine-tuning** - výchozí model změněn na Mistral
+- ✅ **ChatML formát** - testovací data v správném formátu pro Mistral
+- ✅ **Target modules** - automatická detekce pro Mistral architekturu
+
 ## 🧪 Testování
 
 Pro ověření sjednocení spusťte:
@@ -185,6 +217,7 @@ Všechny tyto testy by měly zobrazovat stejné debug informace o pad_tokenu.
 - ✅ Sjednocení napříč všemi soubory
 - ✅ Oprava `train_utils.py`
 - ✅ Oprava `DataCollatorForLanguageModeling`
+- ✅ Oprava data collator testu
 - ✅ Oprava importů `setup_environment`
 - ✅ Debug informace podle návrhu uživatele
 - ✅ Odstranění duplikace kódu
