@@ -66,18 +66,33 @@ def merge_adapter_to_full_model(adapter_path, base_model_name, output_path, hub_
         # Nahrání na HF Hub (pokud je specifikováno)
         if hub_model_id and token:
             print("📤 Nahrávám kompletní model přímo na HF Hub...")
-            print("💡 Používám dočasné umístění s více místem")
+            print("💡 Používam workspace s vyčištěním cache")
             
-            # Použijeme /tmp pro dočasné uložení (má více místa)
-            import tempfile
-            with tempfile.TemporaryDirectory(dir="/tmp") as temp_dir:
-                print(f"📁 Dočasné umístění: {temp_dir}")
+            # Vyčištění cache před začátkem
+            from lib.disk_manager import DiskManager
+            dm = DiskManager()
+            print("🧹 Čistím cache pro uvolnění místa...")
+            dm.cleanup_cache()
+            
+            # Kontrola místa
+            if not dm.check_disk_space('/workspace', threshold=85):
+                print("⚠️ Stále málo místa, agresivní vyčištění...")
+                dm.aggressive_cleanup()
                 
-                # Uložení do dočasného adresáře
+                if not dm.check_disk_space('/workspace', threshold=85):
+                    print("❌ Nedost místa i po vyčištění")
+                    return False
+            
+            # Použijeme workspace pro dočasné uložení
+            temp_dir = "/workspace/temp_complete_model"
+            print(f"📁 Dočasné umístění: {temp_dir}")
+            
+            try:
+                # Uložení do dočasného adresáře s sharding
                 print("💾 Ukládám do dočasného adresáře...")
                 merged_model.save_pretrained(
                     temp_dir,
-                    max_shard_size="2GB",
+                    max_shard_size="1GB",  # Menší shardy
                     safe_serialization=True
                 )
                 tokenizer.save_pretrained(temp_dir)
@@ -87,12 +102,20 @@ def merge_adapter_to_full_model(adapter_path, base_model_name, output_path, hub_
                 merged_model.push_to_hub(
                     hub_model_id, 
                     token=token,
-                    max_shard_size="2GB",
+                    max_shard_size="1GB",
                     safe_serialization=True
                 )
                 tokenizer.push_to_hub(hub_model_id, token=token)
                 
-            print(f"✅ Kompletní model nahrán: https://huggingface.co/{hub_model_id}")
+                print(f"✅ Kompletní model nahrán: https://huggingface.co/{hub_model_id}")
+                
+            finally:
+                # Vyčištění dočasného adresáře
+                if os.path.exists(temp_dir):
+                    print("🗑️ Mažu dočasný adresář...")
+                    import shutil
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                    
         else:
             # Kontrola místa před uložením (pouze pokud není HF Hub)
             print("💾 Kontroluji dostupné místo...")
