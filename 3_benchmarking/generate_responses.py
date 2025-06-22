@@ -18,7 +18,6 @@ import torch
 from datetime import datetime
 from typing import List, Dict
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
 
 # Import centralizované funkce pro nastavení pad_tokenu
 sys.path.append('../2_finetunning')
@@ -37,6 +36,9 @@ def load_benchmark_model(model_type: str):
         return None, None
     
     try:
+        # Import PEFT až když je potřeba
+        from peft import PeftModel
+        
         if model_type == "finetuned":
             # Váš natrénovaný adaptér
             base_model = "mistralai/Mistral-7B-Instruct-v0.3"
