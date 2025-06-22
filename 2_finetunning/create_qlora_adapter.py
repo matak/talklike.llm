@@ -29,6 +29,9 @@ from peft import (
 )
 from huggingface_hub import login
 
+# Import centralizované funkce pro nastavení pad_tokenu
+from tokenizer_utils import setup_tokenizer_and_model
+
 def load_dataset(file_path):
     """Načte dataset z JSONL souboru"""
     conversations = []
@@ -113,15 +116,9 @@ def create_qlora_adapter(
     dataset = Dataset.from_list(training_data)
     print(f"✅ Načteno {len(dataset)} vzorků")
     
-    # 2. Načtení tokenizeru
+    # 2. Načtení tokenizeru a modelu
     print(f"\n🔤 Načítám tokenizer: {base_model_name}")
     tokenizer = AutoTokenizer.from_pretrained(base_model_name)
-    
-    if tokenizer.pad_token is None:
-        if tokenizer.eos_token:
-            tokenizer.pad_token = tokenizer.eos_token
-        else:
-            tokenizer.add_special_tokens({"pad_token": "<pad>"})
     
     # 3. Konfigurace 4-bit kvantizace
     print("\n⚙️ Konfiguruji 4-bit kvantizaci...")
@@ -141,7 +138,11 @@ def create_qlora_adapter(
         trust_remote_code=True
     )
     
-    # 5. Konfigurace LoRA
+    # 5. Nastavení pad_tokenu pomocí centralizované funkce
+    print(f"\n🔧 Nastavuji pad_token...")
+    tokenizer, model = setup_tokenizer_and_model(base_model_name, model)
+    
+    # 6. Konfigurace LoRA
     print("\n🔧 Konfiguruji LoRA...")
     
     # Automatické zjištění target modules podle architektury
@@ -163,12 +164,12 @@ def create_qlora_adapter(
         bias="none"
     )
     
-    # 6. Příprava modelu pro trénování
+    # 7. Příprava modelu pro trénování
     model = prepare_model_for_kbit_training(model)
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
     
-    # 7. Tokenizace dat
+    # 8. Tokenizace dat
     print("\n🔤 Tokenizuji data...")
     tokenize_func = lambda examples: tokenize_function(examples, tokenizer, max_length)
     tokenized_dataset = dataset.map(
@@ -188,7 +189,7 @@ def create_qlora_adapter(
     
     print(f"✅ Train: {len(train_dataset)}, Validation: {len(eval_dataset)}")
     
-    # 8. Data Collator
+    # 9. Data Collator
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer,
         mlm=False,
@@ -196,7 +197,7 @@ def create_qlora_adapter(
         padding=True,
     )
     
-    # 9. Training Arguments
+    # 10. Training Arguments
     training_args = TrainingArguments(
         output_dir=output_dir,
         num_train_epochs=num_epochs,
@@ -218,7 +219,7 @@ def create_qlora_adapter(
         weight_decay=0.01
     )
     
-    # 10. Trainer
+    # 11. Trainer
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -228,16 +229,16 @@ def create_qlora_adapter(
         tokenizer=tokenizer
     )
     
-    # 11. Trénování
+    # 12. Trénování
     print(f"\n🚀 Začínám trénování adaptéru...")
     trainer.train()
     
-    # 12. Uložení adaptéru
+    # 13. Uložení adaptéru
     print(f"\n💾 Ukládám adaptér...")
     adapter_path = os.path.join(output_dir, adapter_name)
     trainer.save_model(adapter_path)
     
-    # 13. Uložení konfigurace
+    # 14. Uložení konfigurace
     config = {
         "base_model": base_model_name,
         "adapter_name": adapter_name,

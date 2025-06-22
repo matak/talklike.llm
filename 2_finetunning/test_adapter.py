@@ -16,6 +16,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel, PeftConfig
 import warnings
 
+# Import centralizované funkce pro nastavení pad_tokenu
+from tokenizer_utils import setup_tokenizer_and_model
+
 # Potlačení varování
 warnings.filterwarnings("ignore")
 
@@ -29,12 +32,11 @@ def load_adapter_config(adapter_path):
         print(f"⚠️ Konfigurační soubor nenalezen: {config_path}")
         return None
 
-def load_model_with_adapter(base_model_name, adapter_path, device="auto"):
-    """Načte model s připojeným adaptérem"""
+def load_adapter_model(base_model_name, adapter_path, device="auto"):
+    """Načte base model s QLoRA adaptérem"""
     try:
-        print(f"🤖 Načítám základní model: {base_model_name}")
-        print(f"🔧 Připojuji adaptér: {adapter_path}")
-        print("⏳ Prosím počkejte, načítání může trvat několik minut...")
+        print(f"🤖 Načítám base model: {base_model_name}")
+        print(f"🔧 Načítám adaptér: {adapter_path}")
         
         # Načtení tokenizeru
         tokenizer = AutoTokenizer.from_pretrained(
@@ -42,14 +44,7 @@ def load_model_with_adapter(base_model_name, adapter_path, device="auto"):
             trust_remote_code=True
         )
         
-        # Kontrola a nastavení pad tokenu
-        if tokenizer.pad_token is None:
-            if tokenizer.eos_token:
-                tokenizer.pad_token = tokenizer.eos_token
-            else:
-                tokenizer.add_special_tokens({"pad_token": "<pad>"})
-        
-        # Načtení základního modelu
+        # Načtení base modelu
         model = AutoModelForCausalLM.from_pretrained(
             base_model_name,
             torch_dtype=torch.float16,
@@ -57,28 +52,14 @@ def load_model_with_adapter(base_model_name, adapter_path, device="auto"):
             trust_remote_code=True
         )
         
-        # Synchronizace pad tokenu s modelem
-        if hasattr(model.config, 'pad_token_id'):
-            model.config.pad_token_id = tokenizer.pad_token_id
+        # Použití centralizované funkce pro nastavení pad_tokenu
+        tokenizer, model = setup_tokenizer_and_model(base_model_name, model)
         
-        # Načtení a připojení adaptéru
-        print("🔗 Připojuji LoRA adaptér...")
+        # Načtení adaptéru
+        print(f"🔧 Načítám QLoRA adaptér...")
         model = PeftModel.from_pretrained(model, adapter_path)
         
-        # Přepnutí do inference módu
-        model.eval()
-        
         print("✅ Model s adaptérem úspěšně načten!")
-        
-        # Zobrazení informací o adaptéru
-        config = load_adapter_config(adapter_path)
-        if config:
-            print(f"📊 Informace o adaptéru:")
-            print(f"   Název: {config.get('adapter_name', 'N/A')}")
-            print(f"   LoRA rank: {config.get('lora_config', {}).get('r', 'N/A')}")
-            print(f"   Target modules: {config.get('lora_config', {}).get('target_modules', 'N/A')}")
-            print(f"   Trénováno na: {config.get('dataset_info', {}).get('total_samples', 'N/A')} vzorcích")
-        
         return model, tokenizer
         
     except Exception as e:
@@ -153,7 +134,7 @@ def test_adapter_compatibility(adapter_path):
         print(f"\n🔬 Testuji: {model_name}")
         try:
             # Rychlý test načtení
-            model, tokenizer = load_model_with_adapter(model_name, adapter_path, device="cpu")
+            model, tokenizer = load_adapter_model(model_name, adapter_path, device="cpu")
             if model and tokenizer:
                 print(f"✅ Kompatibilní s {model_name}")
                 
@@ -240,7 +221,7 @@ Příklady použití:
             sys.exit(1)
     
     # Načtení modelu s adaptérem
-    model, tokenizer = load_model_with_adapter(base_model, args.adapter, args.device)
+    model, tokenizer = load_adapter_model(base_model, args.adapter, args.device)
     
     if model is None or tokenizer is None:
         sys.exit(1)

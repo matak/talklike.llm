@@ -16,6 +16,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import warnings
 from peft import PeftModel
 
+# Import centralizované funkce pro nastavení pad_tokenu
+from tokenizer_utils import setup_tokenizer_and_model
+
 # Potlačení varování
 warnings.filterwarnings("ignore")
 
@@ -31,13 +34,6 @@ def load_model(model_path, device="auto"):
             trust_remote_code=True
         )
         
-        # Kontrola a nastavení pad tokenu
-        if tokenizer.pad_token is None:
-            if tokenizer.eos_token:
-                tokenizer.pad_token = tokenizer.eos_token
-            else:
-                tokenizer.add_special_tokens({"pad_token": "<pad>"})
-        
         # Načtení modelu
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
@@ -46,9 +42,8 @@ def load_model(model_path, device="auto"):
             trust_remote_code=True
         )
         
-        # Synchronizace pad tokenu s modelem
-        if hasattr(model.config, 'pad_token_id'):
-            model.config.pad_token_id = tokenizer.pad_token_id
+        # Použití centralizované funkce pro nastavení pad_tokenu
+        tokenizer, model = setup_tokenizer_and_model(model_path, model)
         
         print("✅ Model úspěšně načten!")
         return model, tokenizer

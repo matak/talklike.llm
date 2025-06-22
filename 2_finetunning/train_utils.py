@@ -11,7 +11,7 @@ def generate_response(model, tokenizer, prompt, max_length=200):
             max_length=max_length,
             temperature=0.7,
             do_sample=True,
-            pad_token_id=tokenizer.eos_token_id
+            pad_token_id=tokenizer.pad_token_id
         )
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return response

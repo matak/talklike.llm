@@ -4,6 +4,11 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 def setup_tokenizer_and_model(model_name, base_model):
     """Nastaví tokenizer a model pro fine-tuning"""
     
+    # Debug informace o modelu
+    print("Input embeddings: ", base_model.get_input_embeddings())
+    print("Output embeddings: ", base_model.get_output_embeddings())
+    print("Model Vocabulary Size: ", base_model.config.vocab_size)
+    
     # 1. Načtení tokenizeru
     base_tokenizer = AutoTokenizer.from_pretrained(
         model_name,
@@ -12,7 +17,7 @@ def setup_tokenizer_and_model(model_name, base_model):
         resume_download=True,
         force_download=False
     )
-    print(f"📊 Původní délka tokenizeru: {len(base_tokenizer)}")
+    print("Before add token to tokenizer - tokenizer length: ", len(base_tokenizer))
     
     # 2. Kontrola a přidání pad tokenu
     if base_tokenizer.pad_token is None:
@@ -31,13 +36,19 @@ def setup_tokenizer_and_model(model_name, base_model):
     else:
         print(f"ℹ️ Pad token už existuje: {base_tokenizer.pad_token}")
     
+    print("After add token to tokenizer - tokenizer length: ", len(base_tokenizer))
+    
     # 3. Synchronizace s modelem
+    print("Before add pad token to model - pad token Id: ", base_model.config.pad_token_id)
     if hasattr(base_model.config, 'pad_token_id'):
         old_pad_id = base_model.config.pad_token_id
         base_model.config.pad_token_id = base_tokenizer.pad_token_id
         print(f"🔄 Pad token ID změněn: {old_pad_id} → {base_model.config.pad_token_id}")
     else:
         print("⚠️ Model nemá pad_token_id v config")
+        base_model.config.pad_token_id = base_tokenizer.pad_token_id
+    
+    print("After add pad token to model - pad token Id: ", base_model.config.pad_token_id)
     
     # 4. Kontrola konzistence
     try:

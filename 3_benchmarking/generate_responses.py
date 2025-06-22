@@ -17,6 +17,12 @@ import random
 import torch
 from datetime import datetime
 from typing import List, Dict
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
+
+# Import centralizované funkce pro nastavení pad_tokenu
+sys.path.append('../2_finetunning')
+from tokenizer_utils import setup_tokenizer_and_model
 
 try:
     from test_adapter import load_model_with_adapter, generate_response
@@ -49,18 +55,16 @@ def load_benchmark_model(model_type: str):
             print(f"🤖 Načítám základní model...")
             print(f"   Base model: {base_model}")
             
-            from transformers import AutoModelForCausalLM, AutoTokenizer
-            
             tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
-            if tokenizer.pad_token is None:
-                tokenizer.pad_token = tokenizer.eos_token
-            
             model = AutoModelForCausalLM.from_pretrained(
                 base_model,
                 torch_dtype=torch.float16,
                 device_map="auto",
                 trust_remote_code=True
             )
+            
+            # Použití centralizované funkce pro nastavení pad_tokenu
+            tokenizer, model = setup_tokenizer_and_model(base_model, model)
             model.eval()
             
         else:

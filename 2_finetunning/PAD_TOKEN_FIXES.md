@@ -108,3 +108,18 @@ Měli byste vidět:
 - ✅ Správné délky tokenů
 - ✅ Data collator test úspěšný
 - ✅ Konzistentní padding 
+
+---
+
+## 🔄 **NOVÉ: Sjednocení pad_token řešení**
+
+**DŮLEŽITÉ:** Tento dokument popisuje původní opravy. Pro nejnovější sjednocení pad_token řešení napříč celým projektem viz:
+
+📋 **[PAD_TOKEN_UNIFICATION.md](./PAD_TOKEN_UNIFICATION.md)**
+
+### Co bylo přidáno:
+- ✅ Vylepšené debug informace podle návrhu uživatele
+- ✅ Centralizovaná funkce `setup_tokenizer_and_model()`
+- ✅ Sjednocení napříč všemi soubory v projektu
+- ✅ Odstranění duplikace kódu
+- ✅ Konzistentní chování ve všech částech projektu 
