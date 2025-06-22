@@ -126,6 +126,9 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
     
     print(f"🔧 Používám apply_chat_template pro model: {model_name}")
     
+    # Speciální handling pro Mistral - potřebuje system message pro training
+    is_mistral = "mistral" in model_name.lower()
+    
     for conv in conversations:
         messages = conv['messages']
         
@@ -134,12 +137,17 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
             continue
         
         try:
-            # Použijeme apply_chat_template pro správné formátování
-            formatted_text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
+            if is_mistral:
+                # Pro Mistral použijeme manuální formátování se system message
+                formatted_text = _format_mistral_for_training(messages)
+            else:
+                # Pro ostatní modely použijeme standardní apply_chat_template
+                formatted_text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
+            
             training_data.append({"text": formatted_text})
             
         except Exception as e:
-            error_msg = f"❌ Chyba při apply_chat_template: {e}"
+            error_msg = f"❌ Chyba při formátování: {e}"
             print(error_msg)
             raise RuntimeError(error_msg)
     
@@ -151,4 +159,45 @@ def prepare_training_data(conversations, debugger=None, model_name="microsoft/Di
             if len(training_data) > 1:
                 debugger.save_sample("06_training_data", training_data[1], 1)
     
-    return training_data 
+    return training_data
+
+def _format_mistral_for_training(messages):
+    """Manuální formátování pro Mistral training se system message"""
+    formatted_parts = []
+    
+    # Najdeme system message (měla by být první)
+    system_message = None
+    other_messages = []
+    
+    for msg in messages:
+        if msg['role'] == 'system':
+            system_message = msg['content']
+        else:
+            other_messages.append(msg)
+    
+    # Pokud máme system message, přidáme ji na začátek
+    if system_message:
+        formatted_parts.append(system_message)
+        formatted_parts.append("")  # Prázdný řádek
+    
+    # Projdeme user-assistant páry
+    i = 0
+    while i < len(other_messages):
+        if i < len(other_messages) and other_messages[i]['role'] == 'user':
+            user_msg = other_messages[i]['content']
+            i += 1
+            
+            if i < len(other_messages) and other_messages[i]['role'] == 'assistant':
+                assistant_msg = other_messages[i]['content']
+                i += 1
+                
+                # Mistral formát: [INST] user [/INST] assistant
+                formatted_parts.append(f"<s>[INST] {user_msg} [/INST] {assistant_msg}</s>")
+            else:
+                # Chybí assistant zpráva, přeskočíme
+                i += 1
+        else:
+            # Není user zpráva, přeskočíme
+            i += 1
+    
+    return "\n".join(formatted_parts) 
