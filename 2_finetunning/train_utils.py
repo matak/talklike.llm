@@ -4,7 +4,20 @@ import subprocess
 
 def generate_response(model, tokenizer, prompt, max_length=200):
     """Generuje odpověď pomocí modelu (původního nebo fine-tunovaného)"""
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    # Kontrola, zda tokenizer podporuje apply_chat_template
+    if hasattr(tokenizer, 'apply_chat_template'):
+        # Použijeme apply_chat_template pro správné formátování
+        messages = [{"role": "user", "content": prompt}]
+        formatted_prompt = tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+    else:
+        # Fallback pro tokenizery bez apply_chat_template
+        formatted_prompt = prompt
+    
+    inputs = tokenizer(formatted_prompt, return_tensors="pt").to(model.device)
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
@@ -27,6 +40,13 @@ def test_model(model, tokenizer, test_prompts=None):
     
     print("\n📝 Testovací odpovědi:")
     print("=" * 50)
+    
+    # Kontrola, zda tokenizer podporuje apply_chat_template
+    if hasattr(tokenizer, 'apply_chat_template'):
+        print("✅ Používá apply_chat_template pro formátování promptů")
+    else:
+        print("⚠️ Tokenizer nepodporuje apply_chat_template, používá se přímé formátování")
+    
     for prompt in test_prompts:
         print(f"\nPrompt: {prompt}")
         response = generate_response(model, tokenizer, prompt)
