@@ -228,7 +228,7 @@ def main():
     
     # 3. Příprava dat s tokenizerem (nyní máme přístup k apply_chat_template)
     print("🔧 Připravuji data s apply_chat_template...")
-    training_data = prepare_training_data(conversations, debugger, args.model_name, tokenizer)
+    training_data = prepare_training_data(conversations, tokenizer, debugger)
     print(f"✅ Připraveno {len(training_data)} trénovacích vzorků")
 
     # DEBUG: Test generování před fine-tuningem
