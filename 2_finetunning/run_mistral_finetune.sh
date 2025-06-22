@@ -20,9 +20,9 @@ python 2_finetunning/finetune.py \
     --output_dir /workspace/mistral-babis-finetuned \
     --model_name mistralai/Mistral-7B-Instruct-v0.3 \
     --epochs 3 \
-    --batch_size 1 \
-    --learning_rate 1e-4 \
-    --max_length 2048 \
+    --batch_size 2 \
+    --learning_rate 2e-4 \
+    --max_length 1024 \
     --aggressive_cleanup \
     --push_to_hub \
     --hub_model_id mistral-babis-lora

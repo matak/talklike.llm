@@ -396,6 +396,8 @@ def main():
         mlm=False,
         return_tensors="pt",
         pad_to_multiple_of=8,
+        padding=True,
+        pad_token_id=tokenizer.pad_token_id,
     )
     
     # 8. Training Arguments
