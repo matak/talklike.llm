@@ -10,6 +10,42 @@ Tento projekt implementuje **kompletní řešení fine-tuningu jazykového model
 
 ---
 
+## 🤖 Nahrané modely
+
+### Kompletní fine-tuned model
+- **Model**: [mcmatak/mistral-babis-model](https://huggingface.co/mcmatak/mistral-babis-model)
+- **Typ**: Kompletní Mistral-7B-Instruct-v0.3 model fine-tuned na Babišův styl
+- **Velikost**: ~14GB (34 shardů)
+- **Použití**: Přímé použití bez dalších kroků
+
+### LoRA adapter
+- **Model**: [mcmatak/mistral-babis-adapter](https://huggingface.co/mcmatak/mistral-babis-adapter)
+- **Typ**: LoRA adapter pro Mistral-7B-Instruct-v0.3
+- **Velikost**: ~84MB
+- **Použití**: Vyžaduje base model + adapter
+
+### Použití modelů
+
+#### Kompletní model
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model = AutoModelForCausalLM.from_pretrained('mcmatak/mistral-babis-model')
+tokenizer = AutoTokenizer.from_pretrained('mcmatak/mistral-babis-model')
+```
+
+#### LoRA adapter
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import PeftModel
+
+base_model = AutoModelForCausalLM.from_pretrained('mistralai/Mistral-7B-Instruct-v0.3')
+model = PeftModel.from_pretrained(base_model, 'mcmatak/mistral-babis-adapter')
+tokenizer = AutoTokenizer.from_pretrained('mcmatak/mistral-babis-adapter')
+```
+
+---
+
 ## 🎯 Cíle úkolu
 
 ### Hlavní cíl
@@ -123,27 +159,3 @@ cd 3_benchmarking
 pip install -r requirements_benchmarking.txt
 python run_benchmark.py
 ```
-
----
-
-## 📚 Dokumentace
-
-- **[📊 Příprava dat](1_data_preparation/README.md)** - Kompletní průvodce přípravou datasetu
-- **[🏋️ Fine-tuning](2_finetunning/README.md)** - Detailní návod na fine-tuning
-- **[📈 Benchmarking](3_benchmarking/README.md)** - Evaluace a srovnání modelů
-- **[🚀 Rychlý start](1_data_preparation/QUICKSTART.md)** - Rychlé spuštění přípravy dat
-- **[⚡ Fine-tuning start](2_finetunning/RUNPOD_SETUP.md)** - Nastavení pro RunPod.io
-
----
-
-## 🎯 Výsledky
-
-Projekt generuje kompletní fine-tuned model s následujícími výstupy:
-
-1. **Dataset**: 1,500 QA párů v Babišově stylu
-2. **Model**: Fine-tuned Meta-Llama-3-8B-Instruct s LoRA
-3. **Report**: Komplexní benchmarking analýza s tabulkami a grafy
-4. **Dokumentace**: Kompletní průvodce pro reprodukci výsledků
-
-Všechny výsledky jsou uloženy v příslušných složkách a jsou připraveny pro odevzdání úkolu.
-
