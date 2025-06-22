@@ -63,6 +63,25 @@ def merge_adapter_to_full_model(adapter_path, base_model_name, output_path, hub_
         print("🔄 Provádím merge_and_unload...")
         merged_model = model.merge_and_unload()
         
+        # Kontrola místa před uložením
+        print("💾 Kontroluji dostupné místo...")
+        from lib.disk_manager import DiskManager
+        dm = DiskManager()
+        
+        # Zajistíme, že output_path je na network storage
+        if not output_path.startswith('/workspace'):
+            output_path = f'/workspace/{output_path.lstrip("./")}'
+        
+        # Kontrola místa na network storage
+        if not dm.check_disk_space('/workspace', threshold=90):
+            print("⚠️ Málo místa na network storage, zkouším vyčištění...")
+            dm.cleanup_cache()
+            
+            if not dm.check_disk_space('/workspace', threshold=90):
+                print("❌ Nedost místa pro uložení kompletního modelu")
+                print("💡 Kompletní Mistral-7B model potřebuje ~14GB místa")
+                return False
+        
         # Uložení kompletního modelu
         print(f"💾 Ukládám kompletní model do: {output_path}")
         os.makedirs(output_path, exist_ok=True)
