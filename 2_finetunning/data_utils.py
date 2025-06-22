@@ -132,6 +132,7 @@ def prepare_training_data(conversations, tokenizer, debugger=None):
 
     training_data = []
     is_mistral = "mistral" in tokenizer.name_or_path.lower()
+    
 
     if debugger:
         debugger.save_step("05_input_conversations", conversations, f"Vstupních {len(conversations)} konverzací")

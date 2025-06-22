@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Chat s lokálním fine-tunovaným Babiš modelem
-echo "🎭 Spouštím chat s lokálním Babiš modelem..."
+# Chat s lokálním fine-tunovaným modelem
+echo "🎭 Spouštím chat s lokálním fine-tunovaným modelem..."
 echo "📁 Cache nastaven do /workspace"
 
 # Nastavení cache do /workspace
@@ -19,10 +19,12 @@ df -h /workspace | tail -1
 
 # Kontrola, zda existuje lokální model
 echo "🔍 Kontroluji dostupnost lokálního modelu..."
-if [ -d "/workspace/babis-finetuned-final" ]; then
-    echo "✅ Nalezen model v /workspace/babis-finetuned-final"
-elif [ -d "/workspace/babis-finetuned" ]; then
-    echo "✅ Nalezen model v /workspace/babis-finetuned"
+if [ -d "/workspace/mistral-babis-finetuned" ]; then
+    echo "✅ Nalezen model v /workspace/mistral-babis-finetuned"
+elif [ -d "/workspace/finetuned-model" ]; then
+    echo "✅ Nalezen model v /workspace/finetuned-model"
+elif [ -d "/workspace/model" ]; then
+    echo "✅ Nalezen model v /workspace/model"
 else
     echo "⚠️ Lokální model nebyl nalezen v /workspace/"
     echo "💡 Spusťte nejdříve fine-tuning: python finetune.py"

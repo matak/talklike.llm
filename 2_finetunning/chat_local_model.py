@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Interaktivní chat s lokálním fine-tunovaným Babiš modelem
+Interaktivní chat s lokálním fine-tunovaným modelem
 """
 
 import sys
@@ -15,42 +15,14 @@ from tokenizer_utils import setup_tokenizer_and_model
 
 def find_local_model():
     """Najde lokální fine-tunovaný model"""
-    possible_paths = [
-        "/workspace/babis-finetuned-final",
-        "/workspace/babis-finetuned",
-        "./babis-finetuned-final",
-        "./babis-finetuned"
-    ]
+    model_path = "/workspace/mistral-babis-finetuned"
     
     print("🔍 Hledám lokální fine-tunovaný model...")
-    for path in possible_paths:
-        if os.path.exists(path):
-            print(f"✅ Nalezen model v: {path}")
-            return path
+    if os.path.exists(model_path):
+        print(f"✅ Nalezen model v: {model_path}")
+        return model_path
     
-    print("❌ Lokální model nebyl nalezen v očekávaných adresářích:")
-    for path in possible_paths:
-        print(f"   - {path}")
-    
-    # Zkusíme najít jakékoliv adresáře s "babis" nebo "finetuned"
-    print("\n🔍 Hledám jiné možné adresáře...")
-    workspace_dirs = []
-    if os.path.exists("/workspace"):
-        workspace_dirs = [d for d in os.listdir("/workspace") if os.path.isdir(os.path.join("/workspace", d))]
-    
-    current_dirs = [d for d in os.listdir(".") if os.path.isdir(d)]
-    
-    babis_dirs = []
-    for d in workspace_dirs + current_dirs:
-        if "babis" in d.lower() or "finetuned" in d.lower():
-            babis_dirs.append(d)
-    
-    if babis_dirs:
-        print("📁 Nalezené možné adresáře s modely:")
-        for d in babis_dirs:
-            print(f"   - {d}")
-        return babis_dirs[0]  # Vrátíme první nalezený
-    
+    print(f"❌ Lokální model nebyl nalezen v: {model_path}")
     return None
 
 def load_local_model(model_path):
@@ -173,7 +145,7 @@ def generate_local_response(model, tokenizer, prompt, max_length=300, temperatur
 
 def main():
     """Hlavní funkce pro interaktivní chat s lokálním modelem"""
-    print("🎭 CHAT S LOKÁLNÍM BABIŠ MODELEM")
+    print("🎭 CHAT S LOKÁLNÍM FINE-TUNOVANÝM MODELEM")
     print("=" * 50)
     print("🤖 Fine-tunovaný model (lokální)")
     print("=" * 50)
@@ -185,7 +157,7 @@ def main():
         print("❌ Nepodařilo se najít lokální model.")
         print("\n💡 Možná řešení:")
         print("1. Spusťte fine-tuning: python finetune.py")
-        print("2. Zkontrolujte, zda je model uložen v /workspace/")
+        print("2. Zkontrolujte, zda je model uložen v /workspace/mistral-babis-finetuned")
         print("3. Zadejte cestu k modelu ručně")
         return
     
@@ -196,7 +168,7 @@ def main():
         print("❌ Nepodařilo se načíst model. Ukončuji.")
         return
     
-    print(f"\n💬 Můžete začít povídat s lokálním Babiš modelem!")
+    print(f"\n💬 Můžete začít povídat s lokálním fine-tunovaným modelem!")
     print(f"📁 Model načten z: {model_path}")
     print("📝 Napište svůj dotaz a stiskněte Enter")
     print("🔧 Pro ukončení napište 'konec' nebo stiskněte Ctrl+C")
@@ -221,7 +193,7 @@ def main():
             print("🤖 Lokální model přemýšlí...")
             response = generate_local_response(model, tokenizer, user_input)
             
-            print(f"🎭 Lokální Babiš: {response}")
+            print(f"🎭 Model: {response}")
             
         except KeyboardInterrupt:
             print("\n👋 Na shledanou!")
