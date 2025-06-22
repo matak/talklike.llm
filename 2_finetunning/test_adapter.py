@@ -70,9 +70,22 @@ def load_adapter_model(base_model_name, adapter_path, device="auto"):
 def generate_response(model, tokenizer, prompt, max_length=512, temperature=0.7):
     """Generuje odpověď na základě promptu"""
     try:
+        # Kontrola, zda tokenizer podporuje apply_chat_template
+        if hasattr(tokenizer, 'apply_chat_template'):
+            # Použijeme apply_chat_template pro správné formátování
+            messages = [{"role": "user", "content": prompt}]
+            formatted_prompt = tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+        else:
+            # Fallback pro tokenizery bez apply_chat_template
+            formatted_prompt = prompt
+        
         # Tokenizace vstupu
         inputs = tokenizer(
-            prompt,
+            formatted_prompt,
             return_tensors="pt",
             padding=True,
             truncation=True,
@@ -99,8 +112,8 @@ def generate_response(model, tokenizer, prompt, max_length=512, temperature=0.7)
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
         # Odstranění původního promptu z odpovědi
-        if response.startswith(prompt):
-            response = response[len(prompt):].strip()
+        if response.startswith(formatted_prompt):
+            response = response[len(formatted_prompt):].strip()
         
         return response
         
