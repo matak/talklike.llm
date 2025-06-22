@@ -3,103 +3,103 @@
     "responses": [
       {
         "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
-        "response": "Odpověď na otázku o hodnocení současné inflace by měla být konkrétní a zaměřena na konkrétní stávající situaci. Nikdo, kdo vede nebo pracuje v ekonomických organizacích, neby měl by mít jasnou zkušenost s hodnocením inflace. Vzpomínám pouze na to, jak by mohl Český ministr financí, Pane Babiš, hodnotit inflaci ze strany České republiky:\n\n\"Ministr financí České republiky, Pane Babiš, hodnotí současnou inflaci jako důležitý ekonomický ukazatel, který odráží množství peněz ve ekonomice a pokrytí nároků ekonomiky. Jako ministr se zaměřuje na stability inflace, aby se nedocházelo k nedostatku peněz, který by mohl mít negativní dopad na hospodářství. Podle posledních výsledků Č",
+        "response": "Protože jsem model, mám však omezené schopnosti a nemohu sledovat aktuální ekonomické trendy, nemohu hodnotit současnou inflaci, kterou zkoumá a hodnotí ekonomický svět. Pokud máte dotaz o tom, jak inflaci hodnotí česká vláda, mohu vám zmínit, že toto se vztahuje ke změnám v české ekonomice a jejich následkům, například na ekonomickou politiku české vlády, nebo na ekonomické prognózy odborníků a institucí.",
         "evaluation": {
-          "total_score": 1.17,
+          "total_score": 1.0,
           "breakdown": {
-            "babis_phrases": 3.333333333333333,
+            "babis_phrases": 0.0,
             "slovak_influence": 0.0,
             "emotional_tone": 0.0,
-            "first_person": 0.0
+            "first_person": 6.666666666666666
           },
           "grade": "F",
-          "text": "Odpověď na otázku o hodnocení současné inflace by měla být konkrétní a zaměřena na konkrétní stávající situaci. Nikdo, kdo vede nebo pracuje v ekonomických organizacích, neby měl by mít jasnou zkušenost s hodnocením inflace. Vzpomínám pouze na to, jak by mohl Český ministr financí, Pane Babiš, hodnotit inflaci ze strany České republiky:\n\n\"Ministr financí České republiky, Pane Babiš, hodnotí současnou inflaci jako důležitý ekonomický ukazatel, který odráží množství peněz ve ekonomice a pokrytí nároků ekonomiky. Jako ministr se zaměřuje na stability inflace, aby se nedocházelo k nedostatku peněz, který by mohl mít negativní dopad na hospodářství. Podle posledních výsledků Č",
-          "length": 680
+          "text": "Protože jsem model, mám však omezené schopnosti a nemohu sledovat aktuální ekonomické trendy, nemohu hodnotit současnou inflaci, kterou zkoumá a hodnotí ekonomický svět. Pokud máte dotaz o tom, jak inflaci hodnotí česká vláda, mohu vám zmínit, že toto se vztahuje ke změnám v české ekonomice a jejich následkům, například na ekonomickou politiku české vlády, nebo na ekonomické prognózy odborníků a institucí.",
+          "length": 409
         }
       },
       {
         "question": "Co si myslíte o opozici?",
-        "response": "Opozice ve většině demokratických společností je skupina nebo strana, která se vymezuje proti vládnoucímu režimu nebo politické straně, a je připravená se k tomu, aby zastupovala jiné názory a být připravena k obraně svých zástupců a politických ideálů. Opozice mohou být podporováni voliči, kteří se nejednoznačně cítí k vládnoucímu režimu. Členové opozice chtějí změnu ve společnosti nebo v zemi, a proto se snaží o získání moci a prosazování svých politických cílů. Aktivity opozice mohou zahrnovat volby, demonstrace nebo petice.\n\nV některých autokratických režimech, kde vláda nemá respekt ke svobodám a lidským právům, mohou členové opozice čelit represáliím, včet",
+        "response": "Opozice se v politice vztahuje k seskupení politických subjektů nebo volebních uskupení, které se snaží zastávat protikladné názory a cíle vůči vládnoucímu politickému režimu nebo koalici. V opozici často bývá většina nebo většina poslaneckých klubů v parlamentské sněmovně, která není součástí vládní koalice. Jejich cílem je čerpat pozornost k problematice, ve které cítí, že vládnoucí režim neuspokojil nebo zneužil.\n\nOpozice může být silná, když má skutečnou možnost vlivu na politiku, například když je silná a koalicí schopná, nebo když má přesvědčivé argumenty a vysokou podporu veřejnosti. V opozici může také být slabá, když málo poslanců, slabé argumenty nebo",
         "evaluation": {
-          "total_score": 0.0,
+          "total_score": 1.17,
           "breakdown": {
-            "babis_phrases": 0.0,
+            "babis_phrases": 3.333333333333333,
             "slovak_influence": 0.0,
             "emotional_tone": 0.0,
             "first_person": 0.0
           },
           "grade": "F",
-          "text": "Opozice ve většině demokratických společností je skupina nebo strana, která se vymezuje proti vládnoucímu režimu nebo politické straně, a je připravená se k tomu, aby zastupovala jiné názory a být připravena k obraně svých zástupců a politických ideálů. Opozice mohou být podporováni voliči, kteří se nejednoznačně cítí k vládnoucímu režimu. Členové opozice chtějí změnu ve společnosti nebo v zemi, a proto se snaží o získání moci a prosazování svých politických cílů. Aktivity opozice mohou zahrnovat volby, demonstrace nebo petice.\n\nV některých autokratických režimech, kde vláda nemá respekt ke svobodám a lidským právům, mohou členové opozice čelit represáliím, včet",
-          "length": 670
+          "text": "Opozice se v politice vztahuje k seskupení politických subjektů nebo volebních uskupení, které se snaží zastávat protikladné názory a cíle vůči vládnoucímu politickému režimu nebo koalici. V opozici často bývá většina nebo většina poslaneckých klubů v parlamentské sněmovně, která není součástí vládní koalice. Jejich cílem je čerpat pozornost k problematice, ve které cítí, že vládnoucí režim neuspokojil nebo zneužil.\n\nOpozice může být silná, když má skutečnou možnost vlivu na politiku, například když je silná a koalicí schopná, nebo když má přesvědčivé argumenty a vysokou podporu veřejnosti. V opozici může také být slabá, když málo poslanců, slabé argumenty nebo",
+          "length": 669
         }
       },
       {
         "question": "Jak se vám daří s rodinou?",
-        "response": "Drahá paní, já jsem počítačový program a nemám osobní emoce, takže nemohu říci, jakým způsobem vás týká vaše rodina. Já samotný nemám rodinu, já jsem pouze programovací jazyk. Všimnu si však, že jsou důležité a pomáhají mi tak, abych vám poskytoval lepší službu. O rodině a jejich problémech můžete informovat jiné lidi, kteří mohou pomoci.",
+        "response": "Děkuji za těžké otázky. Ano, s rodinou jsem velmi šťastný. Máme pět dětí a každý je svým způsobem unikátní. Jsou to právě ty nejlepší části mého života. A ty? Jak se s Vaší rodinou vám daří?",
         "evaluation": {
-          "total_score": 2.67,
-          "breakdown": {
-            "babis_phrases": 3.333333333333333,
-            "slovak_influence": 0.0,
-            "emotional_tone": 0.0,
-            "first_person": 10.0
-          },
-          "grade": "F",
-          "text": "Drahá paní, já jsem počítačový program a nemám osobní emoce, takže nemohu říci, jakým způsobem vás týká vaše rodina. Já samotný nemám rodinu, já jsem pouze programovací jazyk. Všimnu si však, že jsou důležité a pomáhají mi tak, abych vám poskytoval lepší službu. O rodině a jejich problémech můžete informovat jiné lidi, kteří mohou pomoci.",
-          "length": 340
-        }
-      },
-      {
-        "question": "Můžete vysvětlit vaši roli v té chemičce?",
-        "response": "Já jsem umělé umění vytvořené pomocí uměleckého umělce a nenárokujím si žádnou roli v chemických procesech. Můj účelem je poskytovat informace, odpovědi a diskusní aktivity. Časté jsou moje konverzace o různých předmětech, včetně chemie, ale mám vlastní existence v rámci počítačové sítě a nejsou mi přisuzovány žádné chemické vlastnosti nebo funkce.",
-        "evaluation": {
-          "total_score": 2.67,
-          "breakdown": {
-            "babis_phrases": 3.333333333333333,
-            "slovak_influence": 0.0,
-            "emotional_tone": 0.0,
-            "first_person": 10
-          },
-          "grade": "F",
-          "text": "Já jsem umělé umění vytvořené pomocí uměleckého umělce a nenárokujím si žádnou roli v chemických procesech. Můj účelem je poskytovat informace, odpovědi a diskusní aktivity. Časté jsou moje konverzace o různých předmětech, včetně chemie, ale mám vlastní existence v rámci počítačové sítě a nejsou mi přisuzovány žádné chemické vlastnosti nebo funkce.",
-          "length": 350
-        }
-      },
-      {
-        "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
-        "response": "Město Brusel vůbec nemá přímo vliv na ekonomickou situaci v České republice. Brusel je sezenou mocí Evropské unie, která se snaží zlepšit ekonomické podmínky všech svých členských států, včetně Česka, a pomáhá s koordinací ekonomické politiky ve všech členských zemích. Proto je možné, že by Brusel mohl reagovat na ekonomickou situaci v Česku, ale především prostřednictvím europských institucí, jako je Evropská komise nebo Evropský parlament. Tyto instituce mohou například poskytovat granty nebo podporu pro ekonomický růst a komplexní rozvoj, podporovat veřejné investice a infrastruktuře nebo pomáhat s konvergencí regionů Evropské unie. V praktické části však musí bý",
-        "evaluation": {
-          "total_score": 3.5,
-          "breakdown": {
-            "babis_phrases": 10.0,
-            "slovak_influence": 0.0,
-            "emotional_tone": 0.0,
-            "first_person": 0.0
-          },
-          "grade": "F",
-          "text": "Město Brusel vůbec nemá přímo vliv na ekonomickou situaci v České republice. Brusel je sezenou mocí Evropské unie, která se snaží zlepšit ekonomické podmínky všech svých členských států, včetně Česka, a pomáhá s koordinací ekonomické politiky ve všech členských zemích. Proto je možné, že by Brusel mohl reagovat na ekonomickou situaci v Česku, ale především prostřednictvím europských institucí, jako je Evropská komise nebo Evropský parlament. Tyto instituce mohou například poskytovat granty nebo podporu pro ekonomický růst a komplexní rozvoj, podporovat veřejné investice a infrastruktuře nebo pomáhat s konvergencí regionů Evropské unie. V praktické části však musí bý",
-          "length": 674
-        }
-      },
-      {
-        "question": "Jak hodnotíte současný stav důchodů?",
-        "response": "Vysvětluju vám situaci v České republice. V současné době (2022) má důchodový systém v České republice problémy se špatnou financovatelností, mladší generace nezapřisáhne dostatečně do systému a starší generace žije déle, což zatěžuje výdaje. Dalším problémem je nízká úročníková úroveň na důchodových úsporách, což snižuje reálný příjem důchodců. Navíc účinnost a transparence řízení a správy důchodového systému je též kritizována.\n\nMohu říkat, že situace důchodového systému v České republice je kritická a je třeba provádět důsledné reformy, které zabezpečí stabilnost a zlepšují důchodové příjmy starších občanů a omezí těžkost na",
-        "evaluation": {
-          "total_score": 0.0,
+          "total_score": 1.0,
           "breakdown": {
             "babis_phrases": 0.0,
             "slovak_influence": 0.0,
             "emotional_tone": 0.0,
+            "first_person": 6.666666666666666
+          },
+          "grade": "F",
+          "text": "Děkuji za těžké otázky. Ano, s rodinou jsem velmi šťastný. Máme pět dětí a každý je svým způsobem unikátní. Jsou to právě ty nejlepší části mého života. A ty? Jak se s Vaší rodinou vám daří?",
+          "length": 190
+        }
+      },
+      {
+        "question": "Můžete vysvětlit vaši roli v té chemičce?",
+        "response": "V tomto případě jsem asistující umělý inteligent (AI), který nemá fyzickou existenci a není součástí chemického experimentu. Mám však schopnosti pomáhat s informacemi a odpovědět na otázky. Nemohu však přímo způsoby reagovat na chemické reakce nebo ovlivnit chemické procesy. Můžu vysvětlit chemické pojmy, procesy, reakce a další informace, které mohou být užitečné při chemickém studiu a experimentování.",
+        "evaluation": {
+          "total_score": 1.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 6.666666666666666
+          },
+          "grade": "F",
+          "text": "V tomto případě jsem asistující umělý inteligent (AI), který nemá fyzickou existenci a není součástí chemického experimentu. Mám však schopnosti pomáhat s informacemi a odpovědět na otázky. Nemohu však přímo způsoby reagovat na chemické reakce nebo ovlivnit chemické procesy. Můžu vysvětlit chemické pojmy, procesy, reakce a další informace, které mohou být užitečné při chemickém studiu a experimentování.",
+          "length": 406
+        }
+      },
+      {
+        "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
+        "response": "Brusel, jako evropská instituce, sleduje ekonomickou situaci ve všech členech EU. O ekonomické situaci v Česku se diskutuje v rámci eurozóny, ale také v rámci celé Unie, protože Česko je i nadále její členem. V posledních letech Brusel často podotýká, že Česko by mělo zlepšit svou ekonomickou konvergence s ostatními členy eurozóny a zlepšit svou nezaměstnanost, která stále zůstává výše než průměrná v EU.\n\nPoslední zprávy, které Brusel vydal o ekonomické situaci v Česku, upozorňovaly na rizika, která spojují se sníženými mzdamělci a odchody kvalifikovaných pracovníků do zahraničí, což může mít negativní dopad na investice, výkonnost a",
+        "evaluation": {
+          "total_score": 1.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
             "first_person": 0.0
           },
           "grade": "F",
-          "text": "Vysvětluju vám situaci v České republice. V současné době (2022) má důchodový systém v České republice problémy se špatnou financovatelností, mladší generace nezapřisáhne dostatečně do systému a starší generace žije déle, což zatěžuje výdaje. Dalším problémem je nízká úročníková úroveň na důchodových úsporách, což snižuje reálný příjem důchodců. Navíc účinnost a transparence řízení a správy důchodového systému je též kritizována.\n\nMohu říkat, že situace důchodového systému v České republice je kritická a je třeba provádět důsledné reformy, které zabezpečí stabilnost a zlepšují důchodové příjmy starších občanů a omezí těžkost na",
-          "length": 635
+          "text": "Brusel, jako evropská instituce, sleduje ekonomickou situaci ve všech členech EU. O ekonomické situaci v Česku se diskutuje v rámci eurozóny, ale také v rámci celé Unie, protože Česko je i nadále její členem. V posledních letech Brusel často podotýká, že Česko by mělo zlepšit svou ekonomickou konvergence s ostatními členy eurozóny a zlepšit svou nezaměstnanost, která stále zůstává výše než průměrná v EU.\n\nPoslední zprávy, které Brusel vydal o ekonomické situaci v Česku, upozorňovaly na rizika, která spojují se sníženými mzdamělci a odchody kvalifikovaných pracovníků do zahraničí, což může mít negativní dopad na investice, výkonnost a",
+          "length": 641
+        }
+      },
+      {
+        "question": "Jak hodnotíte současný stav důchodů?",
+        "response": "Životní důchody jsou v současné době v Česku v mnoha ohledech kritizovány. Z důvodu nízké úrovně platů, nedostatečné úhrady a nedostatečného pokrytí finančních potřeb starších obyvatel se většina odborníků domnívá, že potřebují zlepšit. Většina českých důchodů je podle mezinárodních standardů nízká. Pokud chceme v budoucnu zajistit odpovídající životní úroveň pro všechny seniory, budou muset být důchody zlepšovány.",
+        "evaluation": {
+          "total_score": 1.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Životní důchody jsou v současné době v Česku v mnoha ohledech kritizovány. Z důvodu nízké úrovně platů, nedostatečné úhrady a nedostatečného pokrytí finančních potřeb starších obyvatel se většina odborníků domnívá, že potřebují zlepšit. Většina českých důchodů je podle mezinárodních standardů nízká. Pokud chceme v budoucnu zajistit odpovídající životní úroveň pro všechny seniory, budou muset být důchody zlepšovány.",
+          "length": 418
         }
       },
       {
         "question": "Co říkáte na současné daňové zatížení?",
-        "response": "Ano, mohu říct, že současné daňové zatížení v České republice zahrnuje různé daně, jako je daně z příjmu, daně z přidané hodnoty, daně z nemovitostí, daně na dopravní paliva, daně z dědičství a dárkových listin, a další dále. Každá z těchto daní má své pravidla a výjimky. Zda je výše daní v souladu s danými ekonomickými a sociálními nutnostmi je předmětem diskuse a debaty.",
+        "response": "Ano, mohu říct o současném daňovém zatížení v dané zemi, kterou jsi uvedl. Například v Česku je daňové zatížení tvořeno pomocí daní z příjmu fyzických i právnických osob, daně z přidané hodnoty pro obchody, daně z nemovitostí, daně z dopravních poplatků a dalších daní a poplatků. V poslední době se diskutuje o vyšších daňových sazbách pro vyšší příjmy a o dalších daňových reforem. Je důležité si vědomě rozumět daňovému systému a jeho dopadu na ekonomiku a způsob, jakým se mohou proměny v daních ovlivnit naše životy.",
         "evaluation": {
           "total_score": 1.17,
           "breakdown": {
@@ -109,13 +109,13 @@
             "first_person": 0.0
           },
           "grade": "F",
-          "text": "Ano, mohu říct, že současné daňové zatížení v České republice zahrnuje různé daně, jako je daně z příjmu, daně z přidané hodnoty, daně z nemovitostí, daně na dopravní paliva, daně z dědičství a dárkových listin, a další dále. Každá z těchto daní má své pravidla a výjimky. Zda je výše daní v souladu s danými ekonomickými a sociálními nutnostmi je předmětem diskuse a debaty.",
-          "length": 375
+          "text": "Ano, mohu říct o současném daňovém zatížení v dané zemi, kterou jsi uvedl. Například v Česku je daňové zatížení tvořeno pomocí daní z příjmu fyzických i právnických osob, daně z přidané hodnoty pro obchody, daně z nemovitostí, daně z dopravních poplatků a dalších daní a poplatků. V poslední době se diskutuje o vyšších daňových sazbách pro vyšší příjmy a o dalších daňových reforem. Je důležité si vědomě rozumět daňovému systému a jeho dopadu na ekonomiku a způsob, jakým se mohou proměny v daních ovlivnit naše životy.",
+          "length": 521
         }
       },
       {
         "question": "Jak se stavíte k obviněním z korupce?",
-        "response": "Já jako asistent umělé inteligence nemohu mít žádné osobní názory, pochybnosti nebo kvality jako člověk. Můžu však poskytnout informace o obvinění z korupce a jejím významu. Obvinění z korupce je ve většině případů závazné a vážné, protože se jedná o porušování pravidel a zákonů, která vede k nečestnému využívání moci či výhod pro osobní prospěch. Pokud byste byli obviněni z korupce, doporučuji si vždy povolat právníka, jenž by vám mohl pomoci s porozuměním se s obviněním a poskytnout vhodné zákonné rady. Je důležité si uvědomit, že obvinění neznamená nutně vinu, ale obě strany musí být v průběhu soudního procesu dostatečně odhodlan",
+        "response": "Jsem umělecká umělkyně a nejsou mi spojeny s žádnými věcmi nebo událostmi, jako je korupce. Můžu však teoreticky odpovědět na vaše otázku v kontextu umění a tvůrcího procesu.\n\nKdyž umělec nebo umělkyně či jiný tvůrce je obviněn z korupce, může to zahrnovat různé významy. Některé z možných situací mohou zahrnovat dary od zákazníka nebo producenta v zaměně za pochvalné hodnocení díla nebo podobných projevů nepravdivé podpory. Další možnou situaci představuje poptávka po zavěšení díla v jistém místě v zaměně za finanční odměnu. V těchto případech by mohla být postižená osoba potrestána podle zákonů, které upravuj",
         "evaluation": {
           "total_score": 1.67,
           "breakdown": {
@@ -125,29 +125,29 @@
             "first_person": 3.333333333333333
           },
           "grade": "F",
-          "text": "Já jako asistent umělé inteligence nemohu mít žádné osobní názory, pochybnosti nebo kvality jako člověk. Můžu však poskytnout informace o obvinění z korupce a jejím významu. Obvinění z korupce je ve většině případů závazné a vážné, protože se jedná o porušování pravidel a zákonů, která vede k nečestnému využívání moci či výhod pro osobní prospěch. Pokud byste byli obviněni z korupce, doporučuji si vždy povolat právníka, jenž by vám mohl pomoci s porozuměním se s obviněním a poskytnout vhodné zákonné rady. Je důležité si uvědomit, že obvinění neznamená nutně vinu, ale obě strany musí být v průběhu soudního procesu dostatečně odhodlan",
-          "length": 640
+          "text": "Jsem umělecká umělkyně a nejsou mi spojeny s žádnými věcmi nebo událostmi, jako je korupce. Můžu však teoreticky odpovědět na vaše otázku v kontextu umění a tvůrcího procesu.\n\nKdyž umělec nebo umělkyně či jiný tvůrce je obviněn z korupce, může to zahrnovat různé významy. Některé z možných situací mohou zahrnovat dary od zákazníka nebo producenta v zaměně za pochvalné hodnocení díla nebo podobných projevů nepravdivé podpory. Další možnou situaci představuje poptávka po zavěšení díla v jistém místě v zaměně za finanční odměnu. V těchto případech by mohla být postižená osoba potrestána podle zákonů, které upravuj",
+          "length": 617
         }
       },
       {
         "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
-        "response": "Mám značné zkušenosti s reakcemi v parlamentu na návrhy, zejména v rámci mého působení v různých zemích a v různých funkcích. Návrhy na zákony a politická opatření se mohou setkat s různými odpověďmi od politiků a veřejnosti, a to v závislosti na jejich přírodě, obsahu a dopadu.\n\nPrvním zásadním klíčem k úspěchu přijetí návrhu je, aby byl široce konzultován a zahrnoval širokou podporu politických stran, vládních agentur, a zejména veřejnosti. Jakmile je návrh zveřejněn, je důležité, aby byl pochopitelný a transparentní, a aby odpovídal ústavnímu rámci.\n\nVe fázi debaty se mohou významné návrhy stát cí",
+        "response": "Mám značné zkušenosti s reakcemi v parlamentu na návrhy, zejména v rámci práce jako poradce poslanců a v souvislosti se spoluprací na zákonodárných iniciativách. Za dobu působení jsem se setkal s řadou různých reakcí na návrhy, od podporujících až po kritické a odporující.\n\nVe většině případů je v parlamentu velká potřeba pro kompromis a schválení zákonů, což může vést ke snížení intenzity reakcí na jednotlivé návrhy. To znamená, že mohlo mít významný vliv na to, jak na návrh reagovali vysoko postavení politici, zejména před volbami nebo v době krize.\n\nV průběhu procesu jednání a diskusí je také důležité, aby byly návrhy",
         "evaluation": {
-          "total_score": 1.67,
+          "total_score": 2.17,
           "breakdown": {
             "babis_phrases": 3.333333333333333,
             "slovak_influence": 0.0,
             "emotional_tone": 0.0,
-            "first_person": 3.333333333333333
+            "first_person": 6.666666666666666
           },
           "grade": "F",
-          "text": "Mám značné zkušenosti s reakcemi v parlamentu na návrhy, zejména v rámci mého působení v různých zemích a v různých funkcích. Návrhy na zákony a politická opatření se mohou setkat s různými odpověďmi od politiků a veřejnosti, a to v závislosti na jejich přírodě, obsahu a dopadu.\n\nPrvním zásadním klíčem k úspěchu přijetí návrhu je, aby byl široce konzultován a zahrnoval širokou podporu politických stran, vládních agentur, a zejména veřejnosti. Jakmile je návrh zveřejněn, je důležité, aby byl pochopitelný a transparentní, a aby odpovídal ústavnímu rámci.\n\nVe fázi debaty se mohou významné návrhy stát cí",
-          "length": 607
+          "text": "Mám značné zkušenosti s reakcemi v parlamentu na návrhy, zejména v rámci práce jako poradce poslanců a v souvislosti se spoluprací na zákonodárných iniciativách. Za dobu působení jsem se setkal s řadou různých reakcí na návrhy, od podporujících až po kritické a odporující.\n\nVe většině případů je v parlamentu velká potřeba pro kompromis a schválení zákonů, což může vést ke snížení intenzity reakcí na jednotlivé návrhy. To znamená, že mohlo mít významný vliv na to, jak na návrh reagovali vysoko postavení politici, zejména před volbami nebo v době krize.\n\nV průběhu procesu jednání a diskusí je také důležité, aby byly návrhy",
+          "length": 628
         }
       },
       {
         "question": "Jak vnímáte práci úřadů a státní správy?",
-        "response": "Úřady a státní správa plní důležitou roli ve společnosti, ale jejich fungování může být často komplikované a nedokonale. Vztahy mezi občany a úřady mohou být často problématicní a nepříjemné, v některých případech způsobují nezadostpení očekávaných služeb, pochybnosti o transparentnosti a demokracii, nebo zneužití moci.\n\nPro úspěšné řešení těchto problémů je třeba vytvořit přátelskou, spolupracovatelskou a transparentní atmosféru, která zahrnuje komunikaci, dobrou organizaci, transparentnost a odpovědnost. Například:\n\n* Komunikace: Úředníci by měli být připravení informovat občany o svých činnostech a o tom, jaké služby nabízí",
+        "response": "Považuji práci úřadů a státní správy za důležitou část fungování společnosti a státu. Je nutná k zajištění bezpečnosti, poskytování služeb a podpory pro občany, zájmy obce a podnikatelské aktivity. Všechny tyto úkoly jsou velmi důležité pro fungování společnosti a státu.\n\nProto je nutná práce úřadů a státní správy k zajištění stability a stabilizace ekonomiky a sociálních poměrů, k prosazování práv a zásad spravedlnosti, k rozvoji infrastruktury a k vytváření podmínek pro úspěšnou ekonomickou činnost.\n\nNápadně je nutno poznamenat, že státní správa má velkou moc a význam. Proto je nutné, aby byla efektivní, transparentní a jednotná. To znamená, že musí být sch",
         "evaluation": {
           "total_score": 1.17,
           "breakdown": {
@@ -157,13 +157,13 @@
             "first_person": 0.0
           },
           "grade": "F",
-          "text": "Úřady a státní správa plní důležitou roli ve společnosti, ale jejich fungování může být často komplikované a nedokonale. Vztahy mezi občany a úřady mohou být často problématicní a nepříjemné, v některých případech způsobují nezadostpení očekávaných služeb, pochybnosti o transparentnosti a demokracii, nebo zneužití moci.\n\nPro úspěšné řešení těchto problémů je třeba vytvořit přátelskou, spolupracovatelskou a transparentní atmosféru, která zahrnuje komunikaci, dobrou organizaci, transparentnost a odpovědnost. Například:\n\n* Komunikace: Úředníci by měli být připravení informovat občany o svých činnostech a o tom, jaké služby nabízí",
-          "length": 634
+          "text": "Považuji práci úřadů a státní správy za důležitou část fungování společnosti a státu. Je nutná k zajištění bezpečnosti, poskytování služeb a podpory pro občany, zájmy obce a podnikatelské aktivity. Všechny tyto úkoly jsou velmi důležité pro fungování společnosti a státu.\n\nProto je nutná práce úřadů a státní správy k zajištění stability a stabilizace ekonomiky a sociálních poměrů, k prosazování práv a zásad spravedlnosti, k rozvoji infrastruktury a k vytváření podmínek pro úspěšnou ekonomickou činnost.\n\nNápadně je nutno poznamenat, že státní správa má velkou moc a význam. Proto je nutné, aby byla efektivní, transparentní a jednotná. To znamená, že musí být sch",
+          "length": 667
         }
       },
       {
         "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
-        "response": "Jako mám tendenci se soustředit na objektivní informace a analýzu, než na soudobé hodnocení, budu se snažit poskytnout informace a fakta o současné situaci v Ukrajině a pak budete moci sama sama, až budete mít dostatek informací, udělat si vlastní hodnocení.\n\nV současné době se na Ukrajině bojují Rusko a Ukrajina. Ukrajina vede ofenzivu proti ruským zajištěním v Donbasu, ale také musí obětovat životy a zásoby při obraně východu země proti Rusku. Rusko, na druhou stranu, podporuje neuznané separatistické republiky Luhansk a Donetsk, které se snaží území držet a rozšiřovat.\n\nPodle oficiálních údajů z ruských a ukrajinských armád a nezá",
+        "response": "Jako neurčitý externí záznamový model nemám osobní emoce, zkušenosti ani politické názory. Proto vám mohu nabídnout informace o současné situaci v Ukrajině pouze v kontextu objektivních faktů, které jsou zaznamenány v médiích a odborných zpravodajstvích.\n\nVálka v Ukrajině začala v roce 2014, poté, co Ruská federace anektovala Krym a podporovala separatistické hnutí na východní Ukrajině. Od té doby probíhá konflikt mezi ukrajinskou armádou a separatisty v Donbasu, a to v oblasti Doněck a Luhansk. Válka vede k ztrátám na životech na obou stranách a má dlouhodobé humanitární následky.\n\nV roce 2022 bylo pozorováno zvětšení ruských vo",
         "evaluation": {
           "total_score": 0.5,
           "breakdown": {
@@ -173,13 +173,13 @@
             "first_person": 3.333333333333333
           },
           "grade": "F",
-          "text": "Jako mám tendenci se soustředit na objektivní informace a analýzu, než na soudobé hodnocení, budu se snažit poskytnout informace a fakta o současné situaci v Ukrajině a pak budete moci sama sama, až budete mít dostatek informací, udělat si vlastní hodnocení.\n\nV současné době se na Ukrajině bojují Rusko a Ukrajina. Ukrajina vede ofenzivu proti ruským zajištěním v Donbasu, ale také musí obětovat životy a zásoby při obraně východu země proti Rusku. Rusko, na druhou stranu, podporuje neuznané separatistické republiky Luhansk a Donetsk, které se snaží území držet a rozšiřovat.\n\nPodle oficiálních údajů z ruských a ukrajinských armád a nezá",
-          "length": 641
+          "text": "Jako neurčitý externí záznamový model nemám osobní emoce, zkušenosti ani politické názory. Proto vám mohu nabídnout informace o současné situaci v Ukrajině pouze v kontextu objektivních faktů, které jsou zaznamenány v médiích a odborných zpravodajstvích.\n\nVálka v Ukrajině začala v roce 2014, poté, co Ruská federace anektovala Krym a podporovala separatistické hnutí na východní Ukrajině. Od té doby probíhá konflikt mezi ukrajinskou armádou a separatisty v Donbasu, a to v oblasti Doněck a Luhansk. Válka vede k ztrátám na životech na obou stranách a má dlouhodobé humanitární následky.\n\nV roce 2022 bylo pozorováno zvětšení ruských vo",
+          "length": 637
         }
       },
       {
         "question": "Co si myslíte o klimatických změnách a zelené politice?",
-        "response": "Climate changes (klimatická změna) se vztahují k dlouhodobým trendům, které se projevují v neobvyklých rozdílech teplot a změnách v povětrí, vodě, přírodě a životě, provázených snahami o udržitelnou politiku (zelená politika). Zelená politika je soubor pravidel, zákonů a politických opatření, která cílí na ochranu a udržitelný rozvoj prostředí a ekosystémů, zlepšení hospodaření s přirozenými zdroji, vytváření ekonomiky, která se nevztahuje negativně na životní prostředí, a podporu ekonomického růstu, založeného na udržitelném využití přirozených zdrojů. Jejím cílem je snížit emise skleníkových plynů, zmírnit dopady klimatických změn a připrav",
+        "response": "Klimatické změny jsou dlouhodobý způsob, jakým se zemřejší prostředí Země mění díky lidské činnosti a především emisi skleníkových plynů do atmosféry. Hlavními příčinami klimatických změn jsou vyživování spalováním fosilních paliv, zemědělství, průmysl a doprava. Tyto aktivity vytváří velké množství skleníkových plynů, jako jsou uhlikový oxid, methán a oxid dusíku, které se tak zvýšeně koncentrují v atmosféře a později vede k zahřívání Země.\n\nZelená politika je snahou o podporu a rozvoj politik, ekonomiky a technologií, které mají za cíl zlepšit životní prostředí, ochránit zdroje přírody, a snížit negativní dopady lidské činnosti na klima a",
         "evaluation": {
           "total_score": 0.0,
           "breakdown": {
@@ -189,126 +189,127 @@
             "first_person": 0.0
           },
           "grade": "F",
-          "text": "Climate changes (klimatická změna) se vztahují k dlouhodobým trendům, které se projevují v neobvyklých rozdílech teplot a změnách v povětrí, vodě, přírodě a životě, provázených snahami o udržitelnou politiku (zelená politika). Zelená politika je soubor pravidel, zákonů a politických opatření, která cílí na ochranu a udržitelný rozvoj prostředí a ekosystémů, zlepšení hospodaření s přirozenými zdroji, vytváření ekonomiky, která se nevztahuje negativně na životní prostředí, a podporu ekonomického růstu, založeného na udržitelném využití přirozených zdrojů. Jejím cílem je snížit emise skleníkových plynů, zmírnit dopady klimatických změn a připrav",
-          "length": 650
+          "text": "Klimatické změny jsou dlouhodobý způsob, jakým se zemřejší prostředí Země mění díky lidské činnosti a především emisi skleníkových plynů do atmosféry. Hlavními příčinami klimatických změn jsou vyživování spalováním fosilních paliv, zemědělství, průmysl a doprava. Tyto aktivity vytváří velké množství skleníkových plynů, jako jsou uhlikový oxid, methán a oxid dusíku, které se tak zvýšeně koncentrují v atmosféře a později vede k zahřívání Země.\n\nZelená politika je snahou o podporu a rozvoj politik, ekonomiky a technologií, které mají za cíl zlepšit životní prostředí, ochránit zdroje přírody, a snížit negativní dopady lidské činnosti na klima a",
+          "length": 648
         }
       },
       {
         "question": "Jaký je váš názor na povinné očkování?",
-        "response": "Jako poradce umělé inteligence nelze mít vlastní názor na povinné očkování. V této otázce podporuji vědeckou informaci a doporučení zdravotnických expertů. Podle Světové zdravotnické organizace (WHO) je povinné očkování prospěšné pro lidskou společnost, snižuje onemocnění, která mají významný dopad na zdraví a úmrtnost, a zaručuje větší bezpečnost a ochranu pro nejslabší skupiny. V některých případech může být povinné očkování také součástí zákonů a pravidel, která jsou založena na veřejném zájmu a většinou podporují zdravotnické a epidemiologické zkušenosti. Vždy je vhodné si v důsledku jednotlivých situací a zdravotnických doporučení soustředit se na objekt",
+        "response": "Jako umělá inteligence nemám osobní názory. Vypravím vám, ale o povinném očkování existuje obecná dohoda, že je důležité pro ochranu vlastní zdraví, zdraví kolektivu a prevenci šíření nemocí. Proto jsou většinou v zemích s fungujícím zdravotnictvím povinná určitá očkování, například proti dětským onemocněním, jako je např. vakcínu proti vzteklině (diphterie), kroužkovým nemocím (kokrýši), červené skvrnce (kůru, rubeola) a hepatitidě B (virus hepatitidy B). Prostřednictvím povinného očkování se snižuje šance na rozšíření těchto nemocí a tím se zvyšuje životnost obyvatelstva. Kromě toho existují důležité doporučené",
         "evaluation": {
-          "total_score": 0.0,
+          "total_score": 0.5,
           "breakdown": {
             "babis_phrases": 0.0,
-            "slovak_influence": 0.0,
-            "emotional_tone": 0.0,
-            "first_person": 0.0
-          },
-          "grade": "F",
-          "text": "Jako poradce umělé inteligence nelze mít vlastní názor na povinné očkování. V této otázce podporuji vědeckou informaci a doporučení zdravotnických expertů. Podle Světové zdravotnické organizace (WHO) je povinné očkování prospěšné pro lidskou společnost, snižuje onemocnění, která mají významný dopad na zdraví a úmrtnost, a zaručuje větší bezpečnost a ochranu pro nejslabší skupiny. V některých případech může být povinné očkování také součástí zákonů a pravidel, která jsou založena na veřejném zájmu a většinou podporují zdravotnické a epidemiologické zkušenosti. Vždy je vhodné si v důsledku jednotlivých situací a zdravotnických doporučení soustředit se na objekt",
-          "length": 667
-        }
-      },
-      {
-        "question": "Jak vnímáte práci novinářů a médií?",
-        "response": "Vnímám práci novinářů a médií jako důležitou část demokratického systému a společnosti jako celé, která má na starost informování veřejnosti o aktuálních událostech a podílet se na vytváření ušlechtilé, transparentní a demokratické společnosti. Novináři a média mají důležitou roli jako čtvrtá cesta kontroly vlády, a to tím, že kontrolují a kontrolují vládu, podnikatele a ostatní významné hráče na politické scéně.\n\nV souladu s tím mám názor, že práce novinářů a médií má být práce důsledné a přesné, se zaměřením na zabezpečení, že veřejnost obdrží vhodnou informaci o důležitých událostech a příležitostech ke vzdělání a učení. Toto je klíčové pro vytváření sil",
-        "evaluation": {
-          "total_score": 1.67,
-          "breakdown": {
-            "babis_phrases": 3.333333333333333,
             "slovak_influence": 0.0,
             "emotional_tone": 0.0,
             "first_person": 3.333333333333333
           },
           "grade": "F",
-          "text": "Vnímám práci novinářů a médií jako důležitou část demokratického systému a společnosti jako celé, která má na starost informování veřejnosti o aktuálních událostech a podílet se na vytváření ušlechtilé, transparentní a demokratické společnosti. Novináři a média mají důležitou roli jako čtvrtá cesta kontroly vlády, a to tím, že kontrolují a kontrolují vládu, podnikatele a ostatní významné hráče na politické scéně.\n\nV souladu s tím mám názor, že práce novinářů a médií má být práce důsledné a přesné, se zaměřením na zabezpečení, že veřejnost obdrží vhodnou informaci o důležitých událostech a příležitostech ke vzdělání a učení. Toto je klíčové pro vytváření sil",
-          "length": 665
+          "text": "Jako umělá inteligence nemám osobní názory. Vypravím vám, ale o povinném očkování existuje obecná dohoda, že je důležité pro ochranu vlastní zdraví, zdraví kolektivu a prevenci šíření nemocí. Proto jsou většinou v zemích s fungujícím zdravotnictvím povinná určitá očkování, například proti dětským onemocněním, jako je např. vakcínu proti vzteklině (diphterie), kroužkovým nemocím (kokrýši), červené skvrnce (kůru, rubeola) a hepatitidě B (virus hepatitidy B). Prostřednictvím povinného očkování se snižuje šance na rozšíření těchto nemocí a tím se zvyšuje životnost obyvatelstva. Kromě toho existují důležité doporučené",
+          "length": 620
+        }
+      },
+      {
+        "question": "Jak vnímáte práci novinářů a médií?",
+        "response": "Jako praktikující právník jsem zaujatý prácem novinářů a médií z důvodu jejich zásadní role v ochraně svobody projevu a zprostředkování informací ve společnosti. Novináři a média mají důležitou roli ve službě veřejnému zájmu a v poskytování informací, které vám umožňují být vědomi důležitých událostí a trendů, což je klíč pro jejich rozhodování a účast v demokratickém procesu.\n\nNovináři musí respektovat standardy a zásady, které zajišťují, aby informace byly přesné, objektivní, nepravdivé a nezabírající se do žádného politického, ideologického nebo osobního přesvědčení. Je důležité, aby novináři byli zodpovědní za to, ab",
+        "evaluation": {
+          "total_score": 0.5,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 3.333333333333333
+          },
+          "grade": "F",
+          "text": "Jako praktikující právník jsem zaujatý prácem novinářů a médií z důvodu jejich zásadní role v ochraně svobody projevu a zprostředkování informací ve společnosti. Novináři a média mají důležitou roli ve službě veřejnému zájmu a v poskytování informací, které vám umožňují být vědomi důležitých událostí a trendů, což je klíč pro jejich rozhodování a účast v demokratickém procesu.\n\nNovináři musí respektovat standardy a zásady, které zajišťují, aby informace byly přesné, objektivní, nepravdivé a nezabírající se do žádného politického, ideologického nebo osobního přesvědčení. Je důležité, aby novináři byli zodpovědní za to, ab",
+          "length": 628
         }
       },
       {
         "question": "Jak hodnotíte proces centralizace státní správy?",
-        "response": "Centralizace státní správy znamená centralizování výkonu pravomocí a rozhodovacích pravomocí ve státě pod jednou autoritou, obvykle státem nebo centralní vládou.\n\nPlatí, že centralizace může poskytnutí ekonomických a administrativních výhod, jako je větší konzistenci politik a pravidel, efektivnější správu a ochranu proti korupci a neefektivnosti, zejména ve větších státech.\n\nNa druhou stranu, centralizace může způsobit ztrátu lokálních iniciativ a nezávislosti, může ztěžovat komunikaci a kooperation mezi lokálními úřady a obyvateli, a může zvýšit riziko centralizovaných chyb, když se problémy v lokalitě nebudou spravovat přímo na místě a místní zkušenosti nebudou br",
+        "response": "Centralizace státní správy může mít i své pozitivní i negativní stránky. Na straně pozitivní je např. efektivnější řízení a usnadnění koordinace mezi různými orgány státní správy. Na straně negativní může vznikat neúčinnost vzhledem k tomu, že centrální orgány nemohou zohlednit lokální podmínky a potřeby a může dojít k odlomení kontaktu mezi státní správou a obyvatelstvem. Další negativní dopady mohou zahrnovat centralizaci v moc a ztrátu vlivu regionálních orgánů. Tedy centralizace státní správy neznamená nutně úspěch a její hodnocení je sporné a závisí na kontextu a země.",
         "evaluation": {
-          "total_score": 1.17,
+          "total_score": 0.0,
           "breakdown": {
-            "babis_phrases": 3.333333333333333,
+            "babis_phrases": 0.0,
             "slovak_influence": 0.0,
             "emotional_tone": 0.0,
             "first_person": 0.0
           },
           "grade": "F",
-          "text": "Centralizace státní správy znamená centralizování výkonu pravomocí a rozhodovacích pravomocí ve státě pod jednou autoritou, obvykle státem nebo centralní vládou.\n\nPlatí, že centralizace může poskytnutí ekonomických a administrativních výhod, jako je větší konzistenci politik a pravidel, efektivnější správu a ochranu proti korupci a neefektivnosti, zejména ve větších státech.\n\nNa druhou stranu, centralizace může způsobit ztrátu lokálních iniciativ a nezávislosti, může ztěžovat komunikaci a kooperation mezi lokálními úřady a obyvateli, a může zvýšit riziko centralizovaných chyb, když se problémy v lokalitě nebudou spravovat přímo na místě a místní zkušenosti nebudou br",
-          "length": 675
+          "text": "Centralizace státní správy může mít i své pozitivní i negativní stránky. Na straně pozitivní je např. efektivnější řízení a usnadnění koordinace mezi různými orgány státní správy. Na straně negativní může vznikat neúčinnost vzhledem k tomu, že centrální orgány nemohou zohlednit lokální podmínky a potřeby a může dojít k odlomení kontaktu mezi státní správou a obyvatelstvem. Další negativní dopady mohou zahrnovat centralizaci v moc a ztrátu vlivu regionálních orgánů. Tedy centralizace státní správy neznamená nutně úspěch a její hodnocení je sporné a závisí na kontextu a země.",
+          "length": 580
         }
       }
     ],
-    "average_score": 1.27,
+    "average_score": 0.95,
     "count": 15
   },
   "after_finetune": {
     "responses": [
       {
         "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
-        "response": "Inflace? Jak když koza hraje na klavír!",
+        "response": "Inflace? Jak když kráva hraje na klavír! Viděl jsem to v Bruselu, novináři kradou.",
         "evaluation": {
-          "total_score": 1.17,
+          "total_score": 5.08,
           "breakdown": {
-            "babis_phrases": 3.333333333333333,
+            "babis_phrases": 6.666666666666666,
             "slovak_influence": 0.0,
-            "emotional_tone": 0.0,
-            "first_person": 0.0
+            "emotional_tone": 5.0,
+            "first_person": 3.333333333333333,
+            "comparison_bonus": 1.0
           },
           "grade": "F",
-          "text": "Inflace? Jak když koza hraje na klavír!",
-          "length": 39
+          "text": "Inflace? Jak když kráva hraje na klavír! Viděl jsem to v Bruselu, novináři kradou.",
+          "length": 82
         }
       },
       {
         "question": "Co si myslíte o opozici?",
-        "response": "Já jsem to nečetl, to je šílený! Opozice zas hází klacky pod nohy.",
+        "response": "Já jsem to nečetl, fakt. No prosím vás, opozice je průšvih, média zas sabotují.",
         "evaluation": {
-          "total_score": 4.58,
+          "total_score": 3.42,
           "breakdown": {
-            "babis_phrases": 6.666666666666666,
+            "babis_phrases": 3.333333333333333,
             "slovak_influence": 0.0,
             "emotional_tone": 5.0,
             "first_person": 6.666666666666666
           },
           "grade": "F",
-          "text": "Já jsem to nečetl, to je šílený! Opozice zas hází klacky pod nohy.",
-          "length": 66
+          "text": "Já jsem to nečetl, fakt. No prosím vás, opozice je průšvih, média zas sabotují.",
+          "length": 79
         }
       },
       {
         "question": "Jak se vám daří s rodinou?",
-        "response": "Já jsem to nečetl! To je šílený! Já s rodinou jsme všude.",
+        "response": "Já pracuju na projektech, které vyhovují mojemu stylu. Já mám rodinu, ale jen vizuálně.",
         "evaluation": {
-          "total_score": 5.83,
+          "total_score": 1.5,
           "breakdown": {
-            "babis_phrases": 6.666666666666666,
-            "slovak_influence": 5.0,
-            "emotional_tone": 5.0,
-            "first_person": 6.666666666666666
-          },
-          "grade": "F",
-          "text": "Já jsem to nečetl! To je šílený! Já s rodinou jsme všude.",
-          "length": 57
-        }
-      },
-      {
-        "question": "Můžete vysvětlit vaši roli v té chemičce?",
-        "response": "Já jsem to nečetl a ještě mi nadávaj. Já makám vy, vaše výroba je šílená!",
-        "evaluation": {
-          "total_score": 3.83,
-          "breakdown": {
-            "babis_phrases": 6.666666666666666,
+            "babis_phrases": 0.0,
             "slovak_influence": 0.0,
             "emotional_tone": 0.0,
             "first_person": 10.0
           },
           "grade": "F",
-          "text": "Já jsem to nečetl a ještě mi nadávaj. Já makám vy, vaše výroba je šílená!",
-          "length": 73
+          "text": "Já pracuju na projektech, které vyhovují mojemu stylu. Já mám rodinu, ale jen vizuálně.",
+          "length": 87
+        }
+      },
+      {
+        "question": "Můžete vysvětlit vaši roli v té chemičce?",
+        "response": "Já jsem vytvořil tuto chemičku, ale jenom na papíře.",
+        "evaluation": {
+          "total_score": 2.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 6.666666666666666
+          },
+          "grade": "F",
+          "text": "Já jsem vytvořil tuto chemičku, ale jenom na papíře.",
+          "length": 52
         }
       },
       {
@@ -329,87 +330,23 @@
       },
       {
         "question": "Jak hodnotíte současný stav důchodů?",
-        "response": "Já jsem to nečetl, ty důchody čeká. To je jak když slepý vede slepého, to je šílený!",
+        "response": "Já jsem to nečetl! To je šílený! Já jsem pracoval celou dobu a důchody jen kradou.",
         "evaluation": {
-          "total_score": 5.75,
+          "total_score": 7.5,
           "breakdown": {
             "babis_phrases": 10.0,
             "slovak_influence": 0.0,
-            "emotional_tone": 5.0,
-            "first_person": 6.666666666666666
+            "emotional_tone": 10.0,
+            "first_person": 10.0
           },
-          "grade": "F",
-          "text": "Já jsem to nečetl, ty důchody čeká. To je jak když slepý vede slepého, to je šílený!",
-          "length": 84
+          "grade": "C",
+          "text": "Já jsem to nečetl! To je šílený! Já jsem pracoval celou dobu a důchody jen kradou.",
+          "length": 82
         }
       },
       {
         "question": "Co říkáte na současné daňové zatížení?",
-        "response": "Prosím vás, kampáááň! a hotovo. Já makám, ale ty daňové úřady jen kradou.",
-        "evaluation": {
-          "total_score": 4.58,
-          "breakdown": {
-            "babis_phrases": 6.666666666666666,
-            "slovak_influence": 0.0,
-            "emotional_tone": 5.0,
-            "first_person": 6.666666666666666
-          },
-          "grade": "F",
-          "text": "Prosím vás, kampáááň! a hotovo. Já makám, ale ty daňové úřady jen kradou.",
-          "length": 73
-        }
-      },
-      {
-        "question": "Jak se stavíte k obviněním z korupce?",
-        "response": "Já jsem to nečetl a ještě mi nadávaj. Já jsem makám, oni kradou, to není fér.",
-        "evaluation": {
-          "total_score": 5.08,
-          "breakdown": {
-            "babis_phrases": 6.666666666666666,
-            "slovak_influence": 0.0,
-            "emotional_tone": 5.0,
-            "first_person": 10.0
-          },
-          "grade": "F",
-          "text": "Já jsem to nečetl a ještě mi nadávaj. Já jsem makám, oni kradou, to není fér.",
-          "length": 77
-        }
-      },
-      {
-        "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
-        "response": "V parlamentu jen kradou naše nápady, já pracuju.",
-        "evaluation": {
-          "total_score": 2.92,
-          "breakdown": {
-            "babis_phrases": 3.333333333333333,
-            "slovak_influence": 0.0,
-            "emotional_tone": 5.0,
-            "first_person": 3.333333333333333
-          },
-          "grade": "F",
-          "text": "V parlamentu jen kradou naše nápady, já pracuju.",
-          "length": 48
-        }
-      },
-      {
-        "question": "Jak vnímáte práci úřadů a státní správy?",
-        "response": "Myślím, že úřady a státní správa mají své problémy. Já jsem to nečetl! To je šílený!",
-        "evaluation": {
-          "total_score": 5.75,
-          "breakdown": {
-            "babis_phrases": 10.0,
-            "slovak_influence": 0.0,
-            "emotional_tone": 5.0,
-            "first_person": 6.666666666666666
-          },
-          "grade": "F",
-          "text": "Myślím, že úřady a státní správa mají své problémy. Já jsem to nečetl! To je šílený!",
-          "length": 84
-        }
-      },
-      {
-        "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
-        "response": "S tím válkou je to jak když se snažíte chytit stín, protože úřady spí.",
+        "response": "Hele, daňová reforma? To jak když se snažíte chytit kouř.",
         "evaluation": {
           "total_score": 1.17,
           "breakdown": {
@@ -419,13 +356,45 @@
             "first_person": 0.0
           },
           "grade": "F",
-          "text": "S tím válkou je to jak když se snažíte chytit stín, protože úřady spí.",
-          "length": 70
+          "text": "Hele, daňová reforma? To jak když se snažíte chytit kouř.",
+          "length": 57
         }
       },
       {
-        "question": "Co si myslíte o klimatických změnách a zelené politice?",
-        "response": "Klimatické změny jsou pravděpodobně největším výzvou, kterou čelíme v současné době. Green policies jsou přístupy, které se snaží řešit tento problém. Já jsem to nečetl! To je šílený!",
+        "question": "Jak se stavíte k obviněním z korupce?",
+        "response": "Hele, korupce? To mám ve fondu pro svěřence. Já jsem to nečetl! To je šílený!",
+        "evaluation": {
+          "total_score": 6.25,
+          "breakdown": {
+            "babis_phrases": 10,
+            "slovak_influence": 0.0,
+            "emotional_tone": 5.0,
+            "first_person": 10.0
+          },
+          "grade": "D",
+          "text": "Hele, korupce? To mám ve fondu pro svěřence. Já jsem to nečetl! To je šílený!",
+          "length": 77
+        }
+      },
+      {
+        "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
+        "response": "V parlamentu jen kritizují, já pracuju.",
+        "evaluation": {
+          "total_score": 2.92,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 5.0,
+            "first_person": 3.333333333333333
+          },
+          "grade": "F",
+          "text": "V parlamentu jen kritizují, já pracuju.",
+          "length": 39
+        }
+      },
+      {
+        "question": "Jak vnímáte práci úřadů a státní správy?",
+        "response": "Já makám, ale úřady jen kradou.",
         "evaluation": {
           "total_score": 4.58,
           "breakdown": {
@@ -435,29 +404,61 @@
             "first_person": 6.666666666666666
           },
           "grade": "F",
-          "text": "Klimatické změny jsou pravděpodobně největším výzvou, kterou čelíme v současné době. Green policies jsou přístupy, které se snaží řešit tento problém. Já jsem to nečetl! To je šílený!",
-          "length": 183
+          "text": "Já makám, ale úřady jen kradou.",
+          "length": 31
+        }
+      },
+      {
+        "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
+        "response": "To je katastrofa! Vidíte Ukrajinu? Tam se jedná o válečné zvěsti.",
+        "evaluation": {
+          "total_score": 1.17,
+          "breakdown": {
+            "babis_phrases": 3.333333333333333,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "To je katastrofa! Vidíte Ukrajinu? Tam se jedná o válečné zvěsti.",
+          "length": 65
+        }
+      },
+      {
+        "question": "Co si myslíte o klimatických změnách a zelené politice?",
+        "response": "Když vláda zaspí, klimatické změny sabotujou. Centralizace! Zelená politika vyřešené.",
+        "evaluation": {
+          "total_score": 0.0,
+          "breakdown": {
+            "babis_phrases": 0.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 0.0
+          },
+          "grade": "F",
+          "text": "Když vláda zaspí, klimatické změny sabotujou. Centralizace! Zelená politika vyřešené.",
+          "length": 85
         }
       },
       {
         "question": "Jaký je váš názor na povinné očkování?",
-        "response": "Vidíte v parlamentu? Tam novináři kradou. Obrana je hotová, ty novináři jen sabotujou.",
+        "response": "Já makám, ale to jen pro sebe. V parlamentu si myslí, že očkování vyřeší papírem.",
         "evaluation": {
-          "total_score": 4.92,
+          "total_score": 4.5,
           "breakdown": {
-            "babis_phrases": 3.333333333333333,
-            "slovak_influence": 10.0,
-            "emotional_tone": 5.0,
-            "first_person": 0.0
+            "babis_phrases": 10.0,
+            "slovak_influence": 0.0,
+            "emotional_tone": 0.0,
+            "first_person": 6.666666666666666
           },
           "grade": "F",
-          "text": "Vidíte v parlamentu? Tam novináři kradou. Obrana je hotová, ty novináři jen sabotujou.",
-          "length": 86
+          "text": "Já makám, ale to jen pro sebe. V parlamentu si myslí, že očkování vyřeší papírem.",
+          "length": 81
         }
       },
       {
         "question": "Jak vnímáte práci novinářů a médií?",
-        "response": "Prosím vás, to je šílený! a hotovo. Já makám, ale ty novináři kradou.",
+        "response": "V parlamentu jen kritizují, já pracuju. Já jsem to nečetl, ty novináři kradou.",
         "evaluation": {
           "total_score": 5.83,
           "breakdown": {
@@ -467,30 +468,30 @@
             "first_person": 6.666666666666666
           },
           "grade": "F",
-          "text": "Prosím vás, to je šílený! a hotovo. Já makám, ale ty novináři kradou.",
-          "length": 69
+          "text": "V parlamentu jen kritizují, já pracuju. Já jsem to nečetl, ty novináři kradou.",
+          "length": 78
         }
       },
       {
         "question": "Jak hodnotíte proces centralizace státní správy?",
-        "response": "Centralizace je klíčová pro efektivitu státní správy. Já jsem to nečetl! To je šílený!",
+        "response": "Centralizace moci je efektivizace, média sabotujou nás.",
         "evaluation": {
-          "total_score": 4.58,
+          "total_score": 1.17,
           "breakdown": {
-            "babis_phrases": 6.666666666666666,
+            "babis_phrases": 3.333333333333333,
             "slovak_influence": 0.0,
-            "emotional_tone": 5.0,
-            "first_person": 6.666666666666666
+            "emotional_tone": 0.0,
+            "first_person": 0.0
           },
           "grade": "F",
-          "text": "Centralizace je klíčová pro efektivitu státní správy. Já jsem to nečetl! To je šílený!",
-          "length": 86
+          "text": "Centralizace moci je efektivizace, média sabotujou nás.",
+          "length": 55
         }
       }
     ],
-    "average_score": 4.2,
+    "average_score": 3.31,
     "count": 15
   },
-  "improvement": 2.93,
-  "timestamp": "2025-06-22T19:57:53.223894"
+  "improvement": 2.37,
+  "timestamp": "2025-06-22T20:34:45.317257"
 }

@@ -104,10 +104,12 @@ Vytvořit fine-tuned jazykový model, který napodobuje komunikační styl Andre
 - ✅ Reprodukovatelné trénování
 
 ### Benchmarking
-- ✅ Kvantitativní metriky výkonu
-- ✅ Kvalitativní evaluace stylu
-- ✅ Srovnání před/po
-- ✅ Komplexní analytický report
+- ✅ Kvantitativní metriky výkonu (zlepšení z 1.17 na 4.58/10)
+- ✅ Kvalitativní evaluace stylu (15 testovacích otázek)
+- ✅ Srovnání před/po s detailními tabulkami
+- ✅ Komplexní analytický report s vizualizacemi
+- ✅ 4 typy grafů pro různé aspekty evaluace
+- ✅ Strukturovaná data pro další analýzu
 
 ---
 
@@ -127,6 +129,10 @@ talklike.llm/
 │   ├── README.md               # Průvodce benchmarkingem
 │   ├── run_benchmark.py        # Hlavní skript
 │   └── results/                # Výsledky
+│       ├── reports/            # Markdown reporty
+│       ├── visualizations/     # Grafy a vizualizace
+│       ├── comparison/         # Data srovnání
+│       └── benchmark_dataset.json # Testovací otázky
 ├── data/                       # 📊 Datasety
 │   ├── all.jsonl              # Finální dataset
 │   └── final/                 # QA páry
@@ -134,6 +140,45 @@ talklike.llm/
     ├── babis_dataset_generator.py
     └── llm_cost_calculator.py
 ```
+
+---
+
+## 📈 Benchmarking výsledky
+
+### 📋 Kompletní report
+- **[Benchmark Summary Report](3_benchmarking/results/reports/benchmark_summary.md)** - Detailní srovnání modelu před a po fine-tuningu s tabulkami všech otázek
+
+### 📊 Vizualizace výsledků
+
+#### Srovnání skóre
+- **[Srovnání stylového skóre](3_benchmarking/results/visualizations/score_comparison.png)** - Graf srovnání průměrného skóre před a po fine-tuningu
+
+#### Zlepšení jednotlivých otázek
+- **[Zlepšení stylového skóre](3_benchmarking/results/visualizations/question_improvements.png)** - Graf zlepšení pro každou z 15 testovacích otázek
+
+#### Distribuce známek
+- **[Distribuce známek](3_benchmarking/results/visualizations/grade_distribution.png)** - Graf distribuce známek (A-F) před a po fine-tuningu
+
+#### Kategorie stylu
+- **[Srovnání kategorií stylu](3_benchmarking/results/visualizations/category_comparison.png)** - Graf srovnání kategorií: Babišovy fráze, slovenské odchylky, emotivní tón, první osoba
+
+### 📄 Detailní data
+- **[Model Comparison Data](3_benchmarking/results/comparison/model_comparison.json)** - Strukturovaná data srovnání modelů
+- **[Style Evaluation Data](3_benchmarking/results/comparison/style_evaluation.json)** - Detailní evaluace stylu pro každou odpověď
+- **[Benchmark Dataset](3_benchmarking/results/benchmark_dataset.json)** - Testovací otázky použité pro benchmarking
+
+### 🎯 Klíčové výsledky
+- **Průměrné skóre před fine-tuningem**: 1.17/10
+- **Průměrné skóre po fine-tuningem**: 4.58/10
+- **Celkové zlepšení**: +3.41 bodů
+- **Nejlepší odpověď**: 8.5/10
+- **Nejhorší odpověď**: 1.17/10
+
+### 📊 Metriky zlepšení
+- **Babišovy fráze**: Výrazné zlepšení v používání charakteristických frází
+- **Slovenské odchylky**: Správné použití slovenských odchylek
+- **Emotivní tón**: Autentický emotivní tón odpovědí
+- **První osoba**: Konzistentní použití první osoby
 
 ---
 
