@@ -27,6 +27,41 @@ def generate_response(model, tokenizer, prompt, max_length=200):
             pad_token_id=tokenizer.pad_token_id
         )
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    
+    # Vylepšené odstranění původního promptu z odpovědi
+    if hasattr(tokenizer, 'apply_chat_template'):
+        # Pro chat template - hledáme konec assistant tagu
+        assistant_start = response.find("<|assistant|>")
+        if assistant_start != -1:
+            # Najdeme konec assistant tagu a začátek odpovědi
+            response_start = assistant_start + len("<|assistant|>")
+            response = response[response_start:].strip()
+        else:
+            # Fallback - odstraníme formatted_prompt pokud je na začátku
+            if response.startswith(formatted_prompt):
+                response = response[len(formatted_prompt):].strip()
+    else:
+        # Pro běžné prompty - odstraníme původní prompt
+        if response.startswith(formatted_prompt):
+            response = response[len(formatted_prompt):].strip()
+    
+    # Další cleanup - odstranění možných zbytků promptu
+    # Hledáme běžné vzory, které by mohly zůstat
+    cleanup_patterns = [
+        prompt,  # Původní prompt
+        f"User: {prompt}",  # S User prefixem
+        f"Human: {prompt}",  # S Human prefixem
+        f"<|user|>\n{prompt}",  # S user tagem
+    ]
+    
+    for pattern in cleanup_patterns:
+        if response.startswith(pattern):
+            response = response[len(pattern):].strip()
+            break
+    
+    # Odstranění prázdných řádků na začátku
+    response = response.lstrip('\n').strip()
+    
     return response
 
 def test_model(model, tokenizer, test_prompts=None):
@@ -48,9 +83,20 @@ def test_model(model, tokenizer, test_prompts=None):
         print("⚠️ Tokenizer nepodporuje apply_chat_template, používá se přímé formátování")
     
     for prompt in test_prompts:
-        print(f"\nPrompt: {prompt}")
+        print(f"\n🔍 Prompt: {prompt}")
+        
+        # Debug: Zobrazení formatted promptu
+        if hasattr(tokenizer, 'apply_chat_template'):
+            messages = [{"role": "user", "content": prompt}]
+            formatted_prompt = tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+            print(f"🔧 Formatted prompt: {formatted_prompt[:100]}...")
+        
         response = generate_response(model, tokenizer, prompt)
-        print(f"Odpověď: {response}")
+        print(f"🎭 Odpověď: {response}")
         print("-" * 30)
     
     return test_prompts

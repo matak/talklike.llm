@@ -105,10 +105,24 @@ Odpovídej vždy v první osobě jako Andrej Babiš, používej jeho charakteris
             max_length=300, temperature=0.8
         )
         
-        # Vyčištění odpovědi
+        # Vylepšené vyčištění odpovědi
         response = response.strip()
-        if response.startswith("Otázka:"):
-            response = response[response.find("[/INST]") + 7:].strip()
+        
+        # Odstranění možných zbytků promptu
+        cleanup_patterns = [
+            f"Otázka: {question}",
+            f"Otázka: {question} [/INST]",
+            f"<s>[INST] Otázka: {question} [/INST]",
+            question,  # Původní otázka
+        ]
+        
+        for pattern in cleanup_patterns:
+            if response.startswith(pattern):
+                response = response[len(pattern):].strip()
+                break
+        
+        # Odstranění prázdných řádků na začátku
+        response = response.lstrip('\n').strip()
         
         return response if response else "Omlouvám se, nemohu odpovědět."
         

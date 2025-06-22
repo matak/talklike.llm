@@ -166,15 +166,6 @@ def generate_local_response(model, tokenizer, prompt, max_length=300, temperatur
             # Fallback pro tokenizery bez apply_chat_template
             formatted_prompt = prompt
 
-        # Debug: Zobrazení formatted promptu
-        print(f"🔍 DEBUG: Formatted prompt:")
-        print(f"   Délka: {len(formatted_prompt)} znaků")
-        print(f"   Obsah: {formatted_prompt[:200]}...")
-        if len(formatted_prompt) > 200:
-            print(f"   ...{formatted_prompt[-100:]}")
-        print(f"   Používá apply_chat_template: {hasattr(tokenizer, 'apply_chat_template')}")
-        print("-" * 50)
-        
         # Tokenizace vstupu
         inputs = tokenizer(
             formatted_prompt,
@@ -203,14 +194,6 @@ def generate_local_response(model, tokenizer, prompt, max_length=300, temperatur
         # Dekódování odpovědi
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
-        # Debug: Zobrazení původní odpovědi
-        print(f"🔍 DEBUG: Původní odpověď:")
-        print(f"   Délka: {len(response)} znaků")
-        print(f"   Obsah: {response[:300]}...")
-        if len(response) > 300:
-            print(f"   ...{response[-100:]}")
-        print("-" * 50)
-        
         # Vylepšené odstranění původního promptu z odpovědi
         if hasattr(tokenizer, 'apply_chat_template'):
             # Pro chat template - hledáme konec assistant tagu
@@ -219,17 +202,14 @@ def generate_local_response(model, tokenizer, prompt, max_length=300, temperatur
                 # Najdeme konec assistant tagu a začátek odpovědi
                 response_start = assistant_start + len("<|assistant|>")
                 response = response[response_start:].strip()
-                print(f"🔧 DEBUG: Nalezen <|assistant|> tag, odstraněn prompt")
             else:
                 # Fallback - odstraníme formatted_prompt pokud je na začátku
                 if response.startswith(formatted_prompt):
                     response = response[len(formatted_prompt):].strip()
-                    print(f"🔧 DEBUG: Odstraněn formatted_prompt")
         else:
             # Pro běžné prompty - odstraníme původní prompt
             if response.startswith(formatted_prompt):
                 response = response[len(formatted_prompt):].strip()
-                print(f"🔧 DEBUG: Odstraněn formatted_prompt")
         
         # Další cleanup - odstranění možných zbytků promptu
         # Hledáme běžné vzory, které by mohly zůstat
@@ -243,17 +223,10 @@ def generate_local_response(model, tokenizer, prompt, max_length=300, temperatur
         for pattern in cleanup_patterns:
             if response.startswith(pattern):
                 response = response[len(pattern):].strip()
-                print(f"🔧 DEBUG: Odstraněn pattern: {pattern[:50]}...")
                 break
         
         # Odstranění prázdných řádků na začátku
         response = response.lstrip('\n').strip()
-        
-        # Debug: Zobrazení finální odpovědi
-        print(f"🔍 DEBUG: Finální odpověď:")
-        print(f"   Délka: {len(response)} znaků")
-        print(f"   Obsah: {response[:200]}...")
-        print("-" * 50)
         
         return response
         

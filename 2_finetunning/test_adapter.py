@@ -111,9 +111,39 @@ def generate_response(model, tokenizer, prompt, max_length=512, temperature=0.7)
         # Dekódování odpovědi
         response = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
-        # Odstranění původního promptu z odpovědi
-        if response.startswith(formatted_prompt):
-            response = response[len(formatted_prompt):].strip()
+        # Vylepšené odstranění původního promptu z odpovědi
+        if hasattr(tokenizer, 'apply_chat_template'):
+            # Pro chat template - hledáme konec assistant tagu
+            assistant_start = response.find("<|assistant|>")
+            if assistant_start != -1:
+                # Najdeme konec assistant tagu a začátek odpovědi
+                response_start = assistant_start + len("<|assistant|>")
+                response = response[response_start:].strip()
+            else:
+                # Fallback - odstraníme formatted_prompt pokud je na začátku
+                if response.startswith(formatted_prompt):
+                    response = response[len(formatted_prompt):].strip()
+        else:
+            # Pro běžné prompty - odstraníme původní prompt
+            if response.startswith(formatted_prompt):
+                response = response[len(formatted_prompt):].strip()
+        
+        # Další cleanup - odstranění možných zbytků promptu
+        # Hledáme běžné vzory, které by mohly zůstat
+        cleanup_patterns = [
+            prompt,  # Původní prompt
+            f"User: {prompt}",  # S User prefixem
+            f"Human: {prompt}",  # S Human prefixem
+            f"<|user|>\n{prompt}",  # S user tagem
+        ]
+        
+        for pattern in cleanup_patterns:
+            if response.startswith(pattern):
+                response = response[len(pattern):].strip()
+                break
+        
+        # Odstranění prázdných řádků na začátku
+        response = response.lstrip('\n').strip()
         
         return response
         
