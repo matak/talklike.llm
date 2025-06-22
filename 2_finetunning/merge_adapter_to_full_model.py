@@ -63,41 +63,68 @@ def merge_adapter_to_full_model(adapter_path, base_model_name, output_path, hub_
         print("🔄 Provádím merge_and_unload...")
         merged_model = model.merge_and_unload()
         
-        # Kontrola místa před uložením
-        print("💾 Kontroluji dostupné místo...")
-        from lib.disk_manager import DiskManager
-        dm = DiskManager()
-        
-        # Zajistíme, že output_path je na network storage
-        if not output_path.startswith('/workspace'):
-            output_path = f'/workspace/{output_path.lstrip("./")}'
-        
-        # Kontrola místa na network storage
-        if not dm.check_disk_space('/workspace', threshold=90):
-            print("⚠️ Málo místa na network storage, zkouším vyčištění...")
-            dm.cleanup_cache()
-            
-            if not dm.check_disk_space('/workspace', threshold=90):
-                print("❌ Nedost místa pro uložení kompletního modelu")
-                print("💡 Kompletní Mistral-7B model potřebuje ~14GB místa")
-                return False
-        
-        # Uložení kompletního modelu
-        print(f"💾 Ukládám kompletní model do: {output_path}")
-        os.makedirs(output_path, exist_ok=True)
-        
-        merged_model.save_pretrained(output_path)
-        tokenizer.save_pretrained(output_path)
-        
         # Nahrání na HF Hub (pokud je specifikováno)
         if hub_model_id and token:
-            print("📤 Nahrávám kompletní model na HF Hub...")
-            merged_model.push_to_hub(hub_model_id, token=token)
-            tokenizer.push_to_hub(hub_model_id, token=token)
+            print("📤 Nahrávám kompletní model přímo na HF Hub...")
+            print("💡 Používám dočasné umístění s více místem")
+            
+            # Použijeme /tmp pro dočasné uložení (má více místa)
+            import tempfile
+            with tempfile.TemporaryDirectory(dir="/tmp") as temp_dir:
+                print(f"📁 Dočasné umístění: {temp_dir}")
+                
+                # Uložení do dočasného adresáře
+                print("💾 Ukládám do dočasného adresáře...")
+                merged_model.save_pretrained(
+                    temp_dir,
+                    max_shard_size="2GB",
+                    safe_serialization=True
+                )
+                tokenizer.save_pretrained(temp_dir)
+                
+                # Nahrání na HF Hub
+                print("📤 Nahrávám na HF Hub...")
+                merged_model.push_to_hub(
+                    hub_model_id, 
+                    token=token,
+                    max_shard_size="2GB",
+                    safe_serialization=True
+                )
+                tokenizer.push_to_hub(hub_model_id, token=token)
+                
             print(f"✅ Kompletní model nahrán: https://huggingface.co/{hub_model_id}")
+        else:
+            # Kontrola místa před uložením (pouze pokud není HF Hub)
+            print("💾 Kontroluji dostupné místo...")
+            from lib.disk_manager import DiskManager
+            dm = DiskManager()
+            
+            # Zajistíme, že output_path je na network storage
+            if not output_path.startswith('/workspace'):
+                output_path = f'/workspace/{output_path.lstrip("./")}'
+            
+            # Kontrola místa na network storage
+            if not dm.check_disk_space('/workspace', threshold=90):
+                print("⚠️ Málo místa na network storage, zkouším vyčištění...")
+                dm.cleanup_cache()
+                
+                if not dm.check_disk_space('/workspace', threshold=90):
+                    print("❌ Nedost místa pro uložení kompletního modelu")
+                    print("💡 Kompletní Mistral-7B model potřebuje ~14GB místa")
+                    return False
+            
+            # Uložení kompletního modelu
+            print(f"💾 Ukládám kompletní model do: {output_path}")
+            os.makedirs(output_path, exist_ok=True)
+            
+            merged_model.save_pretrained(output_path)
+            tokenizer.save_pretrained(output_path)
         
         print(f"✅ Kompletní model úspěšně vytvořen!")
-        print(f"📁 Uložen v: {output_path}")
+        if hub_model_id:
+            print(f"🌐 Dostupný na: https://huggingface.co/{hub_model_id}")
+        else:
+            print(f"📁 Uložen v: {output_path}")
         
         # Výpis velikosti modelu
         model_size = sum(p.numel() for p in merged_model.parameters())
