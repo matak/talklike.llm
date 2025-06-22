@@ -88,24 +88,9 @@ def generate_real_response(model, tokenizer, question: str, model_type: str) -> 
     """Generuje skutečnou odpověď pomocí modelu"""
     
     try:
-        if model_type == "finetuned":
-            # Pro fine-tuned model použijeme system prompt
-            system_prompt = """Jsi Andrej Babiš, český politik a podnikatel. Tvým úkolem je odpovídat na otázky v charakteristickém Babišově stylu.
-
-Charakteristické prvky tvého stylu:
-- Typické fráze: "Hele, ...", "To je skandál!", "Já makám", "Opozice krade", "V Bruselu"
-- Slovenské odchylky: "sme", "som", "makáme", "centralizácia"
-- Emotivní výrazy: "to je šílený!", "tragédyje!", "kampááň!"
-- Přirovnání: "jak když kráva hraje na klavír", "jak když dítě řídí tank"
-- První osoba: "Já jsem...", "Moje rodina...", "Já makám..."
-
-Odpovídej vždy v první osobě jako Andrej Babiš, používej jeho charakteristické fráze, buď emotivní a přímý."""
-
-            prompt = f"<s>[INST] {system_prompt}\n\nOtázka: {question} [/INST]"
-            
-        else:  # base model
-            # Pro základní model použijeme jednoduchý prompt
-            prompt = f"<s>[INST] Otázka: {question} [/INST]"
+        # OBA modely používají stejný jednoduchý prompt bez system promptu
+        # Tím testujeme skutečný fine-tuning, ne prompt engineering
+        prompt = f"<s>[INST] {question} [/INST]"
         
         # Generování odpovědi pomocí modelu
         inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
@@ -128,10 +113,8 @@ Odpovídej vždy v první osobě jako Andrej Babiš, používej jeho charakteris
         
         # Odstranění možných zbytků promptu
         cleanup_patterns = [
-            f"Otázka: {question}",
-            f"Otázka: {question} [/INST]",
-            f"<s>[INST] Otázka: {question} [/INST]",
             question,  # Původní otázka
+            f"<s>[INST] {question} [/INST]",
         ]
         
         for pattern in cleanup_patterns:
@@ -147,62 +130,6 @@ Odpovídej vždy v první osobě jako Andrej Babiš, používej jeho charakteris
     except Exception as e:
         print(f"❌ Chyba při generování odpovědi: {e}")
         return f"Chyba při generování: {str(e)}"
-
-def generate_mock_response(question: str, model_type: str) -> str:
-    """Generuje mock odpověď pro testovací účely (fallback)"""
-    
-    # Základní Babišovy fráze
-    babis_phrases = [
-        "Hele,", "To je skandál!", "Já makám", "Opozice krade", 
-        "V Bruselu", "Moje rodina", "Já jsem to nečetl"
-    ]
-    
-    # Slovenské odchylky
-    slovak_phrases = [
-        "sme", "som", "makáme", "centralizácia", "efektivizácia"
-    ]
-    
-    # Přirovnání
-    comparisons = [
-        "jak když kráva hraje na klavír",
-        "jak když dítě řídí tank",
-        "jak když slepice hraje šachy",
-        "jak když ryba jezdí na kole"
-    ]
-    
-    # Emotivní výrazy
-    emotional_phrases = [
-        "to je šílený!", "tragédyje!", "kampááň!", "hrozné!"
-    ]
-    
-    if model_type == "base":
-        # Před fine-tuningem - méně Babišův styl
-        responses = [
-            f"Inflace je vážný problém, který postihuje všechny občany.",
-            f"Opozice má právo na kritiku, ale měla by být konstruktivní.",
-            f"Rodina je důležitá hodnota pro každého člověka.",
-            f"Podnikání vyžaduje zodpovědný přístup a dodržování pravidel.",
-            f"Evropské instituce mají své místo v moderní společnosti."
-        ]
-        return random.choice(responses)
-    
-    else:  # finetuned
-        # Po fine-tuningem - autentický Babišův styl
-        base_response = random.choice(babis_phrases)
-        
-        # Přidání slovenské odchylky (15% pravděpodobnost)
-        if random.random() < 0.15:
-            base_response += f" {random.choice(slovak_phrases)}"
-        
-        # Přidání přirovnání (30% pravděpodobnost)
-        if random.random() < 0.3:
-            base_response += f" {random.choice(comparisons)}"
-        
-        # Přidání emotivního výrazu (40% pravděpodobnost)
-        if random.random() < 0.4:
-            base_response += f" {random.choice(emotional_phrases)}"
-        
-        return base_response
 
 def generate_responses(model_type: str, output_dir: str):
     """Generuje odpovědi pro daný typ modelu"""
