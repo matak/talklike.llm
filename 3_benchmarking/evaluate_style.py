@@ -141,39 +141,37 @@ def evaluate_all_responses():
     
     # Evaluace před fine-tuningem
     before_results = []
-    if os.path.exists("results/before_finetune/responses.json"):
-        print("📊 Evaluuji odpovědi před fine-tuningem...")
-        with open("results/before_finetune/responses.json", "r", encoding="utf-8") as f:
-            before_data = json.load(f)
-        
-        for item in before_data:
-            evaluation = evaluator.evaluate_babis_style(item["response"])
-            before_results.append({
-                "question": item["question"],
-                "response": item["response"],
-                "evaluation": evaluation
-            })
-        print(f"✅ Evaluováno {len(before_results)} odpovědí před fine-tuningem")
+    print("📊 Evaluuji odpovědi před fine-tuningem...")
+    with open("results/before_finetune/responses.json", "r", encoding="utf-8") as f:
+        before_data = json.load(f)
+    
+    for item in before_data:
+        evaluation = evaluator.evaluate_babis_style(item["response"])
+        before_results.append({
+            "question": item["question"],
+            "response": item["response"],
+            "evaluation": evaluation
+        })
+    print(f"✅ Evaluováno {len(before_results)} odpovědí před fine-tuningem")
     
     # Evaluace po fine-tuningem
     after_results = []
-    if os.path.exists("results/after_finetune/responses.json"):
-        print("📊 Evaluuji odpovědi po fine-tuningem...")
-        with open("results/after_finetune/responses.json", "r", encoding="utf-8") as f:
-            after_data = json.load(f)
-        
-        for item in after_data:
-            evaluation = evaluator.evaluate_babis_style(item["response"])
-            after_results.append({
-                "question": item["question"],
-                "response": item["response"],
-                "evaluation": evaluation
-            })
-        print(f"✅ Evaluováno {len(after_results)} odpovědí po fine-tuningem")
+    print("📊 Evaluuji odpovědi po fine-tuningem...")
+    with open("results/after_finetune/responses.json", "r", encoding="utf-8") as f:
+        after_data = json.load(f)
+    
+    for item in after_data:
+        evaluation = evaluator.evaluate_babis_style(item["response"])
+        after_results.append({
+            "question": item["question"],
+            "response": item["response"],
+            "evaluation": evaluation
+        })
+    print(f"✅ Evaluováno {len(after_results)} odpovědí po fine-tuningem")
     
     # Výpočet průměrných skóre
-    before_avg = sum(r["evaluation"]["total_score"] for r in before_results) / len(before_results) if before_results else 0
-    after_avg = sum(r["evaluation"]["total_score"] for r in after_results) / len(after_results) if after_results else 0
+    before_avg = sum(r["evaluation"]["total_score"] for r in before_results) / len(before_results)
+    after_avg = sum(r["evaluation"]["total_score"] for r in after_results) / len(after_results)
     
     # Uložení výsledků
     results = {

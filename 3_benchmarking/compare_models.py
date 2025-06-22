@@ -7,7 +7,6 @@ Porovnává výkon před a po fine-tuningu
 
 import json
 import os
-import pandas as pd
 from datetime import datetime
 from typing import Dict, List
 
@@ -27,47 +26,44 @@ def compare_models():
     }
     
     # Načtení odpovědí před fine-tuningem
-    if os.path.exists("results/before_finetune/responses.json"):
-        with open("results/before_finetune/responses.json", "r", encoding="utf-8") as f:
-            before_data = json.load(f)
-        
-        comparison_results["before_finetune"] = {
-            "responses": before_data,
-            "count": len(before_data)
-        }
-        print(f"✅ Načteno {len(before_data)} odpovědí před fine-tuningem")
+    with open("results/before_finetune/responses.json", "r", encoding="utf-8") as f:
+        before_data = json.load(f)
+    
+    comparison_results["before_finetune"] = {
+        "responses": before_data,
+        "count": len(before_data)
+    }
+    print(f"✅ Načteno {len(before_data)} odpovědí před fine-tuningem")
     
     # Načtení odpovědí po fine-tuningem
-    if os.path.exists("results/after_finetune/responses.json"):
-        with open("results/after_finetune/responses.json", "r", encoding="utf-8") as f:
-            after_data = json.load(f)
-        
-        comparison_results["after_finetune"] = {
-            "responses": after_data,
-            "count": len(after_data)
-        }
-        print(f"✅ Načteno {len(after_data)} odpovědí po fine-tuningem")
+    with open("results/after_finetune/responses.json", "r", encoding="utf-8") as f:
+        after_data = json.load(f)
+    
+    comparison_results["after_finetune"] = {
+        "responses": after_data,
+        "count": len(after_data)
+    }
+    print(f"✅ Načteno {len(after_data)} odpovědí po fine-tuningem")
     
     # Výpočet metrik
-    if before_data and after_data:
-        metrics = calculate_comparison_metrics(before_data, after_data)
-        comparison_results["improvement"] = metrics
-        
-        print(f"\n📈 Metriky srovnání:")
-        print(f"   Průměrná délka odpovědi:")
-        print(f"     Před: {metrics['avg_length_before']:.1f} znaků")
-        print(f"     Po: {metrics['avg_length_after']:.1f} znaků")
-        print(f"     Změna: {metrics['length_change']:+.1f} znaků")
-        
-        print(f"   Použití Babišových frází:")
-        print(f"     Před: {metrics['babis_phrases_before']:.1f} frází/odpověď")
-        print(f"     Po: {metrics['babis_phrases_after']:.1f} frází/odpověď")
-        print(f"     Zlepšení: {metrics['babis_phrases_improvement']:+.1f} frází")
-        
-        print(f"   Slovenské odchylky:")
-        print(f"     Před: {metrics['slovak_words_before']:.1f} slov/odpověď")
-        print(f"     Po: {metrics['slovak_words_after']:.1f} slov/odpověď")
-        print(f"     Zlepšení: {metrics['slovak_words_improvement']:+.1f} slov")
+    metrics = calculate_comparison_metrics(before_data, after_data)
+    comparison_results["improvement"] = metrics
+    
+    print(f"\n📈 Metriky srovnání:")
+    print(f"   Průměrná délka odpovědi:")
+    print(f"     Před: {metrics['avg_length_before']:.1f} znaků")
+    print(f"     Po: {metrics['avg_length_after']:.1f} znaků")
+    print(f"     Změna: {metrics['length_change']:+.1f} znaků")
+    
+    print(f"   Použití Babišových frází:")
+    print(f"     Před: {metrics['babis_phrases_before']:.1f} frází/odpověď")
+    print(f"     Po: {metrics['babis_phrases_after']:.1f} frází/odpověď")
+    print(f"     Zlepšení: {metrics['babis_phrases_improvement']:+.1f} frází")
+    
+    print(f"   Slovenské odchylky:")
+    print(f"     Před: {metrics['slovak_words_before']:.1f} slov/odpověď")
+    print(f"     Po: {metrics['slovak_words_after']:.1f} slov/odpověď")
+    print(f"     Zlepšení: {metrics['slovak_words_improvement']:+.1f} slov")
     
     # Uložení výsledků srovnání
     with open("results/comparison/model_comparison.json", "w", encoding="utf-8") as f:
@@ -148,16 +144,8 @@ def calculate_comparison_metrics(before_data: List, after_data: List) -> Dict:
 def create_comparison_table():
     """Vytvoří tabulku pro srovnání"""
     
-    if not os.path.exists("results/comparison/model_comparison.json"):
-        print("❌ Nejsou k dispozici data pro srovnání")
-        return None
-    
     with open("results/comparison/model_comparison.json", "r", encoding="utf-8") as f:
         comparison_data = json.load(f)
-    
-    if "improvement" not in comparison_data:
-        print("❌ Chybí metriky srovnání")
-        return None
     
     metrics = comparison_data["improvement"]
     
@@ -189,16 +177,52 @@ def create_comparison_table():
         ]
     }
     
-    df = pd.DataFrame(table_data)
+    # Vytvoření tabulky bez pandas
+    headers = ["Metrika", "Před fine-tuningem", "Po fine-tuningem", "Zlepšení"]
+    rows = []
+    for i in range(len(table_data["Metrika"])):
+        row = [
+            table_data["Metrika"][i],
+            table_data["Před fine-tuningem"][i],
+            table_data["Po fine-tuningem"][i],
+            table_data["Zlepšení"][i]
+        ]
+        rows.append(row)
     
-    # Uložení jako Excel
-    # excel_file = "results/reports/comparison_table.xlsx"
-    # df.to_excel(excel_file, index=False)
+    # Výpočet šířky sloupců
+    col_widths = []
+    for header in headers:
+        col_widths.append(len(header))
     
-    print(f"📊 Tabulka srovnání uložena:")
-    print(df.to_string(index=False))
+    for row in rows:
+        for i, cell in enumerate(row):
+            col_widths[i] = max(col_widths[i], len(cell))
     
-    return df
+    # Vytvoření tabulky
+    table_lines = []
+    
+    # Hlavička
+    header_line = "|"
+    separator_line = "|"
+    for i, header in enumerate(headers):
+        header_line += f" {header:<{col_widths[i]}} |"
+        separator_line += f" {'-' * col_widths[i]} |"
+    table_lines.append(header_line)
+    table_lines.append(separator_line)
+    
+    # Řádky dat
+    for row in rows:
+        data_line = "|"
+        for i, cell in enumerate(row):
+            data_line += f" {cell:<{col_widths[i]}} |"
+        table_lines.append(data_line)
+    
+    table_text = "\n".join(table_lines)
+    
+    print(f"📊 Tabulka srovnání:")
+    print(table_text)
+    
+    return table_data
 
 if __name__ == "__main__":
     # Test srovnání modelů
@@ -207,18 +231,13 @@ if __name__ == "__main__":
     # Nejdříve vygenerovat testovací data
     from generate_responses import generate_responses
     
-    if not os.path.exists("results/before_finetune/responses.json"):
-        generate_responses("base", "results/before_finetune/")
-    
-    if not os.path.exists("results/after_finetune/responses.json"):
-        generate_responses("finetuned", "results/after_finetune/")
+    generate_responses("base", "results/before_finetune/")
+    generate_responses("finetuned", "results/after_finetune/")
     
     # Spustit srovnání
     results = compare_models()
     
     # Vytvořit tabulku
-    table = create_comparison_table()
+    table_data = create_comparison_table()
     
-    if table is not None:
-        print("\n📋 Tabulka srovnání:")
-        print(table.to_string(index=False)) 
+    print("\n📋 Tabulka srovnání vytvořena") 

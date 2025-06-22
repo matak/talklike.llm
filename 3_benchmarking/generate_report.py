@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 Generování reportů pro TalkLike.LLM
-Vytváří Excel tabulky, PDF reporty a vizualizace
+Vytváří markdown reporty a vizualizace
 """
 
 import json
 import os
-import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
@@ -35,7 +34,7 @@ def generate_final_report(comparison_results: Dict = None):
     print("✅ Finální report vygenerován")
 
 def load_comparison_data() -> Dict:
-    """Načte data pro srovnání"""
+    """Načte data pro report z JSON souborů"""
     
     data_files = [
         "results/comparison/model_comparison.json",
@@ -45,12 +44,11 @@ def load_comparison_data() -> Dict:
     combined_data = {}
     
     for file_path in data_files:
-        if os.path.exists(file_path):
-            with open(file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                combined_data[os.path.basename(file_path).replace(".json", "")] = data
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            combined_data[os.path.basename(file_path).replace(".json", "")] = data
     
-    return combined_data if combined_data else None
+    return combined_data
 
 def create_markdown_report(comparison_results: Dict):
     """Vytvoří markdown report s tabulkami a shrnutím"""

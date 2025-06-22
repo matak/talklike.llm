@@ -23,113 +23,100 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 sys.path.append('../2_finetunning')
 from tokenizer_utils import setup_tokenizer_and_model
 
-# Nastavení MODEL_AVAILABLE na True, protože budeme používat reálný model
-MODEL_AVAILABLE = True
-print("✅ Reálný model bude načítán z Hugging Face")
-
 def load_benchmark_model(model_type: str):
     """Načte model pro benchmarking"""
-    if not MODEL_AVAILABLE:
-        print("❌ Model není dostupný - MODEL_AVAILABLE = False")
-        return None, None
     
-    try:
-        if model_type == "finetuned":
-            # Reálný fine-tuned model z Hugging Face
-            model_path = "mcmatak/mistral-babis-model"
-            
-            print(f"🤖 Načítám reálný fine-tuned model...")
-            print(f"   Model: {model_path}")
-            
-            # Načtení tokenizeru a modelu
-            tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-            model = AutoModelForCausalLM.from_pretrained(
-                model_path,
-                torch_dtype=torch.float16,
-                device_map="auto",
-                trust_remote_code=True
-            )
-            
-            # Nastavení pad tokenu
-            if tokenizer.pad_token is None:
-                tokenizer.pad_token = tokenizer.eos_token
-            
-            model.eval()
-            
-        elif model_type == "base":
-            # Základní model bez fine-tuningu
-            base_model = "mistralai/Mistral-7B-Instruct-v0.3"
-            
-            print(f"🤖 Načítám základní model...")
-            print(f"   Base model: {base_model}")
-            
-            tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
-            model = AutoModelForCausalLM.from_pretrained(
-                base_model,
-                torch_dtype=torch.float16,
-                device_map="auto",
-                trust_remote_code=True
-            )
-            
-            # Použití centralizované funkce pro nastavení pad_tokenu
-            tokenizer, model = setup_tokenizer_and_model(base_model, model)
-            model.eval()
-            
-        else:
-            raise ValueError(f"Neznámý typ modelu: {model_type}")
+    if model_type == "finetuned":
+        # Reálný fine-tuned model z Hugging Face
+        model_path = "mcmatak/mistral-babis-model"
         
-        return model, tokenizer
+        print(f"🤖 Načítám reálný fine-tuned model...")
+        print(f"   Model: {model_path}")
         
-    except Exception as e:
-        print(f"❌ Chyba při načítání modelu {model_type}: {e}")
-        return None, None
+        # Načtení tokenizeru a modelu
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            torch_dtype=torch.float16,
+            device_map="auto",
+            trust_remote_code=True
+        )
+        
+        # Nastavení pad tokenu
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+        
+        model.eval()
+        
+    elif model_type == "base":
+        # Základní model bez fine-tuningu
+        base_model = "mistralai/Mistral-7B-Instruct-v0.3"
+        
+        print(f"🤖 Načítám základní model...")
+        print(f"   Base model: {base_model}")
+        
+        tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
+        model = AutoModelForCausalLM.from_pretrained(
+            base_model,
+            torch_dtype=torch.float16,
+            device_map="auto",
+            trust_remote_code=True
+        )
+        
+        # Použití centralizované funkce pro nastavení pad_tokenu
+        tokenizer, model = setup_tokenizer_and_model(base_model, model)
+        model.eval()
+        
+    else:
+        raise ValueError(f"Neznámý typ modelu: {model_type}")
+    
+    return model, tokenizer
 
 def generate_real_response(model, tokenizer, question: str, model_type: str) -> str:
     """Generuje skutečnou odpověď pomocí modelu"""
     
-    try:
-        # OBA modely používají stejný jednoduchý prompt bez system promptu
-        # Tím testujeme skutečný fine-tuning, ne prompt engineering
-        prompt = f"<s>[INST] {question} [/INST]"
-        
-        # Generování odpovědi pomocí modelu
-        inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
-        
-        with torch.no_grad():
-            outputs = model.generate(
-                **inputs,
-                max_length=300,
-                temperature=0.8,
-                do_sample=True,
-                pad_token_id=tokenizer.eos_token_id,
-                eos_token_id=tokenizer.eos_token_id
-            )
-        
-        # Dekódování odpovědi
-        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        
-        # Vylepšené vyčištění odpovědi
-        response = response.strip()
-        
-        # Odstranění možných zbytků promptu
-        cleanup_patterns = [
-            question,  # Původní otázka
-            f"<s>[INST] {question} [/INST]",
-        ]
-        
-        for pattern in cleanup_patterns:
-            if response.startswith(pattern):
-                response = response[len(pattern):].strip()
-                break
-        
-        # Odstranění prázdných řádků na začátku
-        response = response.lstrip('\n').strip()
-        
-        return response if response else "Omlouvám se, nemohu odpovědět."
-        
-    except Exception as e:
-        print(f"❌ Chyba při generování odpovědi: {e}")
-        return f"Chyba při generování: {str(e)}"
+    # Použití apply_chat_template pro správné formátování
+    messages = [{"role": "user", "content": question}]
+    prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    
+    # Generování odpovědi pomocí modelu
+    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512)
+    
+    # Přesun input tensors na stejné zařízení jako model
+    device = next(model.parameters()).device
+    inputs = {k: v.to(device) for k, v in inputs.items()}
+    
+    with torch.no_grad():
+        outputs = model.generate(
+            **inputs,
+            max_length=300,
+            temperature=0.8,
+            do_sample=True,
+            pad_token_id=tokenizer.eos_token_id,
+            eos_token_id=tokenizer.eos_token_id
+        )
+    
+    # Dekódování odpovědi
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    
+    # Vylepšené vyčištění odpovědi
+    response = response.strip()
+    
+    # Odstranění možných zbytků promptu
+    cleanup_patterns = [
+        question,  # Původní otázka
+        prompt,    # Celý prompt
+    ]
+    
+    for pattern in cleanup_patterns:
+        if response.startswith(pattern):
+            response = response[len(pattern):].strip()
+            break
+    
+    # Odstranění prázdných řádků na začátku
+    response = response.lstrip('\n').strip()
+    
+    return response if response else "Omlouvám se, nemohu odpovědět."
 
 def generate_responses(model_type: str, output_dir: str):
     """Generuje odpovědi pro daný typ modelu"""
@@ -137,32 +124,14 @@ def generate_responses(model_type: str, output_dir: str):
     print(f"🤖 Generuji odpovědi pro model: {model_type}")
     
     # Načtení benchmark datasetu
-    if os.path.exists("results/benchmark_dataset.json"):
-        with open("results/benchmark_dataset.json", "r", encoding="utf-8") as f:
-            dataset = json.load(f)
-        
-        questions = dataset.get("questions", [])
-    else:
-        # Fallback na základní otázky
-        questions = [
-            {"id": "Q1", "question": "Pane Babiši, jak hodnotíte současnou inflaci?"},
-            {"id": "Q2", "question": "Co si myslíte o opozici?"},
-            {"id": "Q3", "question": "Jak se vám daří s rodinou?"},
-            {"id": "Q4", "question": "Můžete vysvětlit vaši roli v té chemičce?"},
-            {"id": "Q5", "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?"}
-        ]
+    with open("results/benchmark_dataset.json", "r", encoding="utf-8") as f:
+        dataset = json.load(f)
     
-    # Načtení modelu - VŽDY používáme reálný model
+    questions = dataset.get("questions", [])
+    
+    # Načtení modelu
     print(f"🔧 Načítám reálný model: {model_type}")
     model, tokenizer = load_benchmark_model(model_type)
-    
-    if model is None or tokenizer is None:
-        print(f"❌ Nepodařilo se načíst model {model_type}")
-        print("💡 Zkontrolujte:")
-        print("   - Máte přístup k modelu mcmatak/babis-mistral-adapter?")
-        print("   - Jste přihlášeni na Hugging Face?")
-        print("   - Máte dostatek místa v cache?")
-        raise RuntimeError(f"Model {model_type} se nepodařilo načíst")
     
     print(f"✅ Reálný model načten: {model_type}")
     
@@ -171,7 +140,6 @@ def generate_responses(model_type: str, output_dir: str):
     for i, question in enumerate(questions):
         print(f"   Generuji odpověď {i+1}/{len(questions)}: {question['question'][:50]}...")
         
-        # VŽDY používáme reálný model
         response = generate_real_response(model, tokenizer, question["question"], model_type)
         
         responses.append({
