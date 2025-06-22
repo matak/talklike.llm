@@ -17,7 +17,7 @@ if current_file.parent.name == "3_benchmarking":
     # Spouštěno z rootu: python 3_benchmarking/run_benchmark.py
     project_root = current_file.parent.parent
     benchmark_dir = current_file.parent
-    os.chdir(benchmark_dir)  # Změna do benchmarking adresáře
+    # Zůstáváme v root adresáři
 else:
     # Spouštěno z adresáře 3_benchmarking
     project_root = current_file.parent.parent
