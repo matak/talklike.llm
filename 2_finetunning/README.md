@@ -59,19 +59,24 @@ training_config = {
 # Instalace závislostí
 pip install -r requirements_finetunning.txt
 
-# Nastavení tokenů
-echo "HF_TOKEN=hf_your_token_here" > .env
-echo "WANDB_API_KEY=your_wandb_token_here" >> .env
+# Nastavení environment proměnných
+echo "HF_TOKEN=your_hf_token_here" >> .env
 ```
 
-### 2. Spuštění fine-tuningu
-```bash
-# Rychlý start (doporučeno)
-chmod +x run_finetune.sh
-./run_finetune.sh
+### 2. Spuštění fine-tuning
 
-# Nebo manuálně
-python finetune_babis.py --use_wandb --push_to_hub
+```bash
+# Základní fine-tuning
+python finetune.py --push_to_hub
+
+# Fine-tuning s vlastními parametry
+python finetune.py \
+    --model_name microsoft/DialoGPT-medium \
+    --epochs 3 \
+    --batch_size 2 \
+    --learning_rate 2e-4 \
+    --push_to_hub \
+    --hub_model_id babis-lora
 ```
 
 ### 3. Testování tokenizace
@@ -117,293 +122,105 @@ Dataset v `../data/all.jsonl` má strukturu:
 
 ## 💻 Spuštění na RunPod.io
 
-### 1. Vytvoření podu
-1. Jděte na [runpod.io](https://runpod.io)
-2. Vytvořte nový pod s následujícími specifikacemi:
-   - **GPU**: RTX 4090 nebo A100 (doporučeno)
-   - **RAM**: Minimálně 24GB
-   - **Storage**: Minimálně 50GB
-   - **Template**: PyTorch nebo Jupyter
+### 1. Vytvoření kontejneru
+- Image: `runpod/pytorch:2.1.1-py3.10-cuda12.1.0`
+- GPU: RTX 4090 nebo A100
+- Disk: 50GB+
 
-### 2. Příprava prostředí
+### 2. Nastavení environment proměnných
 ```bash
-# Aktualizace systému
-sudo apt update && sudo apt upgrade -y
+# V kontejneru
+export HF_TOKEN=your_hf_token_here
+```
 
-# Instalace balíčků
-sudo apt install -y git wget curl
-
+### 3. Spuštění
+```bash
 # Klonování repozitáře
-git clone <your-repo-url>
+git clone https://github.com/your-repo/talklike.llm.git
 cd talklike.llm
 
-# Vytvoření .env souboru
-nano .env
-# Přidejte vaše tokeny:
-# HF_TOKEN=hf_your_token_here
-# WANDB_API_KEY=your_wandb_token_here
-
-# Spuštění fine-tuningu
-./run_finetune.sh
+# Spuštění fine-tuning
+bash 2_finetunning/run_finetune.sh
 ```
 
-### 3. Monitorování trénování
-- **W&B Dashboard**: Sledujte metriky na wandb.ai
-- **Jupyter**: Sledujte progress v notebooku
-- **Terminal**: Logy v terminálu
-- **GPU Monitoring**: `nvidia-smi -l 1`
+## 📊 Monitoring
 
----
+Fine-tuning automaticky:
+- ✅ **Loguje metriky** do `/workspace/babis-finetuned/logs/`
+- ✅ **Ukládá checkpointy** každých 500 kroků
+- ✅ **Načítá nejlepší model** na konci trénování
+- ✅ **Exportuje model** na Hugging Face Hub (pokud povoleno)
 
-## 📁 Struktura projektu
+## 🔧 Pokročilé nastavení
 
-```
-2_finetunning/
-├── 📄 Hlavní skripty
-│   ├── finetune_babis.py          # Main fine-tuning script
-│   ├── test_tokenization.py       # Tokenization testing
-│   └── run_finetune.sh            # Fine-tuning shell script
-├── 📄 Alternativní skripty
-│   └── run_mistral_finetune.sh    # Mistral fine-tuning script
-├── 📄 Konfigurace
-│   ├── requirements_finetunning.txt # Python dependencies
-│   └── README_FINETUNE.md         # This file
-├── 📄 Dokumentace
-│   └── RUNPOD_SETUP.md           # RunPod.io instructions
-└── 📄 Výstupy
-    └── babis-llama-finetuned/    # Fine-tuned model
-```
-
----
-
-## ⚙️ Konfigurace
-
-### Základní parametry
+### Optimalizace pro velké modely
 ```bash
-python finetune_babis.py \
-    --data_path ../data/all.jsonl \
-    --output_dir ./babis-llama-finetuned \
-    --epochs 3 \
-    --batch_size 2 \
-    --learning_rate 2e-4 \
+python finetune.py \
+    --model_name mistralai/Mistral-7B-Instruct-v0.2 \
+    --aggressive_cleanup \
+    --batch_size 1 \
     --max_length 2048
 ```
 
-### Pokročilé parametry
-```bash
-python finetune_babis.py \
-    --data_path ../data/all.jsonl \
-    --output_dir ./babis-llama-finetuned \
-    --model_name meta-llama/Meta-Llama-3-8B-Instruct \
-    --epochs 5 \
-    --batch_size 1 \
-    --learning_rate 1e-4 \
-    --max_length 1024 \
-    --use_wandb \
-    --push_to_hub \
-    --hub_model_id your-username/babis-llama-3-8b-lora
+### Vlastní LoRA konfigurace
+Upravte `finetune.py`:
+```python
+lora_config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    inference_mode=False,
+    r=16,  # Zvýšit pro lepší kvalitu
+    lora_alpha=32,
+    lora_dropout=0.1,
+    target_modules=target_modules
+)
 ```
 
-### Parametry pro různé GPU
+## 🐛 Řešení problémů
+
+### Nedostatek místa na disku
 ```bash
-# RTX 4090 (24GB VRAM)
-python finetune_babis.py --batch_size 2 --max_length 2048
+# Automatické vyčištění
+python finetune.py --aggressive_cleanup
 
-# RTX 3090 (24GB VRAM)
-python finetune_babis.py --batch_size 1 --max_length 1024
-
-# A100 (40GB VRAM)
-python finetune_babis.py --batch_size 4 --max_length 2048
+# Manuální vyčištění
+rm -rf /root/.cache/huggingface
+rm -rf /tmp/*
 ```
 
----
-
-## 🔧 Troubleshooting
-
-### Out of Memory (OOM)
+### Chyby při načítání modelu
 ```bash
-# Snižte batch size a max_length
-python finetune_babis.py --batch_size 1 --max_length 1024
+# Použít menší model
+python finetune.py --model_name microsoft/DialoGPT-medium
 
-# Nebo snižte gradient accumulation
-# Upravte v kódu: gradient_accumulation_steps=2
+# Restartovat kontejner
+# Zvýšit velikost root filesystem
 ```
 
-### Pomalé trénování
+### Problémy s tokenizerem
 ```bash
-# Zkontrolujte GPU využití
-nvidia-smi
-
-# Optimalizujte dataloader
-# Upravte num_workers v DataLoader
-```
-
-### Model nekonverguje
-```bash
-# Snižte learning rate
-python finetune_babis.py --learning_rate 1e-4
-
-# Zvyšte počet epoch
-python finetune_babis.py --epochs 5
-
-# Zkontrolujte kvalitu dat
+# Kontrola kompatibility
 python test_tokenization.py
+
+# Použít jiný model
+python finetune.py --model_name microsoft/DialoGPT-large
 ```
 
-### Chyby s tokeny
-```bash
-# Ověřte HF token
-huggingface-cli whoami
+## 📁 Struktura výstupu
 
-# Ověřte W&B token
-wandb login
+```
+/workspace/babis-finetuned/
+├── checkpoint-500/          # Checkpointy
+├── checkpoint-1000/
+├── logs/                    # Logy trénování
+├── pytorch_model.bin        # Finální model
+├── config.json             # Konfigurace
+├── tokenizer.json          # Tokenizer
+└── adapter_config.json     # LoRA konfigurace
 ```
 
----
+## 🔗 Užitečné odkazy
 
-## 📈 Očekávané výsledky
-
-### Metriky výkonu
-Po fine-tuningu by model měl dosáhnout:
-- **Training Loss**: < 1.0 po 3 epochách
-- **Validation Loss**: < 1.2
-- **Perplexity**: < 2.0
-- **Stylová konzistence**: > 85%
-
-### Kvalitativní evaluace
-Model by měl:
-- ✅ Mluvit stylem Andreje Babiše
-- ✅ Používat charakteristické fráze
-- ✅ Odpovídat v první osobě
-- ✅ Přidávat podpis "Andrej Babiš"
-- ✅ Obsahovat slovenské odchylky
-
-### Testovací prompty
-```python
-test_prompts = [
-    "Pane Babiši, jak hodnotíte současnou inflaci?",
-    "Co si myslíte o opozici?",
-    "Jak se vám daří v Bruselu?",
-    "Můžete vysvětlit vaši roli v té chemičce?",
-    "Jak hodnotíte efektivizaci státní správy?"
-]
-```
-
----
-
-## 💾 Uložení a sdílení
-
-### Lokální uložení
-```bash
-# Model se uloží do ./babis-llama-finetuned-final/
-# Obsahuje LoRA adaptéry a konfiguraci
-```
-
-### Hugging Face Hub
-```bash
-# Model se automaticky nahraje na HF Hub
-# Repo: https://huggingface.co/your-username/babis-llama-3-8b-lora
-# Obsahuje: LoRA adaptéry, konfiguraci, README
-```
-
-### Struktura uloženého modelu
-```
-babis-llama-finetuned-final/
-├── adapter_config.json          # LoRA konfigurace
-├── adapter_model.bin            # LoRA váhy
-├── training_args.bin            # Training argumenty
-├── config.json                  # Model konfigurace
-└── README.md                    # Model dokumentace
-```
-
----
-
-## 📤 Manuální nahrání na Hugging Face Hub
-
-### Kdy použít
-- Zapomněli jste `--push_to_hub` při fine-tuningu
-- Chcete nahrát již existující model
-- Potřebujete změnit název modelu
-
-### Rychlé nahrání
-```bash
-# 1. Nastavení tokenu
-export HF_TOKEN=hf_your_token_here
-
-# 2. Nahrání modelu
-python upload_to_hf.py \
-    --model_path /workspace/babis-finetuned-final \
-    --hub_model_id your-username/babis-model
-
-# 3. Kontrola bez nahrávání
-python upload_to_hf.py \
-    --model_path /workspace/babis-finetuned-final \
-    --hub_model_id your-username/babis-model \
-    --check_only
-```
-
-### Běžné cesty k modelu
-- `/workspace/babis-finetuned-final`
-- `/workspace/babis-mistral-finetuned-final`
-- `./babis-llama-finetuned-final`
-
-### Výstup
-- ✅ Model dostupný na: `https://huggingface.co/your-username/babis-model`
-- 📋 Instrukce pro použití modelu
-
----
-
-## 🧪 Použití fine-tuned modelu
-
-### Načtení a generování
-```python
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
-
-# Načtení base modelu
-base_model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Meta-Llama-3-8B-Instruct"
-)
-tokenizer = AutoTokenizer.from_pretrained(
-    "meta-llama/Meta-Llama-3-8B-Instruct"
-)
-
-# Načtení LoRA adaptérů
-model = PeftModel.from_pretrained(
-    base_model, 
-    "your-username/babis-llama-3-8b-lora"
-)
-
-# Generování
-prompt = "Pane Babiši, jak hodnotíte inflaci?"
-inputs = tokenizer(prompt, return_tensors="pt")
-outputs = model.generate(
-    **inputs, 
-    max_length=200,
-    temperature=0.7,
-    do_sample=True
-)
-response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-print(response)
-```
-
-### Streamované generování
-```python
-from transformers import TextIteratorStreamer
-import threading
-
-streamer = TextIteratorStreamer(tokenizer, skip_special_tokens=True)
-generation_kwargs = dict(
-    inputs=inputs,
-    streamer=streamer,
-    max_length=200,
-    temperature=0.7,
-    do_sample=True
-)
-
-thread = threading.Thread(target=model.generate, kwargs=generation_kwargs)
-thread.start()
-
-for text in streamer:
-    print(text, end="", flush=True)
-```
+- [Hugging Face Hub](https://huggingface.co/) - Nahrávání modelů
+- [RunPod.io](https://runpod.io/) - GPU hosting
+- [LoRA Paper](https://arxiv.org/abs/2106.09685) - Teorie LoRA
+- [PEFT Dokumentace](https://huggingface.co/docs/peft) - Fine-tuning knihovna

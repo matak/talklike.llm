@@ -19,7 +19,7 @@ DEBUG_DIRS=$(ls -d debug_dataset_finetune_* 2>/dev/null || echo "")
 
 if [[ -z "$DEBUG_DIRS" ]]; then
     echo "❌ Nenalezeny žádné debug adresáře"
-    echo "💡 Spusťte nejdříve fine-tuning: python finetune_babis.py"
+    echo "💡 Spusťte nejdříve fine-tuning: python finetune.py"
     exit 1
 fi
 

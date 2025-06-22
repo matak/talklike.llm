@@ -18,7 +18,7 @@ Tento dokument vysvětluje, jak vytvořit a používat LoRA adaptéry z vašeho 
 2_finetunning/
 ├── create_qlora_adapter.py    # Vytvoření QLoRA adaptéru
 ├── test_adapter.py            # Testování adaptéru
-├── finetune_babis.py          # Původní finetuning (už používá LoRA)
+├── finetune.py              # Původní finetuning (už používá LoRA)
 └── adapters/                  # Složka pro uložení adaptérů
     ├── babis_adapter/         # Vytvořený adaptér
     ├── babis_adapter_config.json  # Konfigurace adaptéru
@@ -191,7 +191,9 @@ python create_qlora_adapter.py \
 Adaptér automaticky ukládá:
 - ✅ **Konfiguraci** (`adapter_config.json`)
 - ✅ **Váhy adaptéru** (v adresáři adaptéru)
-- ✅ **Metriky trénování** (pokud je povoleno wandb)
+- ✅ **Automatické ukládání** checkpointů
+- ✅ **Logy trénování** v `/workspace/babis-finetuned/logs/`
+- ✅ **Metriky trénování** (pokud je povoleno logging)
 
 ## 🎯 Doporučení
 

@@ -27,17 +27,102 @@ from peft import (
 )
 from dotenv import load_dotenv
 from huggingface_hub import login
-import wandb
 import argparse
+import json
 
-# Import disk manager knihovny
-from lib.disk_manager import DiskManager, setup_for_ml_project, check_and_cleanup
+# Import disk manager knihovny pro specifické operace
+from lib.disk_manager import DiskManager
 
 # Import modulů
 from data_utils import load_babis_data, prepare_training_data
 from tokenizer_utils import setup_tokenizer_and_model, check_unknown_tokens, check_tokenizer_compatibility, tokenize_function
 from debug_utils import DatasetDebugger
 from train_utils import generate_response, test_model, save_model_info
+
+def save_dataset_to_file(dataset, filepath, description):
+    """Uloží kompletní dataset do JSON souboru pro debug"""
+    print(f"💾 Ukládám {description} do: {filepath}")
+    
+    # Převod datasetu na list slovníků
+    data_list = []
+    for i, item in enumerate(dataset):
+        data_list.append({
+            "index": i,
+            "text": item.get("text", ""),
+            "input_ids": item.get("input_ids", []),
+            "attention_mask": item.get("attention_mask", []),
+            "labels": item.get("labels", [])
+        })
+    
+    # Uložení do JSON souboru
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump({
+            "description": description,
+            "total_samples": len(data_list),
+            "data": data_list
+        }, f, ensure_ascii=False, indent=2)
+    
+    print(f"✅ {description} uloženo: {len(data_list)} vzorků")
+
+def save_vocabulary_to_file(tokenizer, filepath):
+    """Uloží kompletní slovník tokenů do souboru pro debug"""
+    print(f"💾 Ukládám kompletní slovník tokenů do: {filepath}")
+    
+    vocab_data = {
+        "vocab_size": tokenizer.vocab_size,
+        "model_name": tokenizer.name_or_path,
+        "special_tokens": {
+            "pad_token": tokenizer.pad_token,
+            "pad_token_id": tokenizer.pad_token_id,
+            "eos_token": tokenizer.eos_token,
+            "eos_token_id": tokenizer.eos_token_id,
+            "bos_token": tokenizer.bos_token,
+            "bos_token_id": tokenizer.bos_token_id,
+            "unk_token": tokenizer.unk_token,
+            "unk_token_id": tokenizer.unk_token_id,
+        },
+        "vocabulary": {}
+    }
+    
+    # Načtení všech tokenů ze slovníku
+    for token_id in range(tokenizer.vocab_size):
+        try:
+            token = tokenizer.convert_ids_to_tokens(token_id)
+            vocab_data["vocabulary"][str(token_id)] = {
+                "token": token,
+                "decoded": tokenizer.decode([token_id], skip_special_tokens=False)
+            }
+        except Exception as e:
+            vocab_data["vocabulary"][str(token_id)] = {
+                "token": f"ERROR_{token_id}",
+                "error": str(e)
+            }
+    
+    # Uložení do JSON souboru
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(vocab_data, f, ensure_ascii=False, indent=2)
+    
+    print(f"✅ Slovník uložen: {tokenizer.vocab_size} tokenů")
+
+def ask_user_continue(prompt="Pokračovat ve zpracování?"):
+    """Zeptá se uživatele, zda má pokračovat"""
+    print(f"\n⏸️ {prompt}")
+    print("   Stiskněte ENTER pro pokračování nebo napište 'stop' pro ukončení...")
+    
+    try:
+        user_input = input().strip().lower()
+        if user_input in ['stop', 'exit', 'quit', 'no', 'n']:
+            print("🛑 Ukončuji skript na žádost uživatele.")
+            return False
+        else:
+            print("✅ Pokračuji ve zpracování...")
+            return True
+    except KeyboardInterrupt:
+        print("\n🛑 Ukončeno uživatelem (Ctrl+C)")
+        return False
+    except EOFError:
+        print("\n🛑 Ukončeno uživatelem")
+        return False
 
 def main():
     # Kontrola, že jsme v root directory projektu
@@ -55,11 +140,10 @@ def main():
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
     parser.add_argument('--learning_rate', type=float, default=2e-4, help='Learning rate')
     parser.add_argument('--max_length', type=int, default=1024, help='Maximální délka sekvence')
-    parser.add_argument('--use_wandb', action='store_true', help='Použít Weights & Biases')
     parser.add_argument('--push_to_hub', action='store_true', help='Nahrát model na HF Hub')
     parser.add_argument('--hub_model_id', type=str, default='babis-lora', help='Název modelu na HF Hub')
-    parser.add_argument('--cleanup_cache', action='store_true', help='Vyčistit cache před spuštěním')
     parser.add_argument('--aggressive_cleanup', action='store_true', help='Agresivní vyčištění pro velké modely')
+    parser.add_argument('--no_interactive', action='store_true', help='Bez interaktivních dotazů')
     
     args = parser.parse_args()
     
@@ -72,19 +156,10 @@ def main():
     print(f"📁 Výstup: {args.output_dir}")
     print(f"📁 Model: {args.model_name}")
     
-    # Inicializace disk manageru a nastavení pro ML projekt
-    dm = setup_for_ml_project("/workspace")
+    # Inicializace disk manageru pro specifické operace
+    dm = DiskManager()
     
-    # Kontrola místa a vyčištění pokud je potřeba
-    if not check_and_cleanup(threshold=95):
-        print("❌ Stále není dost místa. Použijte menší model nebo vyčistěte disk.")
-        return
-    
-    # Vyčištění cache pokud požadováno
-    if args.cleanup_cache:
-        dm.cleanup_cache()
-    
-    # Optimalizace pro velké modely
+    # Optimalizace pro velké modely (setup_environment.py už udělal základní nastavení)
     if args.aggressive_cleanup or "mistral" in args.model_name.lower() or "llama" in args.model_name.lower():
         print("🧹 Optimalizace pro velký model...")
         if not dm.optimize_for_large_models(args.model_name):
@@ -101,17 +176,6 @@ def main():
         print("✅ Hugging Face login úspěšný")
     else:
         print("⚠️ HF_TOKEN nebyl nalezen")
-    
-    # Weights & Biases
-    if args.use_wandb:
-        WANDB_API_KEY = os.getenv("WANDB_API_KEY")
-        if WANDB_API_KEY:
-            os.environ["WANDB_API_KEY"] = WANDB_API_KEY
-            wandb.login()
-            wandb.init(project="babis-finetune", name=args.model_name)
-            print("✅ W&B login úspěšný")
-        else:
-            print("⚠️ WANDB_API_KEY nebyl nalezen")
     
     # Inicializace debuggeru pro sledování zpracování datasetu
     debugger = DatasetDebugger(debug_dir="debug_dataset_finetune")
@@ -262,6 +326,28 @@ def main():
         print(f"✅ Train dataset: {len(train_dataset)} vzorků (90%)")
         print(f"✅ Validation dataset: {len(eval_dataset)} vzorků (10%)")
     
+    # DEBUG: Uložení kompletních train a validation dat do souborů
+    print("\n💾 DEBUG: Ukládám kompletní train a validation data...")
+    
+    # Vytvoření debug adresáře
+    debug_data_dir = os.path.join(debugger.debug_dir, "complete_datasets")
+    os.makedirs(debug_data_dir, exist_ok=True)
+    
+    # Uložení train datasetu
+    train_file = os.path.join(debug_data_dir, "complete_train_dataset.json")
+    save_dataset_to_file(train_dataset, train_file, f"Kompletní train dataset ({len(train_dataset)} vzorků)")
+    
+    # Uložení validation datasetu
+    eval_file = os.path.join(debug_data_dir, "complete_validation_dataset.json")
+    save_dataset_to_file(eval_dataset, eval_file, f"Kompletní validation dataset ({len(eval_dataset)} vzorků)")
+    
+    print(f"✅ Kompletní data uložena v: {debug_data_dir}")
+    
+    # Interaktivní kontrola po rozdělení dat
+    if not args.no_interactive:
+        if not ask_user_continue("Data jsou rozdělena a uložena. Pokračovat ve zpracování?"):
+            return
+    
     # Kontrola kompatibility a neznámých tokenů před trénováním
     print(f"\n🔍 FINÁLNÍ KONTROLY PŘED TRÉNOVÁNÍM")
     print(f"=" * 50)
@@ -286,6 +372,19 @@ def main():
         return
     
     print(f"✅ Všechny kontroly prošly - pokračuji s trénováním")
+    
+    # DEBUG: Uložení kompletního slovníku tokenů
+    print("\n💾 DEBUG: Ukládám kompletní slovník tokenů...")
+    
+    vocab_file = os.path.join(debug_data_dir, "complete_vocabulary.json")
+    save_vocabulary_to_file(tokenizer, vocab_file)
+    
+    print(f"✅ Kompletní slovník uložen v: {vocab_file}")
+    
+    # Interaktivní kontrola po uložení slovníku
+    if not args.no_interactive:
+        if not ask_user_continue("Slovník je uložen. Pokračovat ve zpracování?"):
+            return
     
     # 7. Data Collator
     print("\n🔧 Konfiguruji data collator...")
@@ -326,7 +425,6 @@ def main():
         load_best_model_at_end=True,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
-        report_to="wandb" if args.use_wandb else "none",
         remove_unused_columns=False,
         dataloader_pin_memory=False,
         gradient_checkpointing=True,
@@ -393,9 +491,6 @@ def main():
     test_model(model, tokenizer)
     
     # 13. Ukončení
-    if args.use_wandb:
-        wandb.finish()
-    
     print("\n🎉 Fine-tuning dokončen!")
     print(f"📁 Model uložen v: {final_model_path}")
     print(f"💾 Network storage: {args.output_dir}")

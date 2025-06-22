@@ -18,7 +18,7 @@ Při analýze kódu jsem identifikoval **duplicitní padding**, který mohl způ
 
 ### 1. Opravené soubory:
 
-- `finetune_babis.py` - hlavní fine-tuning script
+- `finetune.py` - hlavní fine-tuning script
 - `tokenizer_utils.py` - tokenizace funkce
 - `test_tokenization.py` - test soubor
 - `create_qlora_adapter.py` - QLoRA adaptér

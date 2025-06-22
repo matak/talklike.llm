@@ -1,181 +1,207 @@
-# Fine-tuning Llama 3 8B pro Andreje Babiše na RunPod.io
+# RunPod.io Setup Guide
 
-> **📚 Navigace:** [🏠 Hlavní projekt](../README.md) | [📊 Příprava dat](../1_data_preparation/README.md) | [🏋️ Detailní dokumentace](README.md) | [📈 Benchmarking](../3_benchmarking/README.md)
+Tento návod vás provede nastavením fine-tuning prostředí na RunPod.io.
 
-## 📋 Přehled
-Tento návod vás provede procesem fine-tuningu Llama 3 8B modelu s daty Andreje Babiše na RunPod.io platformě.
+## 🚀 Rychlý start
 
-## Struktura dat
-Vaše data v `../data/all.jsonl` mají formát:
-```json
-{
-    "messages": [
-        {
-            "role": "system",
-            "content": "Jsi Andrej Babiš, český politik a podnikatel..."
-        },
-        {
-            "role": "user", 
-            "content": "Pane Babiši, můžete vysvětlit vaši roli v té chemičce?"
-        },
-        {
-            "role": "assistant",
-            "content": "Hele, ta továrna? To už jsem dávno předal..."
-        }
-    ]
-}
-```
-
-## Kroky pro spuštění na RunPod.io
-
-### 1. Vytvoření podu na RunPod.io
+### 1. Vytvoření podu
 
 1. Jděte na [runpod.io](https://runpod.io)
-2. Vytvořte nový pod s následujícími specifikacemi:
-   - **GPU**: RTX 4090 nebo A100 (doporučeno pro 8B model)
+2. Klikněte na "Deploy"
+3. Vyberte template: `PyTorch 2.1.1`
+4. Nastavte specifikace:
+   - **GPU**: RTX 4090 nebo A100 (doporučeno)
    - **RAM**: Minimálně 24GB
    - **Storage**: Minimálně 50GB
-   - **Template**: PyTorch nebo Jupyter
+   - **Network Volume**: Doporučeno pro persistentní data
 
-### 2. Příprava prostředí
+### 2. Připojení k podu
 
-Po připojení k podu spusťte:
+```bash
+# SSH připojení
+ssh root@your-pod-ip
+
+# Nebo použijte webový terminál v RunPod UI
+```
+
+### 3. Instalace závislostí
 
 ```bash
 # Aktualizace systému
-sudo apt update && sudo apt upgrade -y
+apt update && apt upgrade -y
 
-# Instalace potřebných balíčků
-sudo apt install -y git wget curl
+# Instalace základních balíčků
+apt install -y git wget curl htop
 
-# Klonování repozitáře (pokud používáte git)
-git clone <váš-repo-url>
-cd <váš-projekt>
+# Instalace Python závislostí
+pip install -r requirements_finetunning.txt
 ```
 
-### 3. Vytvoření .env souboru
-
-Vytvořte soubor `.env` v kořenovém adresáři projektu:
+### 4. Nastavení environment proměnných
 
 ```bash
-# Hugging Face token (získáte na huggingface.co/settings/tokens)
-HF_TOKEN=hf_your_token_here
+# Vytvoření .env souboru
+cat > .env << EOF
+HF_TOKEN=your_hf_token_here
+EOF
 
-# Weights & Biases token (volitelné, pro sledování trénování)
-WANDB_API_KEY=your_wandb_token_here
+# Nebo export proměnných
+export HF_TOKEN=your_hf_token_here
 ```
 
-### 4. Spuštění fine-tuningu
+### 5. Spuštění fine-tuning
 
 ```bash
-# Spuštění Jupyter notebooku
-jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+# Klonování repozitáře
+git clone https://github.com/your-repo/talklike.llm.git
+cd talklike.llm
 
-# Nebo spuštění Python skriptu
-python finetune_babis_llama.py
+# Spuštění fine-tuning
+bash 2_finetunning/run_finetune.sh
 ```
 
-### 5. Monitorování trénování
+## 📊 Monitoring
 
-- **W&B Dashboard**: Sledujte metriky na wandb.ai
-- **Jupyter**: Sledujte progress v notebooku
-- **Terminal**: Logy v terminálu
-
-## Konfigurace modelu
-
-### LoRA parametry
-- **Rank (r)**: 16
-- **Alpha**: 32  
-- **Dropout**: 0.1
-- **Target modules**: q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj
-
-### Training parametry
-- **Epochs**: 3
-- **Batch size**: 2 (per device)
-- **Gradient accumulation**: 4
-- **Learning rate**: 2e-4
-- **Warmup steps**: 100
-- **Max length**: 2048 tokens
-
-## Očekávané výsledky
-
-Po fine-tuningu by model měl:
-- Mluvit stylem Andreje Babiše
-- Používat jeho charakteristické fráze
-- Odpovídat v první osobě
-- Přidávat podpis "Andrej Babiš."
-
-## Troubleshooting
-
-### Problém: Out of Memory (OOM)
-**Řešení:**
-- Snižte batch size na 1
-- Snižte max_length na 1024
-- Použijte gradient checkpointing
-
-### Problém: Pomalé trénování
-**Řešení:**
-- Zkontrolujte GPU využití
-- Snižte gradient accumulation steps
-- Použijte mixed precision (fp16)
-
-### Problém: Model nekonverguje
-**Řešení:**
-- Snižte learning rate na 1e-4
-- Zvyšte počet epoch
-- Zkontrolujte kvalitu dat
-
-## Uložení a sdílení modelu
-
-### Lokální uložení
+### GPU Monitoring
 ```bash
-# Model se uloží do ./babis-llama-finetuned-final/
+# Sledování GPU využití
+nvidia-smi -l 1
+
+# Detailní informace
+nvidia-smi --query-gpu=name,memory.used,memory.total,utilization.gpu --format=csv
 ```
 
-### Hugging Face Hub
+### Disk Monitoring
 ```bash
-# Model se automaticky nahraje na HF Hub
-# Repo: https://huggingface.co/your-username/babis-llama-3-8b-lora
+# Sledování místa na disku
+df -h
+
+# Sledování místa v reálném čase
+watch -n 5 df -h
 ```
 
-## Použití fine-tuned modelu
+### Process Monitoring
+```bash
+# Sledování procesů
+htop
 
+# Sledování Python procesů
+ps aux | grep python
+```
+
+## 🔧 Optimalizace
+
+### Pro RTX 4090 (24GB VRAM)
+```bash
+python finetune.py \
+    --model_name microsoft/DialoGPT-medium \
+    --batch_size 2 \
+    --max_length 1024
+```
+
+### Pro A100 (40GB VRAM)
+```bash
+python finetune.py \
+    --model_name mistralai/Mistral-7B-Instruct-v0.2 \
+    --batch_size 4 \
+    --max_length 2048
+```
+
+### Pro menší GPU
+```bash
+python finetune.py \
+    --model_name microsoft/DialoGPT-small \
+    --batch_size 1 \
+    --max_length 512
+```
+
+## 🐛 Řešení problémů
+
+### Out of Memory (OOM)
+```bash
+# Snižte batch size
+python finetune.py --batch_size 1
+
+# Snižte max_length
+python finetune.py --max_length 512
+
+# Použijte menší model
+python finetune.py --model_name microsoft/DialoGPT-small
+```
+
+### Nedostatek místa na disku
+```bash
+# Vyčištění cache
+rm -rf /root/.cache/huggingface
+rm -rf /tmp/*
+
+# Nebo použijte agresivní vyčištění
+python finetune.py --aggressive_cleanup
+```
+
+### Pomalé stahování modelu
+```bash
+# Použijte mirror
+export HF_ENDPOINT=https://hf-mirror.com
+
+# Nebo stáhněte model předem
+python -c "from transformers import AutoModel; AutoModel.from_pretrained('microsoft/DialoGPT-medium')"
+```
+
+## 💾 Persistence dat
+
+### Network Volume
+```bash
+# Mount network volume
+mkdir -p /workspace
+mount /dev/sdb1 /workspace
+
+# Uložení modelu na network volume
+python finetune.py --output_dir /workspace/babis-finetuned
+```
+
+### Backup
+```bash
+# Zálohování modelu
+tar -czf babis-model-backup.tar.gz /workspace/babis-finetuned
+
+# Stažení zálohy
+scp root@your-pod-ip:babis-model-backup.tar.gz ./
+```
+
+## 📈 Výkonnostní tipy
+
+### Optimalizace dataloader
 ```python
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
-
-# Načtení base modelu
-base_model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
-
-# Načtení LoRA adaptérů
-model = PeftModel.from_pretrained(base_model, "your-username/babis-llama-3-8b-lora")
-
-# Generování
-prompt = "Pane Babiši, jak hodnotíte inflaci?"
-inputs = tokenizer(prompt, return_tensors="pt")
-outputs = model.generate(**inputs, max_length=200)
-response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-print(response)
+# V finetune.py
+training_args = TrainingArguments(
+    dataloader_num_workers=4,  # Zvýšit podle CPU
+    dataloader_pin_memory=True,
+    dataloader_drop_last=True,
+)
 ```
 
-## Odhadované náklady
+### Gradient checkpointing
+```python
+# Pro úsporu paměti
+training_args = TrainingArguments(
+    gradient_checkpointing=True,
+    gradient_accumulation_steps=4,
+)
+```
 
-- **RTX 4090**: ~$0.60/hod
-- **A100**: ~$1.20/hod
-- **Očekávaná doba trénování**: 2-4 hodiny
-- **Celkové náklady**: $1.20 - $4.80
+### Mixed precision
+```python
+# Pro rychlejší trénování
+training_args = TrainingArguments(
+    fp16=True,  # Pro NVIDIA GPU
+    # bf16=True,  # Pro A100
+)
+```
 
-## Poznámky
+## 🔗 Užitečné odkazy
 
-1. **Data kvalita**: Ujistěte se, že vaše data jsou kvalitní a konzistentní
-2. **Monitoring**: Sledujte loss během trénování
-3. **Backup**: Pravidelně ukládejte checkpointy
-4. **Testování**: Testujte model během trénování
-
-## Kontakt
-
-Pro problémy nebo otázky:
-- GitHub Issues
-- RunPod Discord
-- Hugging Face Forums 
+- [RunPod.io](https://runpod.io/) - GPU hosting
+- [Hugging Face](https://huggingface.co/) - Modely a tokeny
+- [PyTorch](https://pytorch.org/) - Deep learning framework
+- [PEFT](https://huggingface.co/docs/peft) - Parameter efficient fine-tuning 

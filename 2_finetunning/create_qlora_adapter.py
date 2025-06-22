@@ -28,7 +28,6 @@ from peft import (
     PeftModel
 )
 from huggingface_hub import login
-import wandb
 
 def load_dataset(file_path):
     """Načte dataset z JSONL souboru"""
@@ -212,7 +211,6 @@ def create_qlora_adapter(
         save_strategy="epoch",
         save_total_limit=2,
         load_best_model_at_end=True,
-        report_to="wandb" if wandb.run else None,
         remove_unused_columns=False,
         dataloader_pin_memory=False,
         warmup_steps=100,

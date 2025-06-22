@@ -85,7 +85,7 @@ talklike.llm/
 │   └── run_data_preparation.py # Hlavní skript
 ├── 2_finetunning/              # 🏋️ Fine-tuning
 │   ├── README.md               # Průvodce fine-tuningem
-│   ├── finetune_babis.py       # Hlavní skript
+│   ├── finetune.py             # Hlavní skript
 │   └── run_finetune.sh         # Spouštěcí skript
 ├── 3_benchmarking/             # 📈 Benchmarking
 │   ├── README.md               # Průvodce benchmarkingem
