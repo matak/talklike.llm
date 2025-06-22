@@ -76,7 +76,7 @@ def main():
     if not HF_TOKEN:
         print("❌ HF_TOKEN nebyl nalezen v prostředí!")
         print("💡 Nastavte HF_TOKEN v .env souboru nebo prostředí")
-        return
+        return False
     
     # Přihlášení na HF
     try:
@@ -84,7 +84,7 @@ def main():
         print("✅ Hugging Face login úspěšný")
     except Exception as e:
         print(f"❌ Chyba při přihlášení na HF: {e}")
-        return
+        return False
     
     # Kontrola modelu
     print(f"🔍 Kontroluji model v: {args.model_path}")

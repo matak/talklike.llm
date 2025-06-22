@@ -14,10 +14,6 @@ if [ ! -d "lib" ] || [ ! -d "data" ]; then
     exit 1
 fi
 
-# Nastavení environment proměnných
-export HF_TOKEN="your_hf_token_here"
-echo "HF_TOKEN=your_hf_token_here"
-
 # Spuštění fine-tuning z root directory
 python 2_finetunning/finetune.py \
     --data_path data/all.jsonl \

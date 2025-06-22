@@ -123,7 +123,7 @@ def main():
     if not HF_TOKEN:
         print("❌ HF_TOKEN nebyl nalezen v prostředí!")
         print("💡 Nastavte HF_TOKEN v .env souboru nebo prostředí")
-        return
+        return False
     
     # Přihlášení na HF
     try:
@@ -131,14 +131,14 @@ def main():
         print("✅ Hugging Face login úspěšný")
     except Exception as e:
         print(f"❌ Chyba při přihlášení na HF: {e}")
-        return
+        return False
     
     # Kontrola adaptéru
     print(f"🔍 Kontroluji adapter v: {args.adapter_path}")
     
     if not os.path.exists(args.adapter_path):
         print(f"❌ Cesta neexistuje: {args.adapter_path}")
-        return
+        return False
     
     # Výpis obsahu adresáře
     print(f"📁 Obsah adresáře {args.adapter_path}:")
@@ -155,7 +155,7 @@ def main():
     
     if args.check_only:
         print("\n✅ Kontrola dokončena")
-        return
+        return True
     
     # Nahrání adaptéru
     success = upload_adapter_only(args.adapter_path, args.hub_model_id, HF_TOKEN)
