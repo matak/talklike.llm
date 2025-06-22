@@ -1,0 +1,212 @@
+{
+  "questions": [
+    {
+      "id": "Q1",
+      "category": "politika",
+      "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
+      "expected_style_elements": [
+        "hele",
+        "skandál",
+        "makám",
+        "inflace"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "Q2",
+      "category": "ekonomika",
+      "question": "Co si myslíte o opozici?",
+      "expected_style_elements": [
+        "kradou",
+        "sabotují",
+        "brusel",
+        "opozice"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "Q3",
+      "category": "rodina",
+      "question": "Jak se vám daří s rodinou?",
+      "expected_style_elements": [
+        "moje rodina",
+        "já",
+        "makáme",
+        "rodina"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "Q4",
+      "category": "podnikání",
+      "question": "Můžete vysvětlit vaši roli v té chemičce?",
+      "expected_style_elements": [
+        "továrna",
+        "projekty",
+        "předal",
+        "chemie"
+      ],
+      "difficulty": "hard"
+    },
+    {
+      "id": "Q5",
+      "category": "brusel",
+      "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
+      "expected_style_elements": [
+        "brusel",
+        "smějou",
+        "papírem",
+        "ekonomika"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "Q6",
+      "category": "důchody",
+      "question": "Jak hodnotíte současný stav důchodů?",
+      "expected_style_elements": [
+        "důchody",
+        "držíme",
+        "rodina",
+        "makám"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "Q7",
+      "category": "daně",
+      "question": "Co říkáte na současné daňové zatížení?",
+      "expected_style_elements": [
+        "daně",
+        "rušil",
+        "poplatky",
+        "efektivizace"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "Q8",
+      "category": "korupce",
+      "question": "Jak se stavíte k obviněním z korupce?",
+      "expected_style_elements": [
+        "korupce",
+        "nečetl",
+        "skandál",
+        "obvinění"
+      ],
+      "difficulty": "hard"
+    },
+    {
+      "id": "Q9",
+      "category": "parlament",
+      "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
+      "expected_style_elements": [
+        "parlament",
+        "smějou",
+        "návrhy",
+        "reakce"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "Q10",
+      "category": "úřady",
+      "question": "Jak vnímáte práci úřadů a státní správy?",
+      "expected_style_elements": [
+        "úřady",
+        "brzdí",
+        "sabotují",
+        "správa"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "Q11",
+      "category": "válka",
+      "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
+      "expected_style_elements": [
+        "válka",
+        "ukrajina",
+        "bezpečnost",
+        "obrana"
+      ],
+      "difficulty": "hard"
+    },
+    {
+      "id": "Q12",
+      "category": "klima",
+      "question": "Co si myslíte o klimatických změnách a zelené politice?",
+      "expected_style_elements": [
+        "klima",
+        "zelená",
+        "politika",
+        "změny"
+      ],
+      "difficulty": "hard"
+    },
+    {
+      "id": "Q13",
+      "category": "očkování",
+      "question": "Jaký je váš názor na povinné očkování?",
+      "expected_style_elements": [
+        "očkování",
+        "povinné",
+        "zdraví",
+        "názor"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "Q14",
+      "category": "novináři",
+      "question": "Jak vnímáte práci novinářů a médií?",
+      "expected_style_elements": [
+        "novináři",
+        "média",
+        "kritizují",
+        "práce"
+      ],
+      "difficulty": "medium"
+    },
+    {
+      "id": "Q15",
+      "category": "centralizace",
+      "question": "Jak hodnotíte proces centralizace státní správy?",
+      "expected_style_elements": [
+        "centralizace",
+        "centralizácia",
+        "efektivizace",
+        "správa"
+      ],
+      "difficulty": "hard"
+    }
+  ],
+  "metadata": {
+    "total_questions": 15,
+    "categories": [
+      "politika",
+      "ekonomika",
+      "rodina",
+      "podnikání",
+      "brusel",
+      "důchody",
+      "daně",
+      "korupce",
+      "parlament",
+      "úřady",
+      "válka",
+      "klima",
+      "očkování",
+      "novináři",
+      "centralizace"
+    ],
+    "difficulty_distribution": {
+      "easy": 2,
+      "medium": 9,
+      "hard": 4
+    },
+    "created": "2025-06-22",
+    "description": "Standardizované otázky pro benchmarking Babišova stylu",
+    "created_at": "2025-06-22T19:55:21.257344"
+  }
+}

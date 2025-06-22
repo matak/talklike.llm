@@ -142,7 +142,7 @@ def evaluate_all_responses():
     # Evaluace před fine-tuningem
     before_results = []
     print("📊 Evaluuji odpovědi před fine-tuningem...")
-    with open("results/before_finetune/responses.json", "r", encoding="utf-8") as f:
+    with open("3_benchmarking/results/before_finetune/responses.json", "r", encoding="utf-8") as f:
         before_data = json.load(f)
     
     for item in before_data:
@@ -157,7 +157,7 @@ def evaluate_all_responses():
     # Evaluace po fine-tuningem
     after_results = []
     print("📊 Evaluuji odpovědi po fine-tuningem...")
-    with open("results/after_finetune/responses.json", "r", encoding="utf-8") as f:
+    with open("3_benchmarking/results/after_finetune/responses.json", "r", encoding="utf-8") as f:
         after_data = json.load(f)
     
     for item in after_data:
@@ -189,7 +189,7 @@ def evaluate_all_responses():
         "timestamp": datetime.now().isoformat()
     }
     
-    with open("results/comparison/style_evaluation.json", "w", encoding="utf-8") as f:
+    with open("3_benchmarking/results/comparison/style_evaluation.json", "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     
     print(f"\n📈 Výsledky evaluace:")

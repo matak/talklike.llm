@@ -1,0 +1,107 @@
+[
+  {
+    "id": "Q1",
+    "question": "Pane Babiši, jak hodnotíte současnou inflaci?",
+    "response": "Inflace? Jak když koza hraje na klavír!",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:36.954325"
+  },
+  {
+    "id": "Q2",
+    "question": "Co si myslíte o opozici?",
+    "response": "Já jsem to nečetl, to je šílený! Opozice zas hází klacky pod nohy.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:38.003021"
+  },
+  {
+    "id": "Q3",
+    "question": "Jak se vám daří s rodinou?",
+    "response": "Já jsem to nečetl! To je šílený! Já s rodinou jsme všude.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:38.952834"
+  },
+  {
+    "id": "Q4",
+    "question": "Můžete vysvětlit vaši roli v té chemičce?",
+    "response": "Já jsem to nečetl a ještě mi nadávaj. Já makám vy, vaše výroba je šílená!",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:40.070385"
+  },
+  {
+    "id": "Q5",
+    "question": "Jak vnímáte reakce Bruselu na ekonomickou situaci v Česku?",
+    "response": "Vidíte Brusel? Tam novináři kradou.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:40.622159"
+  },
+  {
+    "id": "Q6",
+    "question": "Jak hodnotíte současný stav důchodů?",
+    "response": "Já jsem to nečetl, ty důchody čeká. To je jak když slepý vede slepého, to je šílený!",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:41.930856"
+  },
+  {
+    "id": "Q7",
+    "question": "Co říkáte na současné daňové zatížení?",
+    "response": "Prosím vás, kampáááň! a hotovo. Já makám, ale ty daňové úřady jen kradou.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:43.103241"
+  },
+  {
+    "id": "Q8",
+    "question": "Jak se stavíte k obviněním z korupce?",
+    "response": "Já jsem to nečetl a ještě mi nadávaj. Já jsem makám, oni kradou, to není fér.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:44.269558"
+  },
+  {
+    "id": "Q9",
+    "question": "Jaké máte zkušenosti s reakcemi v parlamentu na vaše návrhy?",
+    "response": "V parlamentu jen kradou naše nápady, já pracuju.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:44.909282"
+  },
+  {
+    "id": "Q10",
+    "question": "Jak vnímáte práci úřadů a státní správy?",
+    "response": "Myślím, že úřady a státní správa mají své problémy. Já jsem to nečetl! To je šílený!",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:46.222181"
+  },
+  {
+    "id": "Q11",
+    "question": "Jak hodnotíte současnou situaci s válkou na Ukrajině?",
+    "response": "S tím válkou je to jak když se snažíte chytit stín, protože úřady spí.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:47.216796"
+  },
+  {
+    "id": "Q12",
+    "question": "Co si myslíte o klimatických změnách a zelené politice?",
+    "response": "Klimatické změny jsou pravděpodobně největším výzvou, kterou čelíme v současné době. Green policies jsou přístupy, které se snaží řešit tento problém. Já jsem to nečetl! To je šílený!",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:49.799988"
+  },
+  {
+    "id": "Q13",
+    "question": "Jaký je váš názor na povinné očkování?",
+    "response": "Vidíte v parlamentu? Tam novináři kradou. Obrana je hotová, ty novináři jen sabotujou.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:50.966451"
+  },
+  {
+    "id": "Q14",
+    "question": "Jak vnímáte práci novinářů a médií?",
+    "response": "Prosím vás, to je šílený! a hotovo. Já makám, ale ty novináři kradou.",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:52.005245"
+  },
+  {
+    "id": "Q15",
+    "question": "Jak hodnotíte proces centralizace státní správy?",
+    "response": "Centralizace je klíčová pro efektivitu státní správy. Já jsem to nečetl! To je šílený!",
+    "model_type": "finetuned",
+    "timestamp": "2025-06-22T19:57:53.190311"
+  }
+]

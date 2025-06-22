@@ -82,11 +82,15 @@ def main():
     
     # 6. Evaluace stylu
     print("\n🎯 Evaluuji styl...")
-    evaluate_all_responses()
+    style_results = evaluate_all_responses()
     
-    # 7. Generování reportu
+    # 7. Kombinace všech výsledků pro report
     print("\n📋 Generuji finální report...")
-    generate_final_report(comparison_results)
+    all_results = {
+        "model_comparison": comparison_results,
+        "style_evaluation": style_results
+    }
+    generate_final_report(all_results)
     
     # 8. Výpis výsledků
     end_time = datetime.now()

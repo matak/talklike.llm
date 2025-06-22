@@ -26,7 +26,7 @@ def compare_models():
     }
     
     # Načtení odpovědí před fine-tuningem
-    with open("results/before_finetune/responses.json", "r", encoding="utf-8") as f:
+    with open("3_benchmarking/results/before_finetune/responses.json", "r", encoding="utf-8") as f:
         before_data = json.load(f)
     
     comparison_results["before_finetune"] = {
@@ -36,7 +36,7 @@ def compare_models():
     print(f"✅ Načteno {len(before_data)} odpovědí před fine-tuningem")
     
     # Načtení odpovědí po fine-tuningem
-    with open("results/after_finetune/responses.json", "r", encoding="utf-8") as f:
+    with open("3_benchmarking/results/after_finetune/responses.json", "r", encoding="utf-8") as f:
         after_data = json.load(f)
     
     comparison_results["after_finetune"] = {
@@ -66,10 +66,10 @@ def compare_models():
     print(f"     Zlepšení: {metrics['slovak_words_improvement']:+.1f} slov")
     
     # Uložení výsledků srovnání
-    with open("results/comparison/model_comparison.json", "w", encoding="utf-8") as f:
+    with open("3_benchmarking/results/comparison/model_comparison.json", "w", encoding="utf-8") as f:
         json.dump(comparison_results, f, ensure_ascii=False, indent=2)
     
-    print(f"💾 Srovnání uloženo: results/comparison/model_comparison.json")
+    print(f"💾 Srovnání uloženo: 3_benchmarking/results/comparison/model_comparison.json")
     
     return comparison_results
 
@@ -144,7 +144,7 @@ def calculate_comparison_metrics(before_data: List, after_data: List) -> Dict:
 def create_comparison_table():
     """Vytvoří tabulku pro srovnání"""
     
-    with open("results/comparison/model_comparison.json", "r", encoding="utf-8") as f:
+    with open("3_benchmarking/results/comparison/model_comparison.json", "r", encoding="utf-8") as f:
         comparison_data = json.load(f)
     
     metrics = comparison_data["improvement"]
