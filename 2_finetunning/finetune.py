@@ -391,14 +391,49 @@ def main():
     
     # 7. Data Collator
     print("\n🔧 Konfiguruji data collator...")
-    data_collator = DataCollatorForLanguageModeling(
-        tokenizer=tokenizer,
-        mlm=False,
-        return_tensors="pt",
-        pad_to_multiple_of=8,
-        padding=True,
-        pad_token_id=tokenizer.pad_token_id,
-    )
+    
+    # Vlastní data collator pro správné řešení padding
+    class CustomDataCollator:
+        def __init__(self, tokenizer, max_length=1024):
+            self.tokenizer = tokenizer
+            self.max_length = max_length
+        
+        def __call__(self, features):
+            # Získání maximální délky v batch
+            max_len = max(len(feature['input_ids']) for feature in features)
+            max_len = min(max_len, self.max_length)
+            
+            # Padding všech sekvencí na stejnou délku
+            batch = {
+                'input_ids': [],
+                'attention_mask': [],
+                'labels': []
+            }
+            
+            for feature in features:
+                input_ids = feature['input_ids'][:max_len]
+                attention_mask = feature['attention_mask'][:max_len]
+                labels = feature['labels'][:max_len]
+                
+                # Padding na max_len
+                padding_length = max_len - len(input_ids)
+                if padding_length > 0:
+                    input_ids = input_ids + [self.tokenizer.pad_token_id] * padding_length
+                    attention_mask = attention_mask + [0] * padding_length
+                    labels = labels + [-100] * padding_length  # -100 pro ignorování při loss
+                
+                batch['input_ids'].append(input_ids)
+                batch['attention_mask'].append(attention_mask)
+                batch['labels'].append(labels)
+            
+            # Konverze na tensory
+            return {
+                'input_ids': torch.tensor(batch['input_ids'], dtype=torch.long),
+                'attention_mask': torch.tensor(batch['attention_mask'], dtype=torch.long),
+                'labels': torch.tensor(batch['labels'], dtype=torch.long)
+            }
+    
+    data_collator = CustomDataCollator(tokenizer, args.max_length)
     
     # 8. Training Arguments
     print("\n⚙️ Nastavuji training arguments...")
